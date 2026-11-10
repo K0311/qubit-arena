@@ -103,6 +103,19 @@ describe('Quantum Challenge', () => {
     expect(s.winner).toBe('RED');
   });
 
+  it('T-R-21: sudden death keeps going after the question bank is used up', () => {
+    let s = toChallenge('SOLO', { suddenDeath: true });
+    // Every question in the bank tied, plus a few more to prove questions are reused.
+    for (let i = 0; i < QUESTION_BANK.length + 3; i++) {
+      s = answerRound(s, { BLUE: true, RED: true });
+      expect(s.phase, `after question ${i + 1}`).toBe('CHALLENGE');
+    }
+    s = answerRound(s, { BLUE: true, RED: false });
+    expect(s.phase).toBe('FINISHED');
+    expect(s.endReason).toBe('CHALLENGE');
+    expect(s.winner).toBe('BLUE');
+  });
+
   it('T-R-22: tie with sudden death off → draw', () => {
     let s = toChallenge('SOLO', { suddenDeath: false });
     for (let i = 0; i < 5; i++) s = answerRound(s, { BLUE: i % 2 === 0, RED: i % 2 === 0 });

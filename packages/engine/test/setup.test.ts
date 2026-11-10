@@ -123,13 +123,14 @@ describe('deck and setup (rules.md §3.5, §5)', () => {
     },
   );
 
-  it('T-R-04b: Solo and Team both default to target 7 and 15 minutes', () => {
+  it('T-R-04b: Solo and Team both default to target 7, 15 minutes and sudden death on', () => {
     for (const mode of ['SOLO', 'TEAM'] as const) {
       const c = defaultConfig(mode);
       expect(c.targetScore).toBe(7);
       expect(c.timeLimitMs).toBe(15 * 60 * 1000);
       expect(c.turnTimerMs).toBe(60 * 1000);
       expect(c.handSize).toBe(4);
+      expect(c.suddenDeath).toBe(true);
     }
   });
 
