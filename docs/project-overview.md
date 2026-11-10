@@ -89,9 +89,9 @@ Implementation and testing repeat in rounds: **rules engine → server → clien
 
 | Role | Member | Main tasks |
 |---|---|---|
-| Rules engine & quantum logic | [Name] | Port prototype rules to TypeScript, CNOT and partner qubit, rule tests |
-| Server & online play | [Name] | Rooms, lobby, matchmaking, filtered views, timer, reconnection, database, deployment |
-| Client & user interface | [Name] | 3D board, cards, Bloch spheres, animation, tutorial, user evaluation |
+| Rules engine & quantum logic | Bunyakorn Wongchadakul | Port prototype rules to TypeScript, CNOT and partner qubit, rule tests |
+| Server & online play | Ayumu Sakurai | Rooms, lobby, matchmaking, filtered views, timer, reconnection, database, deployment |
+| Client & user interface | Kittiyakarn Kaewmungkun | 3D board, cards, Bloch spheres, animation, tutorial, user evaluation |
 
 ## 8. Risks
 

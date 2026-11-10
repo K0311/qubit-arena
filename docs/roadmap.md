@@ -34,7 +34,7 @@
 - [ ] P-0.1 Scaffold monorepo (pnpm, TS strict, Vitest, ESLint/Prettier)
 - [ ] P-0.2 GitHub Actions CI
 - [ ] 👤 ตั้ง branch protection ให้ `main` (Settings → Branches → require PR + CI)
-- [ ] 👤 ใส่ชื่อสมาชิกในตาราง Team roles (`docs/project-overview.md` §7)
+- [x] 👤 ใส่ชื่อสมาชิกในตาราง Team roles (`docs/project-overview.md` §7)
 
 **ผ่านเมื่อ:** `pnpm test` / `pnpm typecheck` ผ่าน, CI เขียว
 
@@ -132,3 +132,4 @@
 | วันที่ | สิ่งที่เสร็จ | หมายเหตุ |
 |---|---|---|
 | 10 พ.ย. 2026 | Proposal, spec, rules, test plan, prompts | เข้าเฟส Implementation |
+| 11 พ.ย. 2026 | ใส่ชื่อบทบาททีม | engine: Bunyakorn · server: Ayumu · client: Kittiyakarn |
