@@ -96,6 +96,7 @@ Coverage goal: **≥ 90 % lines in `packages/engine`**, ≥ 70 % in `apps/server
 * **T-S-09** — Rate limit: 50 chat messages in 1 s are throttled.
 * **T-S-10** — Host adds bots to empty seats before the game (`ADD_BOT`); non-hosts are rejected; the game starts with the bots and they play on their turns.
 * **T-S-11** — Room chat before the game reaches everyone in the room; after `START_GAME` room chat is closed and only team chat is delivered.
+* **T-S-12** — Quantum Challenge with bot seats (rules.md §8.1): a side with only bots answers by itself; in Team mode a bot does not answer while its human teammate is connected, and answers once that human has disconnected.
 
 ### 3.5 End-to-end (Playwright)
 

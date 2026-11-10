@@ -241,6 +241,7 @@ The side with more points wins. If the score is tied → **Quantum Challenge**.
 
 * Five multiple-choice questions about the gates, states and measurement used in the game.
 * Both sides answer every question; in Team mode the team submits one answer (any member may submit; the first submission counts). [OPEN]
+* A bot answers the Quantum Challenge for its side only when that side has no connected human player.
 * One point per correct answer; the higher total wins.
 * If still tied and **sudden death** is on (**default: on**, a room setting): one more question at a time until one side is right and the other is wrong.
 * If still tied and sudden death is off: the game is a draw.
