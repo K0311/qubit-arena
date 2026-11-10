@@ -31,7 +31,8 @@ Every player uses their own device. Local play on one computer is out of scope.
 ### 2.1 Positions
 
 The board has six positions, the six states at the ends of the Bloch sphere axes, arranged on a circle in this order
-(clockwise, starting at the top):
+(clockwise). The circle is drawn with the two end zones facing each other like a football field: \|+⟩ at the top and
+\|−⟩ at the bottom, so index 0 (\|0⟩) is at the upper left. See [visual-design.md](visual-design.md) §2.
 
 | Index | State | Bloch vector (x, y, z) | Amplitudes (α, β) for α\|0⟩ + β\|1⟩ |
 |---|---|---|---|

@@ -151,6 +151,8 @@ Rules:
 * Right: quantum state panel — amplitudes, probabilities, global phase, partner qubit Bloch sphere, fog indicator.
 * Bottom right: action log and team chat.
 * Theme: dark space background; Blue `#1f5bd6`, Red `#c8323f`, accent cyan `#27e5f7`.
+* Full look and feel (board layout, dome characters, orbit swirl, Bloch sphere, animations, camera, HUD):
+  [visual-design.md](visual-design.md), taken from the Blender prototype in `reference/blender/`.
 
 ### 7.3 Build order
 

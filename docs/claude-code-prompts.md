@@ -134,7 +134,7 @@ Plan first. In apps/client build the screens from docs/architecture.md §7.1 wit
 ```
 **P-4.2 2D board and hand**
 ```
-Build the game screen with a 2D SVG board: six positions on a circle in the order of rules.md §2.1, lines and arrows from boardLines(), end zones colored Blue (|+>) and Red (|->), the football or a fog effect.
+Build the game screen with a 2D SVG board following docs/visual-design.md (space theme, 2D top view): six positions placed with boardPoint() (|+> top, |-> bottom, rotated so the viewer's own end zone is up), the 13 edges from boardEdges() with their gate labels, end zones colored Blue (|+>) and Red (|->), the football or a fog effect.
 Show the player's 4 cards; selecting a card previews the destination using @qa/engine on the public state; Play Card sends PLAY_CARD. Show the turn timer, both team panels with card counts and score, and the action log.
 ```
 **P-4.3 State panel and team chat**
@@ -155,11 +155,11 @@ Using the e2e-test-generator approach, write Playwright tests T-E-01..T-E-05 fro
 
 **P-5.1 3D board**
 ```
-Replace the 2D board with a three.js board using @react-three/fiber and drei, keeping the same props and game logic: circular board, six glowing nodes, lines/arrows, Blue and Red end zones, the football as a 3D ball, camera controls. Keep the 2D board as a fallback setting for slow computers.
+Replace the 2D board with a three.js board using @react-three/fiber and drei, keeping the same props and game logic. Follow docs/visual-design.md §1–§3 and §5 (the Blender prototype's ORBIT style; reference/blender/ and docs/images/blender-*.jpg): space sky, floating dome characters with eyes, orbit swirl, gradient edges with arrows and gate labels from boardEdges(), Blue and Red end zones, the football token, camera views with the goal view as default. Use reference/blender/ as the reference implementation; port its logic, do not copy Blender-specific code. Keep the 2D board as a fallback setting for slow computers.
 ```
 **P-5.2 Bloch spheres and animation**
 ```
-Add 3D Bloch spheres for the football (above the board center) and the partner qubit. Animate the ball moving along a line, staying in place, entering and leaving the fog, and measurement collapse.
+Add 3D Bloch spheres for the football (above the board center) and the partner qubit. Animate the ball moving along a line, staying in place, entering and leaving the fog, and measurement collapse. Follow docs/visual-design.md §3 (partner and fog) and §4 (event → banner and motion; the Bloch vector rotates about each gate's axis while the ball hops).
 ```
 **P-5.3 Tutorial**
 ```
