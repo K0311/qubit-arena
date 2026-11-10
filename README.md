@@ -11,6 +11,7 @@ Senior project · Faculty of ICT, Mahidol University · Aug 2026 – Apr 2027
 | [docs/project-overview.md](docs/project-overview.md) | Goals, scope (MVP), schedule, roles, risks |
 | [docs/rules.md](docs/rules.md) | **Complete game rules — source of truth** |
 | [docs/architecture.md](docs/architecture.md) | Monorepo, tech stack, protocol, server and client design |
+| [docs/ui-spec.md](docs/ui-spec.md) | UI specification for every screen; references in [docs/design/](docs/design/) |
 | [docs/test-plan.md](docs/test-plan.md) | Test IDs, pass criteria, user evaluation |
 | [docs/roadmap.md](docs/roadmap.md) | **Every task until the project ends** (checkboxes, dates) |
 | [docs/claude-code-prompts.md](docs/claude-code-prompts.md) | Claude Code prompt for each task (P-0.1 … P-9.3) |

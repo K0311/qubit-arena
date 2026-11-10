@@ -242,7 +242,7 @@ The side with more points wins. If the score is tied → **Quantum Challenge**.
 * Five multiple-choice questions about the gates, states and measurement used in the game.
 * Both sides answer every question; in Team mode the team submits one answer (any member may submit; the first submission counts). [OPEN]
 * One point per correct answer; the higher total wins.
-* If still tied and **sudden death** is on: one more question at a time until one side is right and the other is wrong.
+* If still tied and **sudden death** is on (**default: on**, a room setting): one more question at a time until one side is right and the other is wrong.
 * If still tied and sudden death is off: the game is a draw.
 * Question order and selection are random on the server.
 
@@ -260,6 +260,7 @@ The result screen shows the winner, the final score and the reason the game ende
 | Deck order, RNG seed, upcoming quiz questions | **Nobody** — server only |
 | Football state, partner state, score, clocks, action log | Everyone, including spectators |
 | Team chat | Only that team |
+| Room chat (in the room, before the game starts) | Everyone in the room; it closes when the game starts |
 
 ---
 
@@ -268,6 +269,7 @@ The result screen shows the winner, the final score and the reason the game ende
 * **Server-authoritative.** The client only sends intents. Every rule, random result and clock runs on the server.
 * **Rooms:** public, private (join code) and quick match. Spectators may join any public room.
 * **Reconnection:** a player who disconnects keeps their seat. After [OPEN] 30 seconds, a **bot** plays for them until they return.
+* **Bot seats before the game:** the host may fill empty seats with bots before starting, so a game can start without every human player.
 * **Bot (v1):** plays a random legal card. [later] a simple greedy bot that prefers moves towards its own end zone.
 
 ---
@@ -281,6 +283,8 @@ Short guided lessons, played against a bot, in this order:
 3. Measurement and the failed punt.
 4. Touchdowns and why pushing the ball into the other end zone does not score.
 5. CNOT, the partner qubit and the fog.
+
+Each lesson uses a fixed deck and seed so it always plays the same way.
 
 ---
 
@@ -297,5 +301,8 @@ Local hot-seat play, replays, mobile apps. Sound and music are optional and adde
 | 1 | Penalty for repeated turn timeouts | None |
 | 2 | How a team submits a Quantum Challenge answer | First submission counts |
 | 3 | Delay before a bot replaces a disconnected player | 30 seconds |
+| 4 | Time limit per Quantum Challenge question | None |
 
 Decided on 10 Nov 2026: opening roll in both modes (higher roll plays first, tie re-rolls); Solo uses the same target score (7) and time limit (15 min) as Team; Team order P1 → P3 → P2 → P4.
+
+Decided on 11 Nov 2026: hosts may add bots to empty seats before the game; a room chat exists before the game only; sudden death defaults to on; tutorial lessons use a fixed deck and seed.

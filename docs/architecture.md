@@ -110,7 +110,7 @@ type Action =
 
 All messages are JSON with a `type` field and are validated with zod on both sides.
 
-**Client → server:** `CREATE_ROOM`, `JOIN_ROOM`, `QUICK_MATCH`, `TAKE_SEAT`, `START_GAME`, `PLAY_CARD`, `CHAT`, `CHALLENGE_ANSWER`, `LEAVE`, `PING`.
+**Client → server:** `CREATE_ROOM`, `JOIN_ROOM`, `QUICK_MATCH`, `TAKE_SEAT`, `ADD_BOT`, `START_GAME`, `PLAY_CARD`, `CHAT`, `CHALLENGE_ANSWER`, `LEAVE`, `PING`.
 
 **Server → client:** `ROOM_STATE` (lobby), `GAME_VIEW` (filtered state), `EVENT` (card played, touchdown, kickoff, measure result, timeout, game over), `CHAT`, `ERROR`, `PONG`.
 
@@ -134,14 +134,17 @@ Rules:
 
 ## 7. Client (`apps/client`)
 
+> The full UI specification (every screen, positions, colours, card text, animation, test ids) is in [ui-spec.md](ui-spec.md). This section is only a summary.
+
 ### 7.1 Screens
 
-1. **Main menu** — Solo 1v1, Team 2v2, Tutorial, Settings.
-2. **Lobby** — create/join room, choose seat and team, set target score, time, turn timer.
+1. **Main menu** and **mode select** — Play (Solo 1v1 / Team 2v2), Tutorial, Settings, About.
+2. **Lobby** and **room** — create/join room, choose seat and team, set target score, time, turn timer.
 3. **Game** — board, hand, team panels, state panel, action log, team chat.
 4. **Quantum Challenge** — tie-breaker questions.
 5. **Result** — winner, final score, end reason, play again.
 6. **Tutorial** — guided lessons against a bot.
+7. **Settings** and **About / card library**.
 
 ### 7.2 Game screen layout
 
@@ -151,8 +154,8 @@ Rules:
 * Right: quantum state panel — amplitudes, probabilities, global phase, partner qubit Bloch sphere, fog indicator.
 * Bottom right: action log and team chat.
 * Theme: dark space background; Blue `#1f5bd6`, Red `#c8323f`, accent cyan `#27e5f7`.
-* Full look and feel (board layout, dome characters, orbit swirl, Bloch sphere, animations, camera, HUD):
-  [visual-design.md](visual-design.md), taken from the Blender prototype in `reference/blender/`.
+* **Board, 3D scene, animations and camera:** [visual-design.md](visual-design.md), taken from the Blender prototype in `reference/blender/`.
+* **Screens, HUD panels, gate cards and overlays:** [ui-spec.md](ui-spec.md) (tokens in §2). If the two disagree about the board, visual-design.md wins; rules.md always wins.
 
 ### 7.3 Build order
 
