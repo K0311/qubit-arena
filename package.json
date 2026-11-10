@@ -14,7 +14,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "dev": "pnpm --parallel --filter @qa/server --filter @qa/client dev",
-    "e2e": "pnpm --filter @qa/e2e e2e"
+    "e2e": "pnpm --filter @qa/e2e e2e",
+    "sim": "pnpm --filter @qa/engine sim"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

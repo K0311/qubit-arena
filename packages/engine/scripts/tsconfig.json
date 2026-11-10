@@ -1,0 +1,8 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    // Node types only for scripts; src/ stays free of Node globals (CLAUDE.md rule 3).
+    "types": ["node"]
+  },
+  "include": ["."]
+}
