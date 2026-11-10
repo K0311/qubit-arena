@@ -184,6 +184,96 @@ Add Dockerfiles for server and client and docker-compose.yml with postgres, redi
 Add optional sound effects (card play, move, touchdown, measure) with a mute toggle in settings. Default volume low.
 ```
 
+**P-6.4 Greedy bot (optional)**
+```
+Add a greedy bot level in packages/engine/bot.ts: for each legal card, use the engine to compute the result and prefer (1) a touchdown for its side, (2) leaving the fog when it helps, (3) moving one step closer to its own end zone, (4) moving the ball away from the opponent's end zone; break ties with the RNG. Add a setting for bot level. Test with 1,000 games: greedy must beat random in more than 60 % of games.
+```
+
+---
+
+## รอบ 7 — Testing & Integration + user study (เฟส 7)
+
+**P-7.0 Feature freeze checklist**
+```
+Compare the app with docs/project-overview.md §4 (MVP features) and docs/test-plan.md. Produce a checklist in docs/report/mvp-checklist.md: each MVP feature → implemented? where in the code? which tests cover it? Open a GitHub issue for every missing item. Do not add new features.
+```
+**P-7.1 Full system test run and report**
+```
+Run every test level in docs/test-plan.md: unit, simulation (10,000 games, Solo and Team), server integration, Playwright E2E. Write docs/report/test-report.md with a table for SE-1..SE-6 (aspect, method, numbers, pass/fail), the measurement statistics from T-C-07 and SE-3 (exact % of zeros), coverage per package, and any failures with their seeds. Commit raw outputs to docs/report/raw/.
+```
+**P-7.2 Online soak test**
+```
+Write a script apps/server/scripts/soak.ts that starts the server and connects 8 bot clients in 2 Team rooms through real WebSockets, playing games back to back for a configurable time (default 2 hours, 5 minutes in CI). After every move, compare all clients' views (T-S-02) and scan for hidden data (T-S-03). Log memory use and the number of games. Add the result to docs/report/test-report.md.
+```
+**P-7.3 Study pages (learning check + survey)**
+```
+Read docs/user-study.md. Add a study mode to the client behind a URL like /study?code=XXXX:
+consent page → pre-test (set A or B, random, saved) → tutorial lessons 1–4 → one game → post-test (the other set) → survey (Likert + open questions) → thank-you page.
+Store results on the server in a `study_results` table (or a JSON file if the database is not used yet) keyed by an anonymous participant code. No names. Show correct answers only at the end. Add Playwright test that completes the whole flow.
+```
+**P-7.4 Export results**
+```
+Add an admin-only endpoint and script `pnpm study:export` that writes study results to CSV: participant code, set order, pre score, post score, each answer, each Likert item, open answers, mode, game length, timestamp. Protect it with an ADMIN_TOKEN env variable.
+```
+**P-7.5 Analyse the study**
+```
+Read the CSV in docs/report/raw/study.csv. Write a script (Python or TS) that computes: n, mean/median pre and post score, per-question correct rate before and after, Wilcoxon signed-rank test with p-value and effect size, Likert median and distribution per item and per aspect. Produce charts as PNG and write docs/report/user-study-results.md with tables, charts and a short neutral interpretation (do not over-claim with small n). Summarise open answers by theme.
+```
+**P-7.6 Fix and balance from feedback**
+```
+Read docs/report/test-report.md, docs/report/user-study-results.md and the open GitHub issues. Group the problems into: bugs, confusing UI, game balance. Propose fixes ordered by impact. For game balance (deck counts, timer), suggest changes and run 2,000 bot games for each option to compare game length and score spread. Do not change docs/rules.md without asking me.
+```
+
+---
+
+## รอบ 8 — Maintenance, deploy final, รายงาน (เฟส 8)
+
+**P-8.1 Final deployment**
+```
+Prepare the production deployment: Dockerfiles with multi-stage builds, docker-compose.prod.yml, health check endpoint, environment variables documented in .env.example, HTTPS through a reverse proxy (Caddy), automatic restart. Update README with a one-command local run and the deployment steps. Run the Playwright smoke test against the deployed URL.
+```
+**P-8.2 Release v1.0**
+```
+Write CHANGELOG.md from the merged PRs, bump versions to 1.0.0, create a git tag v1.0.0 and a GitHub release with the notes and the demo URL.
+```
+**P-8.3 Screenshots and demo video**
+```
+With Playwright, record the screens needed for the report and slides at 1920x1080: main menu, lobby, game board with preview, fog after CNOT, Bloch spheres, quantum challenge, result screen, tutorial. Save PNGs to docs/report/figures/ with clear names. Record a 2–3 minute demo video of one short scripted Team game (fixed seed) to docs/report/demo.webm.
+```
+**P-8.4 Chapter 4 — Implementation**
+```
+Draft docs/report/ch4-implementation.md for the final report (academic English, past tense, 12–15 pages of content). Sections: 4.1 Development process (how the SDLC rounds actually went, with dates from git history), 4.2 System architecture as built, 4.3 Rules engine (state model, matrices, CNOT and fog, RNG), 4.4 Game server (rooms, filtered views, clocks, reconnection), 4.5 Web client (screens, 3D board, preview, visualisation), 4.6 Tutorial and study mode, 4.7 Testing infrastructure and CI, 4.8 Deployment. Reference figures in docs/report/figures/ as "Figure 4.x" with captions, and tables as "Table 4.x". Only describe what exists in the code; mark anything uncertain with [CHECK].
+```
+**P-8.5 Chapter 5 — Evaluation and Results**
+```
+Draft docs/report/ch5-evaluation.md from docs/report/test-report.md and docs/report/user-study-results.md. Sections: 5.1 System evaluation (SE-1..SE-6 with numbers), 5.2 User evaluation (participants, procedure, learning check results, survey results, open feedback), 5.3 Discussion (what worked, limitations such as small n and self-selected participants). Keep numbers exactly as in the reports.
+```
+**P-8.6 Chapter 6 — Conclusion and Future Work**
+```
+Draft docs/report/ch6-conclusion.md: 6.1 Summary of what was built, 6.2 How each objective in docs/project-overview.md §2 was met (one paragraph each, with evidence), 6.3 Problems and how they were solved, 6.4 Limitations, 6.5 Future work (e.g. more qubits, more gates, mobile app, classroom mode, replays).
+```
+**P-8.7 AI usage statement and appendices**
+```
+Draft docs/report/ai-usage.md for the "AI Usage Acknowledgment Statement" in the ICT template: list the AI tools used (Claude, Claude Code, any others the team tells you) and tick the purposes from the template that apply, with one sentence each on how they were used and that the team reviewed and tested all output. Also draft docs/report/appendix-user-manual.md (how to install, create a room, play, tutorial) and docs/report/appendix-tests.md (list of test IDs and what they check).
+```
+
+---
+
+## รอบ 9 — Final presentation และส่งมอบ (เฟส 9)
+
+**P-9.1 Demo script**
+```
+Create a demo mode: `pnpm demo` starts server + client with a fixed seed and a short deck so a Team game shows, in under 5 minutes: preview, a normal move, a push into the other end zone (no score), CNOT into the fog, Measure out of the fog, a touchdown, and the result screen. Write docs/report/demo-script.md with the exact click order and what to say at each step, plus a fallback plan if the network fails (play the recorded video).
+```
+**P-9.2 Final slides content**
+```
+Write docs/report/final-slides.md: 15–18 slides of content for the final presentation (title, problem, objectives, what we built, architecture, CNOT/fog, demo, system test results, user study results with charts, challenges, limitations, future work, Q&A). For each slide give the title, 3–5 short bullets, which figure from docs/report/figures/ to use, and speaker notes. Keep the numbers exactly as in the reports.
+```
+**P-9.3 Handover check**
+```
+Do a final handover review: README accurate, all docs up to date with the final code, no secrets in git history, no TODO left without an issue, CI green on main, the deployed URL works (run the smoke test), LICENSE present, tag v1.0.0 exists. Write the result to docs/report/handover-checklist.md and list anything the team must still do by hand.
+```
+
 ---
 
 ## Prompt ที่ใช้ได้ตลอด

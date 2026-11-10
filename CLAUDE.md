@@ -9,6 +9,9 @@ Senior project, Faculty of ICT, Mahidol University (Aug 2026 – Apr 2027).
 - **docs/architecture.md** — monorepo layout, tech stack, protocol, server-authoritative design.
 - **docs/test-plan.md** — test IDs and pass criteria. Name tests after these IDs (e.g. `T-G-01`, `T-C-03`).
 - **docs/project-overview.md** — goals, scope (MVP), schedule, roles, risks.
+- **docs/roadmap.md** — every task until the project ends, as checkboxes. `/next` does the next task; `/status` reports progress.
+- **docs/claude-code-prompts.md** — the prompt for each task ID (P-0.1 … P-9.3).
+- **docs/user-study.md** — learning check, survey and procedure for the user study.
 
 ## Golden rules
 1. **Do not change game rules on your own.** If a rule is unclear or an item is marked [OPEN] in rules.md, use the default written there and tell me; never invent a new rule.

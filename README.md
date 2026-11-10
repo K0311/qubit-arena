@@ -12,12 +12,15 @@ Senior project · Faculty of ICT, Mahidol University · Aug 2026 – Apr 2027
 | [docs/rules.md](docs/rules.md) | **Complete game rules — source of truth** |
 | [docs/architecture.md](docs/architecture.md) | Monorepo, tech stack, protocol, server and client design |
 | [docs/test-plan.md](docs/test-plan.md) | Test IDs, pass criteria, user evaluation |
-| [docs/claude-code-prompts.md](docs/claude-code-prompts.md) | Step-by-step Claude Code prompts to build the game |
+| [docs/roadmap.md](docs/roadmap.md) | **Every task until the project ends** (checkboxes, dates) |
+| [docs/claude-code-prompts.md](docs/claude-code-prompts.md) | Claude Code prompt for each task (P-0.1 … P-9.3) |
+| [docs/user-study.md](docs/user-study.md) | Learning check, survey and procedure for the user study |
 | [CLAUDE.md](CLAUDE.md) | Instructions Claude Code reads in every session |
 
 ## Status
 
-SDLC phase: **Implementation** (Planning, Analysis and Design done). Next step: round 0 in `docs/claude-code-prompts.md`.
+SDLC phase: **Implementation** (Planning, Analysis and Design done).
+With Claude Code open in this folder, type `/next` to do the next task in the roadmap, or `/status` to see progress.
 
 ## Quick start (after round 0)
 
