@@ -61,7 +61,7 @@ Coverage goal: **≥ 90 % lines in `packages/engine`**, ≥ 70 % in `apps/server
 | T-R-02 | New Team game | Turn order P1 → P3 → P2 → P4; P1,P2 = Blue, P3,P4 = Red |
 | T-R-03 | Opening roll, Solo and Team | Higher roll plays first (Team: P1 or P3 starts); tie re-rolls (fixed seed) |
 | T-R-04 | Kickoff after a touchdown | Ball at ZERO or ONE, partner \|+⟩; the side that did not score plays first |
-| T-R-04b | Defaults | Solo and Team both default to target 7 and 15 minutes; sudden death defaults to on |
+| T-R-04b | Defaults | Solo and Team both default to target 7 and 15 minutes |
 | T-R-05 | Play a card | Card removed from hand, goes to discard, player draws to 4 |
 | T-R-06 | Deck empty | Player does not draw; game continues until all hands are empty |
 | T-R-07 | Wrong player acts | Action rejected, state unchanged |
@@ -94,9 +94,6 @@ Coverage goal: **≥ 90 % lines in `packages/engine`**, ≥ 70 % in `apps/server
 * **T-S-07** — Turn timer fires on the server even if the client is silent.
 * **T-S-08** — Spectator receives public state only.
 * **T-S-09** — Rate limit: 50 chat messages in 1 s are throttled.
-* **T-S-10** — Host adds bots to empty seats before the game (`ADD_BOT`); non-hosts are rejected; the game starts with the bots and they play on their turns.
-* **T-S-11** — Room chat before the game reaches everyone in the room; after `START_GAME` room chat is closed and only team chat is delivered.
-* **T-S-12** — Quantum Challenge with bot seats (rules.md §8.1): a side with only bots answers by itself; in Team mode a bot does not answer while its human teammate is connected, and answers once that human has disconnected.
 
 ### 3.5 End-to-end (Playwright)
 
@@ -105,7 +102,7 @@ Coverage goal: **≥ 90 % lines in `packages/engine`**, ≥ 70 % in `apps/server
 * **T-E-03** — Move preview: selecting a card highlights the destination from rules.md §3.2.
 * **T-E-04** — CNOT: ball shows fog; Measure brings it back.
 * **T-E-05** — Reload during a game → the player returns to the same game.
-* **T-E-06** — Tutorial lesson 1 can be completed, and replaying it gives the same deal (fixed deck and seed, rules.md §11).
+* **T-E-06** — Tutorial lesson 1 can be completed.
 
 Test hooks: the server accepts `TEST_SEED` and `TEST_DECK` **only** when `NODE_ENV=test`.
 

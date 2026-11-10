@@ -59,7 +59,7 @@
 ## เฟส 3 — Server (16 ธ.ค. – 10 ม.ค.)
 
 - [ ] P-3.1 Protocol (zod)
-- [ ] P-3.2 Server core: rooms, lobby, filtered views, room chat + team chat, bots in empty seats (T-S-01..05, 08, 10, 11)
+- [ ] P-3.2 Server core: rooms, lobby, filtered views, chat (T-S-01..05, 08)
 - [ ] P-3.3 Clocks, reconnection, bot seats, rate limit (T-S-06, 07, 09)
 - [ ] P-3.4 Hidden data audit (T-S-03 กับ 50 เกม)
 
@@ -133,4 +133,4 @@
 |---|---|---|
 | 10 พ.ย. 2026 | Proposal, spec, rules, test plan, prompts | เข้าเฟส Implementation |
 | 11 พ.ย. 2026 | ใส่ชื่อบทบาททีม | engine: Bunyakorn · server: Ayumu · client: Kittiyakarn |
-| 11 พ.ย. 2026 | UI spec + ภาพ reference | `docs/ui-spec.md` (หน้าจอ, HUD, การ์ด) + `docs/visual-design.md` (กระดาน); rules: bot ก่อนเริ่มเกม, room chat, sudden death on, tutorial fixed deck |
+| 11 พ.ย. 2026 | UI spec + ภาพ reference | `docs/ui-spec.md` (หน้าจอ, HUD, การ์ด) + `docs/visual-design.md` (กระดาน); เอาแค่ UI ไม่เปลี่ยนกฎ |

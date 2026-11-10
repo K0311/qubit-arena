@@ -142,7 +142,7 @@ Both cards carry a green **ONLINE** pill. There is no local or hot-seat mode (ou
 Uses the "Game Settings" panel of `ref-06` for the room settings.
 
 * Header: room name, pills: mode, `CODE QX7-42`, `n / 4 READY`. "Leave" (Danger) top right.
-* Team columns: **BLUE TEAM** (subtitle "End zone \|+⟩") and **RED TEAM** ("End zone \|−⟩"). Each seat shows a player chip (seat, name) and a ✓ Ready pill, or an empty dashed seat with **+ Add Bot** (host only, rules.md §10). Solo shows one seat per side.
+* Team columns: **BLUE TEAM** (subtitle "End zone \|+⟩") and **RED TEAM** ("End zone \|−⟩"). Each seat shows a player chip (seat, name) and a ✓ Ready pill, or an empty dashed seat "Waiting for player…". Solo shows one seat per side.
 * Line under the teams: "Turn order: P1 → P3 → P2 → P4 (opening roll decides which side starts)". Solo: "P1 ⇄ P2".
 * **Match settings** panel (host can edit, others read-only). Defaults come from rules.md:
 
@@ -153,10 +153,9 @@ Uses the "Game Settings" panel of `ref-06` for the room settings.
   | Match timer | time stepper | **15:00** |
   | Turn timer | stepper | **60 s** |
   | Deck | read-only text + "Edit counts" | 55 cards (H7 X4 Y9 Z7 S7 √X12 I3 M3 CNOT3) |
-  | Sudden death (tie-break) | toggle | **on** (rules.md §8.1) |
+  | Sudden death (tie-break) | toggle | engine default config (rules.md §8.1) |
 
-* **Room chat** at the bottom left: everyone in the room, before the game only (rules.md §9). It closes when the game starts; then only team chat exists.
-* **Ready** and **START GAME** buttons bottom right; Start is enabled only for the host when every seat is filled (players or bots).
+* **Ready** and **START GAME** buttons bottom right; Start is enabled only for the host when every seat is filled.
 
 ## 7. Game screen (`/game/:id`)
 
@@ -295,7 +294,7 @@ Adapted from `ref-04-quantum-challenge.png`.
 * Dim the game behind it. Title **"QUANTUM CHALLENGE"** (Display, gold, glow) and the reason: "Time's up — tied 5 : 5. Five questions decide the winner."
 * Progress: one dot per question (green = done, gold = current, grey = to come). Sudden death shows "SUDDEN DEATH".
 * Centre card (960 wide, gold border): "QUESTION 3 OF 5", the question (may include a ket), and **2–6 choices** labelled A–F, exactly as many as the server sends, in two columns. Your side's selected answer gets a gold border and the pill "YOUR TEAM'S ANSWER".
-* **No question timer** in version 1 (rules.md §13 open decision). Do not show a countdown.
+* No per-question countdown: rules.md §8.1 has no question time limit.
 * Side panels: BLUE (left) and RED (right) with challenge points, their players, and status ("✓ Answer submitted by P2" / "… still answering").
 * Footer: "Team mode: any member may answer — the first submission counts." (rules.md §8.1) and "One point per correct answer · higher total wins".
 * After each question show the correct answer with a one-line explanation for 3 s.
@@ -313,7 +312,7 @@ Adapted from the right half of `ref-06`.
 
 ## 11. Tutorial (`/tutorial/:lesson`)
 
-* Same game layout (Solo) against the tutorial bot with a fixed deck and seed (rules.md §11).
+* Same game layout (Solo) against the tutorial bot (rules.md §11). Lessons use fixed decks so each lesson always works (implementation detail, not a game rule).
 * Left column replaced by the **lesson list** 1–5 (done ✓, current highlighted, locked).
 * A coach bubble near the board explains one step at a time and points at the dome or card; the right card in the hand is highlighted.
 * Right column: lesson **goal** checklist and a progress bar; the state panel is shown from lesson 2 on.
@@ -351,7 +350,7 @@ The board animations are in **visual-design §4** (hop along the edge, Bloch vec
 
 ## 14. Test ids (for Playwright)
 
-Use `data-testid` on: `menu-play`, `mode-solo`, `mode-team`, `lobby-quick-solo`, `lobby-quick-team`, `room-start`, `room-add-bot-{seat}`, `turn-active`, `clock-game`, `clock-turn`, `score-blue`, `score-red`, `board-node-{ZERO|PLUS|MINUS_I|ONE|MINUS|PLUS_I}`, `ball` (with `data-position`; absent in the fog), `fog`, `preview-target`, `hand-card-{0..3}` (with `data-gate`), `play-card`, `opponent-count-{seat}`, `state-fog-indicator`, `action-log`, `team-chat`, `challenge-option-{0..5}`, `result-winner`, `result-reason`.
+Use `data-testid` on: `menu-play`, `mode-solo`, `mode-team`, `lobby-quick-solo`, `lobby-quick-team`, `room-start`, `turn-active`, `clock-game`, `clock-turn`, `score-blue`, `score-red`, `board-node-{ZERO|PLUS|MINUS_I|ONE|MINUS|PLUS_I}`, `ball` (with `data-position`; absent in the fog), `fog`, `preview-target`, `hand-card-{0..3}` (with `data-gate`), `play-card`, `opponent-count-{seat}`, `state-fog-indicator`, `action-log`, `team-chat`, `challenge-option-{0..5}`, `result-winner`, `result-reason`.
 
 ## 15. Differences from the reference images
 
@@ -365,7 +364,7 @@ Use `data-testid` on: `menu-play`, `mode-solo`, `mode-team`, `lobby-quick-solo`,
 | ref-02 | CNOT: generic control/target, \|11⟩ ↔ \|10⟩ | Control = **partner**, target = **football**, effects from rules.md §4.3 |
 | ref-02 | X red, I and Measure blue, S and Z both green | Colours in §2.2 |
 | ref-03 mode select | "Compete against another player" only | Both modes marked ONLINE; Team text names P1, P2 vs P3, P4 |
-| ref-04 challenge | Single player, light bulb, 0:20 timer, always 4 options | Two sides with status and points, progress dots, 2–6 options, no timer |
+| ref-04 challenge | Single player, light bulb, 0:20 timer, always 4 options | Two sides with status and points, progress dots, 2–6 options, no timer (rules.md §8.1 has none) |
 | ref-05 3D board | Neon hexagon arena, Blue end zone on the left, Red on the right, extra duplicate nodes, avatar portraits | **Board from visual-design.md** (Blender dome characters, \|+⟩ and \|−⟩ facing each other, your own end zone at the top), exactly 6 positions; seat chips in the HUD (avatars optional, phase 6) |
 | ref-05 | "Turn 1" counter | Turn bar with seat order + game clock + turn timer |
 | ref-06 settings | Game mode, target, timer, tips, sound, music in one panel | Split: room settings (§6) and personal settings (§12); sound hidden until P-6.3 |

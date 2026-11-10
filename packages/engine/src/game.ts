@@ -36,7 +36,7 @@ export function defaultConfig(mode: Mode): GameConfig {
     turnTimerMs: 60 * 1000,
     handSize: 4,
     deckCounts: DEFAULT_DECK_COUNTS,
-    // rules.md §8.1: on by default, a room setting.
+    // Not fixed by rules.md §8.1; on by default so a tie is still decided, configurable per room.
     suddenDeath: true,
     challengeQuestions: 5,
   };

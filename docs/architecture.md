@@ -110,7 +110,7 @@ type Action =
 
 All messages are JSON with a `type` field and are validated with zod on both sides.
 
-**Client → server:** `CREATE_ROOM`, `JOIN_ROOM`, `QUICK_MATCH`, `TAKE_SEAT`, `ADD_BOT`, `START_GAME`, `PLAY_CARD`, `CHAT`, `CHALLENGE_ANSWER`, `LEAVE`, `PING`.
+**Client → server:** `CREATE_ROOM`, `JOIN_ROOM`, `QUICK_MATCH`, `TAKE_SEAT`, `START_GAME`, `PLAY_CARD`, `CHAT`, `CHALLENGE_ANSWER`, `LEAVE`, `PING`.
 
 **Server → client:** `ROOM_STATE` (lobby), `GAME_VIEW` (filtered state), `EVENT` (card played, touchdown, kickoff, measure result, timeout, game over), `CHAT`, `ERROR`, `PONG`.
 
@@ -128,8 +128,8 @@ Rules:
 | Room / match manager | Owns one `GameState`, runs `applyAction`, broadcasts filtered views |
 | Clocks | Game time limit and per-turn timer (server timers); on timeout → `TIMEOUT` action |
 | Randomness | One seeded RNG per match, seed from `crypto.randomBytes`, never sent |
-| Bot seats | Bots the host adds to empty seats before the game (`ADD_BOT`), and bots that play for disconnected players after the delay in rules.md §10 |
-| Chat | Room chat for everyone in the room before the game; team-only chat during the game (rules.md §9); basic length limit and rate limit |
+| Bot seats | Plays for disconnected players after the delay in rules.md §10 |
+| Chat | Team-only chat channel; basic length limit and rate limit |
 | Persistence (round 6) | Save finished matches and ratings to PostgreSQL |
 
 ## 7. Client (`apps/client`)
