@@ -1,0 +1,10 @@
+pnpm-lock.yaml
+node_modules
+dist
+build
+coverage
+playwright-report
+test-results
+# Specs are hand-formatted, so leave them alone.
+docs
+*.md
