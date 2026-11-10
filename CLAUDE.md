@@ -40,6 +40,7 @@ pnpm --filter @qa/engine test  # engine only
 pnpm typecheck
 pnpm lint
 pnpm format                    # Prettier write (format:check in CI)
+pnpm build                     # production builds (client only for now)
 pnpm dev                       # server + client
 pnpm e2e                       # Playwright
 ```

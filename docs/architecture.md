@@ -41,7 +41,7 @@ qubit-arena/
 | Package manager | pnpm workspaces | |
 | Rules engine | Pure TS, own small complex-number + matrix code | No heavy math library needed (4×4 at most) |
 | Protocol | zod schemas | Every incoming message is validated |
-| Server | Node.js 20+, `ws` WebSocket library | One process holds live rooms in memory; Redis later |
+| Server | Node.js 22.12+ (CI uses 24 LTS), `ws` WebSocket library | One process holds live rooms in memory; Redis later |
 | Client | React 18 + Vite, Zustand for state | |
 | 3D | three.js through @react-three/fiber + drei | Start with a 2D SVG board, switch to 3D in round 5 |
 | Database | PostgreSQL + Prisma | Accounts, match history, ranking (round 6) |
