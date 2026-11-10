@@ -12,6 +12,7 @@ Senior project, Faculty of ICT, Mahidol University (Aug 2026 – Apr 2027).
 - **docs/roadmap.md** — every task until the project ends, as checkboxes. `/next` does the next task; `/status` reports progress.
 - **docs/claude-code-prompts.md** — the prompt for each task ID (P-0.1 … P-9.3).
 - **docs/user-study.md** — learning check, survey and procedure for the user study.
+- **docs/visual-design.md** — space theme, board layout, animations, camera and HUD (from the Blender prototype in `reference/blender/`). Follow it for all client work; it never overrides rules.md.
 
 ## Golden rules
 1. **Do not change game rules on your own.** If a rule is unclear or an item is marked [OPEN] in rules.md, use the default written there and tell me; never invent a new rule.
