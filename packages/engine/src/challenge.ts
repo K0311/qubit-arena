@@ -137,16 +137,13 @@ export function questionById(id: string): Question {
   return q;
 }
 
-const shuffledBank = (rng: Rng): readonly string[] =>
-  shuffle(
-    QUESTION_BANK.map((q) => q.id),
-    rng,
-  );
-
 /** Tie at the end → CHALLENGE phase with a random question order (rules.md §8.1). */
 export function startChallenge(state: GameState, rng: Rng): Step {
   const challenge: ChallengeState = {
-    questionIds: shuffledBank(rng),
+    questionIds: shuffle(
+      QUESTION_BANK.map((q) => q.id),
+      rng,
+    ),
     index: 0,
     answers: {},
     scores: { BLUE: 0, RED: 0 },
@@ -162,7 +159,6 @@ const reject = (code: ActionError['code'], message: string): ActionError => ({ c
 export function answerChallenge(
   state: GameState,
   action: Extract<Action, { type: 'CHALLENGE_ANSWER' }>,
-  rng: Rng,
 ): Step | ActionError {
   const ch = state.challenge;
   if (state.phase !== 'CHALLENGE' || !ch) return reject('WRONG_PHASE', 'no challenge running');
@@ -185,7 +181,7 @@ export function answerChallenge(
   if (answers.BLUE === undefined || answers.RED === undefined) {
     return { state: { ...state, challenge: { ...ch, answers } }, events: [answered] };
   }
-  return resolveQuestion(state, ch, q, { BLUE: answers.BLUE, RED: answers.RED }, answered, rng);
+  return resolveQuestion(state, ch, q, { BLUE: answers.BLUE, RED: answers.RED }, answered);
 }
 
 function resolveQuestion(
@@ -194,7 +190,6 @@ function resolveQuestion(
   q: Question,
   answers: Record<Side, number>,
   answered: GameEvent,
-  rng: Rng,
 ): Step {
   const correct = { BLUE: answers.BLUE === q.answer, RED: answers.RED === q.answer };
   const scores = {
@@ -212,16 +207,10 @@ function resolveQuestion(
     const done = finishGame(scored, winner === 'DRAW' ? 'DRAW' : 'CHALLENGE', winner);
     return { state: done.state, events: [...events, ...done.events] };
   };
-  const next = (): Step => {
-    // Sudden death only ends when one side is right and the other wrong (rules.md §8.1),
-    // so a used-up bank is reshuffled rather than ending the game in a draw.
-    const questionIds =
-      asked < ch.questionIds.length ? ch.questionIds : [...ch.questionIds, ...shuffledBank(rng)];
-    return {
-      state: { ...scored, challenge: { ...scored.challenge, questionIds, index: asked } },
-      events,
-    };
-  };
+  const next = (): Step =>
+    asked < ch.questionIds.length
+      ? { state: { ...scored, challenge: { ...scored.challenge, index: asked } }, events }
+      : end('DRAW'); // Bank exhausted in sudden death: nobody can be separated.
 
   if (asked < regular) return next();
   if (asked === regular) {

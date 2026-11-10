@@ -2,19 +2,11 @@ import { mulberry32 } from '../../src/rng';
 import { applyAction, createGame, defaultConfig } from '../../src/game';
 import { botAction } from '../../src/bot';
 import { checkInvariants } from '../../src/invariants';
-import { FIRST_PLAYER } from '../../src/seats';
-import type { GameState, Mode, PlayerId } from '../../src/types';
+import type { GameState, Mode } from '../../src/types';
 
 export const MAX_TURNS = 2000;
 
 export type SimResult = { seed: number; mode: Mode; actions: number; final: GameState };
-
-/** Every seat is a bot here, so whichever seat still has to act goes next. */
-function nextSeat(state: GameState): PlayerId {
-  if (state.phase === 'PLAYING') return state.turn;
-  const side = state.challenge?.answers.BLUE === undefined ? 'BLUE' : 'RED';
-  return FIRST_PLAYER[state.config.mode][side];
-}
 
 /**
  * One bot-vs-bot game. Throws with the seed on any invariant failure or stuck game,
@@ -39,7 +31,7 @@ export function simulateGame(seed: number, mode: Mode): SimResult {
         ? ({ type: 'TIME_UP' } as const)
         : state.phase === 'PLAYING' && rng.next() < 0.05
           ? ({ type: 'TIMEOUT', player: state.turn } as const)
-          : (botAction(state, nextSeat(state), rng) ?? fail('bot had no action', actions));
+          : botAction(state, rng);
     const res = applyAction(state, action, rng);
     if (res.error)
       fail(`bot action rejected: ${res.error.code} (${JSON.stringify(action)})`, actions);
