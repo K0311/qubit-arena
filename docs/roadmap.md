@@ -67,13 +67,13 @@
 
 ## เฟส 4 — Client 2D (11–31 ม.ค.)
 
-- [ ] P-4.1 App shell + WebSocket + store
-- [ ] P-4.2 2D board + hand + preview
-- [ ] P-4.3 State panel + team chat
+- [ ] P-4.1 App shell + theme tokens + menu/lobby/room + WebSocket + store (ตาม `docs/ui-spec.md`)
+- [ ] P-4.2 Game screen: 2D board + gate cards + hand + preview + action log
+- [ ] P-4.3 State panel + team chat + Quantum Challenge + Result + Settings
 - [ ] P-4.4 Playwright T-E-01..05
 - [ ] 👤 ทีมเล่นทดสอบกันเอง 3 เกม (Solo 1, Team 2) จดสิ่งที่งงลง GitHub Issues
 
-**ผ่านเมื่อ:** เล่น Solo และ Team ผ่านเบราว์เซอร์จนจบเกมได้
+**ผ่านเมื่อ:** เล่น Solo และ Team ผ่านเบราว์เซอร์จนจบเกมได้ และหน้าจอตรงกับ `docs/ui-spec.md`
 
 ## เฟส 5 — 3D + tutorial (1–15 ก.พ.) → Feature freeze
 
@@ -133,3 +133,4 @@
 |---|---|---|
 | 10 พ.ย. 2026 | Proposal, spec, rules, test plan, prompts | เข้าเฟส Implementation |
 | 11 พ.ย. 2026 | ใส่ชื่อบทบาททีม | engine: Bunyakorn · server: Ayumu · client: Kittiyakarn |
+| 11 พ.ย. 2026 | UI spec + ภาพ reference + mockup Figma 7 หน้า | `docs/ui-spec.md`, `docs/design/`; prompt รอบ 4–5 อ้างสเปกนี้ |

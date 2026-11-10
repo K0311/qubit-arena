@@ -134,14 +134,17 @@ Rules:
 
 ## 7. Client (`apps/client`)
 
+> The full UI specification (every screen, positions, colours, card text, animation, test ids) is in [ui-spec.md](ui-spec.md). This section is only a summary.
+
 ### 7.1 Screens
 
-1. **Main menu** — Solo 1v1, Team 2v2, Tutorial, Settings.
-2. **Lobby** — create/join room, choose seat and team, set target score, time, turn timer.
+1. **Main menu** and **mode select** — Play (Solo 1v1 / Team 2v2), Tutorial, Settings, About.
+2. **Lobby** and **room** — create/join room, choose seat and team, set target score, time, turn timer.
 3. **Game** — board, hand, team panels, state panel, action log, team chat.
 4. **Quantum Challenge** — tie-breaker questions.
 5. **Result** — winner, final score, end reason, play again.
 6. **Tutorial** — guided lessons against a bot.
+7. **Settings** and **About / card library**.
 
 ### 7.2 Game screen layout
 
@@ -150,7 +153,7 @@ Rules:
 * Sides: Blue and Red team panels (players, card counts, score), turn timer.
 * Right: quantum state panel — amplitudes, probabilities, global phase, partner qubit Bloch sphere, fog indicator.
 * Bottom right: action log and team chat.
-* Theme: dark space background; Blue `#1f5bd6`, Red `#c8323f`, accent cyan `#27e5f7`.
+* Theme: dark space background; Blue `#2F7BFF`, Red `#E5484D`, accent cyan `#27E5F7`. All tokens: [ui-spec.md §2](ui-spec.md#2-design-tokens).
 
 ### 7.3 Build order
 

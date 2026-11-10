@@ -128,26 +128,49 @@ Write T-S-03: wrap the server's send function in tests and assert that no outgoi
 
 ## รอบ 4 — Web client แบบ 2D (คนทำ client)
 
-**P-4.1 App shell and connection**
+> **สเปก UI อยู่ที่ [`docs/ui-spec.md`](ui-spec.md)** (ตำแหน่ง สี ข้อความ ของทุกหน้าจอ) ภาพ reference อยู่ใน [`docs/design/`](design/) และ mockup ใน Figma
+> ภาพ reference มีเนื้อหาเกมที่ผิดกฎหลายจุด (ดู ui-spec §15) ให้ Claude Code ทำตาม ui-spec เท่านั้น ถ้าขัดกับ rules.md ให้เชื่อ rules.md
+
+**P-4.1 App shell, theme and connection**
 ```
-Plan first. In apps/client build the screens from docs/architecture.md §7.1 with React Router: main menu, lobby, game, challenge, result. Add a WebSocket client with reconnection and a Zustand store fed only by server messages (GAME_VIEW, EVENT). Dark space theme with the colors in architecture.md §7.2.
+Plan first. Read docs/ui-spec.md §1–§3 and docs/architecture.md §7.
+In apps/client:
+- Design tokens from ui-spec §2 in src/theme/tokens.ts and as CSS variables (colours, gate colours, type styles, spacing). Self-host Orbitron, Exo 2 and JetBrains Mono with @fontsource. All kets use JetBrains Mono and the real minus sign.
+- Space background (gradient + star layer) as a component; do not use the PNGs in docs/design/.
+- Shared UI components: Panel, Button (Primary/Secondary/Danger), Pill, PlayerChip (team, seat, name, card count, active), Toggle, Stepper, Modal/Overlay, Toast.
+- React Router with every route in ui-spec §3. Build Main menu and Mode select (§4), Lobby (§5) and Room (§6) fully; other routes may be placeholders for now.
+- WebSocket client with reconnection and a Zustand store fed only by server messages (ROOM_STATE, GAME_VIEW, EVENT, CHAT). The client never stores deck, seed or opponents' cards.
+- Put all UI strings in src/i18n/en.ts. Add the data-testid values from ui-spec §14 for these screens.
+Component tests with Vitest + Testing Library for PlayerChip, Button and the Room settings defaults (target 7, 15:00, 60 s).
 ```
-**P-4.2 2D board and hand**
+**P-4.2 Game screen: 2D board, gate cards, hand and preview**
 ```
-Build the game screen with a 2D SVG board: six positions on a circle in the order of rules.md §2.1, lines and arrows from boardLines(), end zones colored Blue (|+>) and Red (|->), the football or a fog effect.
-Show the player's 4 cards; selecting a card previews the destination using @qa/engine on the public state; Play Card sends PLAY_CARD. Show the turn timer, both team panels with card counts and score, and the action log.
+Plan first. Read docs/ui-spec.md §7.1–§7.3 and §8, and docs/rules.md §2–§4.
+- Game screen layout exactly as ui-spec §7.1 (Team and Solo variants, spectator view), scaling from 1920×1080 down to 1280×720.
+- 2D SVG board per §7.2: six nodes in rules.md §2.1 order, Blue end zone at |+> (upper right), Red at |-> (lower left), lines/arrows/labels from boardLines(), centre Bloch sphere, football, fog effect. Never hard-code moves.
+- GateCard component per §8.1 (hand size and detail size) and a card back. Name, description and footer come from §8.2; the "board effect" line is generated from @qa/engine (apply the gate to each of the six positions and group the results into ↔ swaps, → cycles and "stay"), never typed by hand. Add a snapshot test showing the generated lines match the §8.2 table.
+- Hand: select by click or keys 1–4, Enter plays, Esc cancels. Move preview with @qa/engine on the public state, with all banner texts from §7.3 (touchdown, wrong end zone, stays, measure 50/50, failed punt, CNOT and fog texts from rules.md §4.3–§4.4).
+- Scoreboard, turn bar (Team P1→P3→P2→P4, Solo P1→P2), clocks with the turn timer turning red under 10 s, team panels with opponents' card counts only and the teammate's hand as gate tags (rules.md §9), deck count, PLAY CARD sends PLAY_CARD.
+- Action log per §7.5 built only from EVENT messages.
+Add the data-testid values from ui-spec §14.
 ```
-**P-4.3 State panel and team chat**
+**P-4.3 State panel, team chat, challenge and result**
 ```
-Add the quantum state panel: amplitudes, probabilities, global phase, a simple 2D Bloch sphere view for the football and the partner, and a fog indicator. Add team chat (Team mode only).
+Read docs/ui-spec.md §7.4, §9 and §10.
+- Quantum state panel: two 2D Bloch spheres (football, partner), amplitudes (single-qubit or two-qubit form in the fog), P(|0>) and P(|1>) bars, global phase, fog indicator (green / purple) and the hint line.
+- Team chat (Team mode only, never shown to opponents or spectators).
+- Quantum Challenge overlay (§9): 5-dot progress, question card with A–D, timer, both sides' status and points, "first submission counts" note, correct-answer reveal. Questions arrive one by one from the server.
+- Result overlay (§10): winner, score, end reason, stats, Play Again / Main Menu, and the learning-check button only when the study flag is on.
+- Settings page (§12) saved in localStorage; hide the Audio group until sound exists.
 ```
 **P-4.4 Playwright**
 ```
-Using the e2e-test-generator approach, write Playwright tests T-E-01..T-E-05 from docs/test-plan.md §3.5. Use TEST_SEED and TEST_DECK (server only accepts them when NODE_ENV=test) so games are short and deterministic.
+Using the e2e-test-generator approach, write Playwright tests T-E-01..T-E-05 from docs/test-plan.md §3.5. Use the data-testid values in docs/ui-spec.md §14. Use TEST_SEED and TEST_DECK (server only accepts them when NODE_ENV=test) so games are short and deterministic.
+Also save screenshots of every screen in ui-spec §3 at 1920×1080 to e2e/screenshots/ and compare them by eye with the Figma frames; list any difference from ui-spec.
 ```
-**เสร็จเมื่อ:** เล่น Solo กับ Team ได้ครบตั้งแต่เริ่มจนจบผ่านเบราว์เซอร์ และ test ในหมวด T-E-01..05 ผ่าน
+**เสร็จเมื่อ:** เล่น Solo กับ Team ได้ครบตั้งแต่เริ่มจนจบผ่านเบราว์เซอร์, test ในหมวด T-E-01..05 ผ่าน และทุกหน้าจอในรอบนี้ตรงกับ ui-spec (ภาพหน้าจอเทียบกับ Figma แล้ว)
 
-> 💡 ใช้ playwright plugin ให้ Claude ลองเล่นจริงได้: `Open the app with Playwright, play one Solo game in two tabs and send me screenshots of anything that looks wrong.`
+> 💡 ใช้ playwright plugin ให้ Claude ลองเล่นจริงได้: `Open the app with Playwright, play one Solo game in two tabs and send me screenshots of anything that looks wrong compared with docs/ui-spec.md.`
 
 ---
 
@@ -155,17 +178,25 @@ Using the e2e-test-generator approach, write Playwright tests T-E-01..T-E-05 fro
 
 **P-5.1 3D board**
 ```
-Replace the 2D board with a three.js board using @react-three/fiber and drei, keeping the same props and game logic: circular board, six glowing nodes, lines/arrows, Blue and Red end zones, the football as a 3D ball, camera controls. Keep the 2D board as a fallback setting for slow computers.
+Plan first. Read docs/ui-spec.md §7.2 and look at docs/design/ref-05-3d-board.png for mood only (its end-zone sides and extra nodes are wrong — see ui-spec §15).
+Replace the 2D board with a three.js board using @react-three/fiber and drei, with the same props and no new game logic:
+a round arena platform with a cyan rim glow, six glowing node pads in rules.md §2.1 order, raised Blue end-zone pad at |+> (upper right) and Red at |-> (lower left) with their labels, lines/arrows from boardLines() as glowing tubes with gate labels, the football as a 3D ball, the fog as a soft volumetric/sprite cloud in accent/purple, a slightly tilted fixed camera with limited orbit.
+Keep the 2D board as the "Board: 2D" setting (ui-spec §12) and use it automatically when WebGL is unavailable. Keep every data-testid working in both boards.
 ```
 **P-5.2 Bloch spheres and animation**
 ```
-Add 3D Bloch spheres for the football (above the board center) and the partner qubit. Animate the ball moving along a line, staying in place, entering and leaving the fog, and measurement collapse.
+Read docs/ui-spec.md §7.4 and §13.
+Add 3D Bloch spheres for the football (board centre) and the partner (state panel); in the fog both vectors shrink to the centre.
+Implement every animation in ui-spec §13 driven only by EVENT messages (card played, move, stay, enter/leave fog, measure, touchdown, kickoff). Respect "Reduce motion" and prefers-reduced-motion (fades only).
+The gate-card detail view and the card library at /about use the full card design from ui-spec §8 with a small 3D or SVG Bloch sphere showing the rotation axis.
 ```
 **P-5.3 Tutorial**
 ```
-Build the tutorial from docs/rules.md §11: five short lessons against the bot, each with goals and hints, using fixed decks so the lesson always works. Track completed lessons in localStorage. Add Playwright test T-E-06.
+Read docs/rules.md §11 and docs/ui-spec.md §11.
+Build the tutorial: five short lessons against the bot in the Solo game layout, with the lesson list on the left, a coach bubble pointing at nodes and cards, a goal checklist and progress bar on the right, and fixed decks so every lesson always works. Lesson 5 must show entering the fog and leaving it by Measure and by a second CNOT.
+Track completed lessons in localStorage. Add Playwright test T-E-06.
 ```
-**เสร็จเมื่อ:** หน้าจอตรงกับ Figure 3.2 / 3.4 และทำ tutorial ได้ครบ 5 บท
+**เสร็จเมื่อ:** ทุกหน้าจอตรงกับ `docs/ui-spec.md` (เทียบภาพหน้าจอกับ Figma), animation ครบตาม §13, ทำ tutorial ได้ครบ 5 บท และ T-E-06 ผ่าน
 
 ---
 
