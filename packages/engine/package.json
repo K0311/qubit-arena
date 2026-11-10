@@ -7,11 +7,12 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^5.1.0",
     "typescript": "~6.0.3",
     "vitest": "^5.1.0"
   }
