@@ -128,8 +128,8 @@ Rules:
 | Room / match manager | Owns one `GameState`, runs `applyAction`, broadcasts filtered views |
 | Clocks | Game time limit and per-turn timer (server timers); on timeout → `TIMEOUT` action |
 | Randomness | One seeded RNG per match, seed from `crypto.randomBytes`, never sent |
-| Bot seats | Plays for disconnected players after the delay in rules.md §10 |
-| Chat | Team-only chat channel; basic length limit and rate limit |
+| Bot seats | Bots the host adds to empty seats before the game (`ADD_BOT`), and bots that play for disconnected players after the delay in rules.md §10 |
+| Chat | Room chat for everyone in the room before the game; team-only chat during the game (rules.md §9); basic length limit and rate limit |
 | Persistence (round 6) | Save finished matches and ratings to PostgreSQL |
 
 ## 7. Client (`apps/client`)

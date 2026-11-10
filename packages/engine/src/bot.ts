@@ -8,7 +8,9 @@ const pick = <T>(xs: readonly T[], rng: Rng): T | undefined =>
 
 /**
  * Bot v1 (rules.md §10): a random legal card on its turn, a random answer in the
- * Quantum Challenge. Used for disconnected seats and for simulation.
+ * Quantum Challenge. Used for seats the host fills with bots before the game,
+ * for disconnected seats, and for simulation. The engine does not care which:
+ * the server decides when a seat is played by a bot.
  */
 export function botAction(state: GameState, rng: Rng): Action {
   if (state.phase === 'PLAYING') {

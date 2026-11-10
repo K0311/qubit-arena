@@ -43,7 +43,7 @@ The game supports learning; it does not replace a quantum computing course.
 | Turn and cards | 4 cards per hand, 1 card per turn, no passing, draw back to 4 |
 | Touchdown and scoring | Point only for moving the ball into your own end zone on your turn |
 | Game end | Target score, time limit or all cards played; tie → Quantum Challenge |
-| Online play | Rooms, lobby, server-side randomness, hidden hands, team chat, turn timer, reconnection |
+| Online play | Rooms, lobby, bots for empty seats, room chat (before the game) and team chat, server-side randomness, hidden hands, turn timer, reconnection |
 | Visualization | Bloch sphere, amplitudes, probabilities, global phase, action history |
 | Tutorial | Gates, measurement, touchdowns, CNOT |
 

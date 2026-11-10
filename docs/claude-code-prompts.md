@@ -111,7 +111,8 @@ Implement packages/protocol from docs/architecture.md §5: zod schemas and TS ty
 Plan first. Then implement apps/server with the `ws` library following docs/architecture.md §6:
 connections with a session token, heartbeat, lobby (public/private rooms with join code, quick match), seats and teams, start game, PLAY_CARD handling through @qa/engine, per-player GAME_VIEW using viewFor, EVENT broadcasts, team-only CHAT, spectators.
 One seeded RNG per match from crypto.randomBytes; the seed never leaves the server.
-Tests first: integration tests T-S-01..T-S-05 and T-S-08 on a random port.
+Also: the host can fill empty seats with bots before the game (ADD_BOT, rules.md §10), and a room chat for everyone in the room that closes when the game starts (rules.md §9).
+Tests first: integration tests T-S-01..T-S-05, T-S-08, T-S-10 and T-S-11 on a random port.
 ```
 **P-3.3 Clocks, reconnection, bot seats**
 ```
