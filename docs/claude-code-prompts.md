@@ -271,7 +271,7 @@ Write docs/report/final-slides.md: 15–18 slides of content for the final prese
 ```
 **P-9.3 Handover check**
 ```
-Do a final handover review: README accurate, all docs up to date with the final code, no secrets in git history, no TODO left without an issue, CI green on main, the deployed URL works (run the smoke test), LICENSE present, tag v1.0.0 exists. Write the result to docs/report/handover-checklist.md and list anything the team must still do by hand.
+Do a final handover review: README accurate, all docs up to date with the final code, no secrets in git history, no TODO left without an issue, CI green on main, the deployed URL works (run the smoke test), tag v1.0.0 exists (no LICENSE file by team decision; all rights reserved). Write the result to docs/report/handover-checklist.md and list anything the team must still do by hand.
 ```
 
 ---
