@@ -36,7 +36,7 @@ export function defaultConfig(mode: Mode): GameConfig {
     turnTimerMs: 60 * 1000,
     handSize: 4,
     deckCounts: DEFAULT_DECK_COUNTS,
-    // Not fixed by rules.md §8.1; on by default so a tie is still decided, configurable per room.
+    // rules.md §8.1: on by default, a room setting.
     suddenDeath: true,
     challengeQuestions: 5,
   };
@@ -121,7 +121,7 @@ export function applyAction(state: GameState, action: Action, rng: Rng): ApplyRe
       if (state.phase !== 'PLAYING' || state.timeUp) return { state, events: [] };
       return commit({ state: { ...state, timeUp: true }, events: [{ type: 'TIME_UP' }] }, state);
     case 'CHALLENGE_ANSWER': {
-      const res = answerChallenge(state, action);
+      const res = answerChallenge(state, action, rng);
       return 'code' in res ? reject(state, res.code, res.message) : commit(res, state);
     }
     default:
