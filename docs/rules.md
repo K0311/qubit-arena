@@ -167,19 +167,20 @@ General rule (any partner state): compute the new 4-amplitude state; then
 2. Players take seats. In Team mode, P1 and P2 are Blue and P3 and P4 are Red.
 3. The server shuffles the deck with a seeded RNG. The seed never leaves the server.
 4. Each player is dealt **4 cards**.
-5. **Who kicks off first:**
-   * Solo: [OPEN] default = random (coin flip on the server).
-   * Team: each team rolls a six-sided die; the higher roll kicks off; a tie rolls again.
+5. **Opening roll (start of the game, both modes):** each side rolls a six-sided die on the server
+   (Solo: P1 and P2; Team: Blue and Red). **The higher roll plays first.** A tie rolls again.
+   * Solo: the winner takes the first turn.
+   * Team: the first player of the winning side takes the first turn (P1 for Blue, P3 for Red), and the order then continues P1 → P3 → P2 → P4.
 6. **Kickoff:** a binary die places the football at \|0⟩ or \|1⟩ (50 / 50). The partner is reset to \|+⟩.
-7. **First turn after a kickoff:** the side that did **not** kick off plays first (as in the original game).
-   [OPEN] Within that side in Team mode, the player who is next in the turn order plays.
+7. **After a touchdown:** the scoring side kicks off again (new ball at \|0⟩ or \|1⟩, partner reset to \|+⟩) and the
+   **other side plays first** (as in the original game). In Team mode, the next player of that side in the turn order plays.
 
 ### Defaults
 
 | Setting | Solo default | Team default |
 |---|---|---|
-| Target score | [OPEN] 5 | 7 |
-| Time limit | [OPEN] 10 min | 15 min |
+| Target score | 7 | 7 |
+| Time limit | 15 min | 15 min |
 | Turn timer | 60 s | 60 s |
 | Hand size | 4 | 4 |
 
@@ -292,9 +293,8 @@ Local hot-seat play, replays, mobile apps. Sound and music are optional and adde
 
 | # | Question | Default used until decided |
 |---|---|---|
-| 1 | Who kicks off first in Solo mode | Random coin flip |
-| 2 | Solo target score and time limit | 5 points, 10 minutes |
-| 3 | Which player of the receiving team plays first after a kickoff | Next player of that side in the turn order |
-| 4 | Penalty for repeated turn timeouts | None |
-| 5 | How a team submits a Quantum Challenge answer | First submission counts |
-| 6 | Delay before a bot replaces a disconnected player | 30 seconds |
+| 1 | Penalty for repeated turn timeouts | None |
+| 2 | How a team submits a Quantum Challenge answer | First submission counts |
+| 3 | Delay before a bot replaces a disconnected player | 30 seconds |
+
+Decided on 10 Nov 2026: opening roll in both modes (higher roll plays first, tie re-rolls); Solo uses the same target score (7) and time limit (15 min) as Team; Team order P1 → P3 → P2 → P4.

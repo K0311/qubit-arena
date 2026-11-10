@@ -73,8 +73,8 @@ Add boardLines() that builds the two-way lines and one-way arrows from the gate 
 **P-2.1 Deck and setup**
 ```
 Implement deck.ts and createGame(config, rng) following docs/rules.md §3.5 and §5:
-default 55-card deck with configurable counts, seeded shuffle, deal 4 cards, Solo and Team seats and sides, kickoff (Team dice with re-roll on tie; Solo uses the [OPEN] default), ball at ZERO or ONE, partner reset to |+>, receiving side plays first.
-Tests first: T-R-01..T-R-04 and T-R-24.
+default 55-card deck with configurable counts, seeded shuffle, deal 4 cards, Solo and Team seats and sides, opening roll in both modes (higher roll plays first, tie re-rolls), kickoff with the ball at ZERO or ONE and the partner reset to |+>, after a touchdown the scorer kicks off and the other side plays first. Defaults: target 7, 15 minutes for both modes.
+Tests first: T-R-01..T-R-04b and T-R-24.
 ```
 **P-2.2 Turns, scoring and game end**
 ```

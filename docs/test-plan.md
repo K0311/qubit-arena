@@ -59,8 +59,9 @@ Coverage goal: **≥ 90 % lines in `packages/engine`**, ≥ 70 % in `apps/server
 |---|---|---|
 | T-R-01 | New Solo game | 55-card deck, 4 cards each, turn order P1 → P2 |
 | T-R-02 | New Team game | Turn order P1 → P3 → P2 → P4; P1,P2 = Blue, P3,P4 = Red |
-| T-R-03 | Team kickoff dice | Higher roll kicks off; tie re-rolls (fixed seed) |
-| T-R-04 | Kickoff | Ball at ZERO or ONE; receiving side plays first |
+| T-R-03 | Opening roll, Solo and Team | Higher roll plays first (Team: P1 or P3 starts); tie re-rolls (fixed seed) |
+| T-R-04 | Kickoff after a touchdown | Ball at ZERO or ONE, partner \|+⟩; the side that did not score plays first |
+| T-R-04b | Defaults | Solo and Team both default to target 7 and 15 minutes |
 | T-R-05 | Play a card | Card removed from hand, goes to discard, player draws to 4 |
 | T-R-06 | Deck empty | Player does not draw; game continues until all hands are empty |
 | T-R-07 | Wrong player acts | Action rejected, state unchanged |
