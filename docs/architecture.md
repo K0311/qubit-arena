@@ -110,14 +110,17 @@ type Action =
 
 All messages are JSON with a `type` field and are validated with zod on both sides.
 
-**Client → server:** `CREATE_ROOM`, `JOIN_ROOM`, `QUICK_MATCH`, `TAKE_SEAT`, `START_GAME`, `PLAY_CARD`, `CHAT`, `CHALLENGE_ANSWER`, `LEAVE`, `PING`.
+**Client → server:** `CREATE_ROOM`, `JOIN_ROOM`, `QUICK_MATCH`, `TAKE_SEAT`, `READY`, `START_GAME`, `PLAY_CARD`, `CHAT`, `CHALLENGE_ANSWER`, `LEAVE`, `PING`.
 
-**Server → client:** `ROOM_STATE` (lobby), `GAME_VIEW` (filtered state), `EVENT` (card played, touchdown, kickoff, measure result, timeout, game over), `CHAT`, `ERROR`, `PONG`.
+**Server → client:** `WELCOME` (session token), `ROOM_STATE` (lobby), `GAME_VIEW` (filtered state), `EVENT` (card played, touchdown, kickoff, measure result, timeout, game over), `CHAT`, `ERROR`, `PONG`.
 
 Rules:
 * `GAME_VIEW` is built per player with `viewFor()`; never broadcast one object to all.
-* Every message from the client carries no trusted data other than the intent and ids.
-* Include a `stateVersion` number so clients can ignore stale messages.
+* Every message from the client carries no trusted data other than the intent and ids. Schemas are strict: unknown fields are rejected, and there is no `player` field (the server knows who is on each connection).
+* Include a `stateVersion` number (on `ROOM_STATE`, `GAME_VIEW` and `EVENT`) so clients can ignore stale messages.
+* `WELCOME` is the first message on every connection and gives the client a token. The client reconnects with that token in the connection URL to get its seat back (rules.md §10).
+* `READY` drives the ready pill in the room (ui-spec.md §6). `CREATE_ROOM`, `JOIN_ROOM` and `QUICK_MATCH` carry the player's display name.
+* Client messages over 4,096 characters are rejected before parsing.
 
 ## 6. Server (`apps/server`)
 
