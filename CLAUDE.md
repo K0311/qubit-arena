@@ -49,6 +49,7 @@ pnpm build                     # production builds (client only for now)
 pnpm dev                       # server + client
 pnpm e2e                       # Playwright
 pnpm sim [games] [seed]        # bot-vs-bot simulation (default 10,000 games)
+pnpm --filter @qa/server cli   # terminal client for the game server (PORT 8080 by default)
 ```
 (Update this list if you add or rename scripts.)
 

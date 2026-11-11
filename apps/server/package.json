@@ -7,14 +7,18 @@
     "dev": "tsx watch src/index.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "cli": "tsx scripts/cli.ts",
+    "start": "tsx src/index.ts"
   },
   "dependencies": {
     "@qa/engine": "workspace:*",
-    "@qa/protocol": "workspace:*"
+    "@qa/protocol": "workspace:*",
+    "ws": "^8.22.2"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
+    "@types/ws": "^8.18.2",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "vitest": "^5.1.0"
