@@ -60,7 +60,7 @@
 
 - [x] P-3.1 Protocol (zod)
 - [x] P-3.2 Server core: rooms, lobby, filtered views, chat (T-S-01..05, 08)
-- [ ] P-3.3 Clocks, reconnection, bot seats, rate limit (T-S-06, 07, 09)
+- [x] P-3.3 Clocks, reconnection, bot seats, rate limit (T-S-06, 07, 09)
 - [ ] P-3.4 Hidden data audit (T-S-03 กับ 50 เกม)
 
 **ผ่านเมื่อ:** T-S ผ่านทั้งหมด
@@ -140,4 +140,5 @@
 | 11 พ.ย. 2026 | อาจารย์อนุมัติ user study | ไม่ต้องขออนุมัติเพิ่มก่อนเก็บข้อมูลในเฟส 7 |
 | 11 พ.ย. 2026 | P-3.1 Protocol | `packages/protocol`: zod schema ทุกข้อความ + `READY`, `WELCOME`; ตรวจกับเกมจริงจาก engine ทุก view และ event |
 | 11 พ.ย. 2026 | P-3.2 Server core | `apps/server`: WebSocket (`ws`), ห้อง public/private/quick match, ที่นั่ง, ready, เริ่มเกม, view แยกต่อคน, chat เฉพาะทีม, ผู้ชม; T-S-01..05, 08 ผ่าน |
+| 12 พ.ย. 2026 | P-3.3 Clocks, reconnection, bots | turn timer 60 วิ + นาฬิกาเกมบน server, กลับเข้าเกมด้วย token, bot เล่นแทนที่นั่งที่หลุดเกิน 30 วิ, rate limit chat/ข้อความ; T-S-06, 07, 09 ผ่าน |
 | 11 พ.ย. 2026 | UI spec + ภาพ reference | `docs/ui-spec.md` (หน้าจอ, HUD, การ์ด) + `docs/visual-design.md` (กระดาน); เอาแค่ UI ไม่เปลี่ยนกฎ |

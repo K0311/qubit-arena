@@ -6,8 +6,14 @@ import type { RunningServer } from '../src/server';
 let server: RunningServer;
 const open: TestClient[] = [];
 
+/** Scripted clients move far faster than people, so the flood limit is lifted here. */
+const NO_LIMITS = {
+  messages: { capacity: 1e6, perSecond: 1e6 },
+  chat: { capacity: 1e6, perSecond: 1e6 },
+};
+
 async function setup(): Promise<number> {
-  server = await withServer();
+  server = await withServer({ limits: NO_LIMITS });
   return server.port;
 }
 

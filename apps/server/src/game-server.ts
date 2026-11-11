@@ -1,5 +1,6 @@
 import {
   applyAction,
+  botAction,
   createGame,
   mulberry32,
   viewFor,
@@ -17,6 +18,7 @@ import {
   type ServerMessage,
 } from '@qa/protocol';
 import { newRoomCode, newSeed, newToken } from './random';
+import { LIMITS, newLimiter, type Limiter, type Limits } from './rate-limit';
 import { Room, roomConfig, type Connection, type Session } from './room';
 import { realScheduler, type Scheduler } from './scheduler';
 
@@ -24,7 +26,16 @@ export type GameServerOptions = {
   scheduler?: Scheduler;
   /** Sees every outgoing message before it is encoded; tests audit it (T-S-03). */
   onSend?: (session: Session, msg: ServerMessage) => void;
+  /** How long a disconnected seat waits before a bot plays for it (rules.md §10: 30 s). */
+  botDelayMs?: number;
+  /** A bot waits this long before each move so people can follow it. */
+  botThinkMs?: number;
+  /** Flood limits per connection (defaults in rate-limit.ts). */
+  limits?: Limits;
 };
+
+/** rules.md §13 [OPEN] item 3 default. */
+export const BOT_DELAY_MS = 30_000;
 
 type Failure = { code: ErrorCode; message: string };
 const fail = (code: ErrorCode, message: string): Failure => ({ code, message });
@@ -37,20 +48,31 @@ const fail = (code: ErrorCode, message: string): Failure => ({ code, message });
 export class GameServer {
   readonly scheduler: Scheduler;
   private readonly onSend: GameServerOptions['onSend'];
+  private readonly botDelayMs: number;
+  private readonly botThinkMs: number;
+  private readonly limits: Limits;
   private readonly sessions = new Map<string, Session>();
+  private readonly limiters = new WeakMap<Session, Limiter>();
   private readonly rooms = new Map<string, Room>();
   private nextSessionId = 1;
 
   constructor(options: GameServerOptions = {}) {
     this.scheduler = options.scheduler ?? realScheduler();
     this.onSend = options.onSend;
+    this.botDelayMs = options.botDelayMs ?? BOT_DELAY_MS;
+    this.botThinkMs = options.botThinkMs ?? 1_000;
+    this.limits = options.limits ?? LIMITS;
   }
 
   // ---- connection layer ------------------------------------------------------------------
 
-  /** `token` is for reconnection (P-3.3); for now every connection is a new session. */
+  /** A known token gets its old session back, seat included (rules.md §10, T-S-06). */
   connect(conn: Connection, token?: string): Session {
-    void token;
+    const known = token ? this.sessions.get(token) : undefined;
+    if (known) {
+      this.reattach(known, conn);
+      return known;
+    }
     const session: Session = {
       id: this.nextSessionId++,
       token: newToken(),
@@ -67,6 +89,24 @@ export class GameServer {
     return session;
   }
 
+  private reattach(session: Session, conn: Connection): void {
+    const old = session.conn;
+    session.conn = conn;
+    // A second tab with the same token takes over; the old socket's close is then ignored.
+    old?.close();
+    this.send(session, {
+      type: 'WELCOME',
+      protocolVersion: PROTOCOL_VERSION,
+      token: session.token,
+    });
+    const room = session.room;
+    if (!room) return;
+    const p = room.seatOf(session);
+    if (p) this.seatBack(room, p);
+    this.broadcastRoom(room);
+    this.sendView(room, session);
+  }
+
   /** The socket closed. Only acts if `conn` is still the session's live connection. */
   disconnect(session: Session, conn: Connection): void {
     if (session.conn !== conn) return;
@@ -78,6 +118,8 @@ export class GameServer {
     }
     if (room.status === 'PLAYING' && room.seatOf(session)) {
       // rules.md §10: a player who disconnects keeps their seat.
+      const p = room.seatOf(session);
+      if (p) this.onSeatLost(room, p);
       this.broadcastRoom(room);
       return;
     }
@@ -87,12 +129,27 @@ export class GameServer {
 
   receive(session: Session, raw: string): void {
     const parsed = parseClientMessage(raw);
+    // PING stays free so a throttled client can still keep its connection alive.
+    const isPing = parsed.ok && parsed.msg.type === 'PING';
+    if (!isPing && !this.limiter(session).messages.take(this.scheduler.now())) {
+      this.error(session, fail('RATE_LIMITED', 'too many messages'));
+      return;
+    }
     if (!parsed.ok) {
       this.error(session, fail('BAD_MESSAGE', parsed.error));
       return;
     }
     const problem = this.handle(session, parsed.msg);
     if (problem) this.error(session, problem);
+  }
+
+  private limiter(session: Session): Limiter {
+    let l = this.limiters.get(session);
+    if (!l) {
+      l = newLimiter(this.scheduler.now(), this.limits);
+      this.limiters.set(session, l);
+    }
+    return l;
   }
 
   // ---- messages --------------------------------------------------------------------------
@@ -184,6 +241,17 @@ export class GameServer {
     const room = this.rooms.get(code);
     if (!room) return fail('ROOM_NOT_FOUND', `no room ${code}`);
     if (session.room === room) return fail('BAD_MESSAGE', 'already in this room');
+    const mine = room.seatOf(session);
+    if (role === 'PLAYER' && room.status === 'PLAYING' && mine) {
+      // Back to the seat they left during the game (rules.md §10: until they return).
+      const problem = this.leaveForNewRoom(session);
+      if (problem) return problem;
+      session.room = room;
+      this.seatBack(room, mine);
+      this.broadcastRoom(room);
+      this.sendView(room, session);
+      return;
+    }
     if (role === 'PLAYER') {
       if (room.status !== 'WAITING') return fail('GAME_IN_PROGRESS', 'join as a spectator');
       const seat = room.freeSeat();
@@ -222,6 +290,9 @@ export class GameServer {
     const room = session.room;
     const from = room?.seatOf(session);
     if (!room || !from) return fail('NOT_SEATED', 'only players can chat');
+    if (!this.limiter(session).chat.take(this.scheduler.now())) {
+      return fail('RATE_LIMITED', 'too many chat messages');
+    }
     // rules.md §9: team chat is seen by that team only (in Solo the team is one player).
     const side = room.sideOf(from);
     const msg: ServerMessage = {
@@ -296,13 +367,40 @@ export class GameServer {
     this.broadcastRoom(room);
   }
 
-  /** Hook for P-3.3 bot seats; a seat's human is gone (disconnected or left). */
-  protected onSeatLost(room: Room, p: PlayerId): void {
-    void room;
-    void p;
+  /** A seat's human is gone (disconnected or left): a bot takes over after the delay. */
+  private onSeatLost(room: Room, p: PlayerId): void {
+    if (room.status !== 'PLAYING') return;
+    this.scheduler.clear(room.timers.seats.get(p));
+    room.timers.seats.set(
+      p,
+      this.scheduler.set(() => {
+        room.timers.seats.delete(p);
+        const seat = room.seats.get(p);
+        if (!seat || room.status !== 'PLAYING') return;
+        seat.bot = true;
+        this.broadcastRoom(room);
+        this.scheduleBot(room);
+      }, this.botDelayMs),
+    );
   }
 
-  protected closeRoom(room: Room): void {
+  /** The human is back: cancel the pending bot or stop the running one. */
+  private seatBack(room: Room, p: PlayerId): void {
+    const seat = room.seats.get(p);
+    if (!seat) return;
+    this.scheduler.clear(room.timers.seats.get(p));
+    room.timers.seats.delete(p);
+    seat.left = false;
+    if (seat.bot) {
+      seat.bot = false;
+      this.scheduleBot(room);
+    }
+  }
+
+  private closeRoom(room: Room): void {
+    this.stopClocks(room);
+    for (const t of room.timers.seats.values()) this.scheduler.clear(t);
+    room.timers.seats.clear();
     this.rooms.delete(room.code);
   }
 
@@ -312,7 +410,7 @@ export class GameServer {
 
   // ---- game ------------------------------------------------------------------------------
 
-  protected startGame(room: Room): void {
+  private startGame(room: Room): void {
     // One seeded RNG per match; the seed stays in this closure (architecture.md §6).
     room.rng = mulberry32(newSeed());
     const { state, events } = createGame(room.config, room.rng);
@@ -320,7 +418,12 @@ export class GameServer {
     room.status = 'PLAYING';
     this.broadcastRoom(room);
     this.pushGame(room, events);
-    this.afterGameChange(room);
+    // Game clock (rules.md §8 item 2); the engine ends the game after the current turn.
+    room.timers.game = this.scheduler.set(() => {
+      room.timers.game = undefined;
+      this.apply(room, { type: 'TIME_UP' });
+    }, room.config.timeLimitMs);
+    this.afterGameChange(room, events);
   }
 
   private act(session: Session, build: (player: PlayerId) => Action): Failure | void {
@@ -332,7 +435,7 @@ export class GameServer {
   }
 
   /** The only path from an action to the game state. */
-  protected apply(room: Room, action: Action): Failure | void {
+  private apply(room: Room, action: Action): Failure | void {
     if (!room.state || !room.rng) return fail('WRONG_PHASE', 'no game is running');
     const res = applyAction(room.state, action, room.rng);
     if (res.error) return fail(res.error.code, res.error.message);
@@ -343,12 +446,58 @@ export class GameServer {
       room.status = 'FINISHED';
       this.broadcastRoom(room);
     }
-    this.afterGameChange(room);
+    this.afterGameChange(room, res.events);
   }
 
-  /** Hook for P-3.3 clocks and bots. */
-  protected afterGameChange(room: Room): void {
-    void room;
+  /** Restart the turn timer after every card and give bots their move. */
+  private afterGameChange(room: Room, events: readonly GameEvent[]): void {
+    const state = room.state;
+    if (!state || state.phase === 'FINISHED') {
+      this.stopClocks(room);
+      return;
+    }
+    if (state.phase !== 'PLAYING') {
+      this.scheduler.clear(room.timers.turn);
+      room.timers.turn = undefined;
+    } else if (!room.timers.turn || events.some((e) => e.type === 'CARD_PLAYED')) {
+      this.scheduler.clear(room.timers.turn);
+      const player = state.turn;
+      // rules.md §6.2: the server plays a card for a silent player.
+      room.timers.turn = this.scheduler.set(() => {
+        room.timers.turn = undefined;
+        this.apply(room, { type: 'TIMEOUT', player });
+      }, room.config.turnTimerMs);
+    }
+    this.scheduleBot(room);
+  }
+
+  /** At most one pending bot move per room; recomputed after every change. */
+  private scheduleBot(room: Room): void {
+    this.scheduler.clear(room.timers.bot);
+    room.timers.bot = undefined;
+    const state = room.state;
+    if (!state || room.status !== 'PLAYING') return;
+    const answered = state.challenge?.answers ?? {};
+    const due = [...room.seats].find(([p, seat]) => {
+      if (!seat?.bot) return false;
+      if (state.phase === 'PLAYING') return state.turn === p;
+      return state.phase === 'CHALLENGE' && answered[room.sideOf(p)] === undefined;
+    });
+    if (!due) return;
+    const [p] = due;
+    room.timers.bot = this.scheduler.set(() => {
+      room.timers.bot = undefined;
+      if (!room.state || !room.rng || !room.seats.get(p)?.bot) return;
+      const action = botAction(room.state, p, room.rng);
+      if (action) this.apply(room, action);
+    }, this.botThinkMs);
+  }
+
+  private stopClocks(room: Room): void {
+    for (const key of ['game', 'turn', 'bot'] as const) {
+      this.scheduler.clear(room.timers[key]);
+      room.timers[key] = undefined;
+    }
   }
 
   // ---- sending ---------------------------------------------------------------------------
@@ -373,12 +522,12 @@ export class GameServer {
     this.send(session, { type: 'GAME_VIEW', stateVersion: room.version, view } as ServerMessage);
   }
 
-  protected broadcastRoom(room: Room): void {
+  private broadcastRoom(room: Room): void {
     room.version++;
     for (const s of room.members()) this.sendRoom(room, s);
   }
 
-  protected sendRoom(room: Room, session: Session): void {
+  private sendRoom(room: Room, session: Session): void {
     this.send(session, {
       type: 'ROOM_STATE',
       stateVersion: room.version,
@@ -387,11 +536,11 @@ export class GameServer {
     });
   }
 
-  protected error(session: Session, f: Failure): void {
+  private error(session: Session, f: Failure): void {
     this.send(session, { type: 'ERROR', code: f.code, message: f.message.slice(0, 200) });
   }
 
-  protected send(session: Session, msg: ServerMessage): void {
+  private send(session: Session, msg: ServerMessage): void {
     this.onSend?.(session, msg);
     session.conn?.send(encodeMessage(msg));
   }
