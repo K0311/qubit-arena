@@ -7,7 +7,9 @@
     "dev": "tsx watch src/index.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "cli": "tsx scripts/cli.ts",
+    "start": "tsx src/index.ts"
   },
   "dependencies": {
     "@qa/engine": "workspace:*",

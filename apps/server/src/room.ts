@@ -120,8 +120,14 @@ export class Room {
     return out;
   }
 
+  /**
+   * Nobody is here any more. A running game survives everyone dropping at once (they can
+   * reconnect, and bots play meanwhile) unless every player has left on purpose.
+   */
   isEmpty(): boolean {
-    return this.spectators.size === 0 && [...this.seats.values()].every((s) => !s || s.left);
+    if (this.members().length > 0) return false;
+    if (this.status !== 'PLAYING') return true;
+    return [...this.seats.values()].every((s) => !s || s.left);
   }
 
   info(): RoomInfo {
