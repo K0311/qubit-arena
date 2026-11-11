@@ -58,7 +58,7 @@
 
 ## เฟส 3 — Server (16 ธ.ค. – 10 ม.ค.)
 
-- [ ] P-3.1 Protocol (zod)
+- [x] P-3.1 Protocol (zod)
 - [ ] P-3.2 Server core: rooms, lobby, filtered views, chat (T-S-01..05, 08)
 - [ ] P-3.3 Clocks, reconnection, bot seats, rate limit (T-S-06, 07, 09)
 - [ ] P-3.4 Hidden data audit (T-S-03 กับ 50 เกม)
@@ -138,4 +138,5 @@
 | 11 พ.ย. 2026 | เฟส 2 ครบ (P-2.1 – P-2.4) | PR #3: T-R-01..24 ผ่าน, coverage engine 98.8 % lines, `pnpm sim` 10,000 เกมผ่าน (~6 วินาที) · เร็วกว่าแผนประมาณ 5 สัปดาห์ |
 | 11 พ.ย. 2026 | ธีมอวกาศ + กระดานแบบ Blender | PR #4: `docs/visual-design.md`, `boardPoint()`, `boardEdges()` |
 | 11 พ.ย. 2026 | อาจารย์อนุมัติ user study | ไม่ต้องขออนุมัติเพิ่มก่อนเก็บข้อมูลในเฟส 7 |
+| 11 พ.ย. 2026 | P-3.1 Protocol | `packages/protocol`: zod schema ทุกข้อความ + `READY`, `WELCOME`; ตรวจกับเกมจริงจาก engine ทุก view และ event |
 | 11 พ.ย. 2026 | UI spec + ภาพ reference | `docs/ui-spec.md` (หน้าจอ, HUD, การ์ด) + `docs/visual-design.md` (กระดาน); เอาแค่ UI ไม่เปลี่ยนกฎ |
