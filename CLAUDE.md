@@ -7,6 +7,7 @@ Senior project, Faculty of ICT, Mahidol University (Aug 2026 – Apr 2027).
 ## Read first
 - **docs/rules.md** — every game rule. It is the source of truth. If code and rules.md disagree, the code is wrong.
 - **docs/architecture.md** — monorepo layout, tech stack, protocol, server-authoritative design.
+- **docs/ui-spec.md** — screens, HUD panels, gate cards, overlays, settings, test ids. Client work follows it for everything around the board. Images in `docs/design/` are mood references only; they contain rule errors (see ui-spec §15).
 - **docs/test-plan.md** — test IDs and pass criteria. Name tests after these IDs (e.g. `T-G-01`, `T-C-03`).
 - **docs/project-overview.md** — goals, scope (MVP), schedule, roles, risks.
 - **docs/roadmap.md** — every task until the project ends, as checkboxes. `/next` does the next task; `/status` reports progress.

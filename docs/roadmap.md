@@ -31,28 +31,28 @@
 
 ## เฟส 0 — ตั้งโครง (11–17 พ.ย.)
 
-- [ ] P-0.1 Scaffold monorepo (pnpm, TS strict, Vitest, ESLint/Prettier)
-- [ ] P-0.2 GitHub Actions CI
-- [ ] 👤 ตั้ง branch protection ให้ `main` (Settings → Branches → require PR + CI)
+- [x] P-0.1 Scaffold monorepo (pnpm, TS strict, Vitest, ESLint/Prettier)
+- [x] P-0.2 GitHub Actions CI
+- [x] 👤 ตั้ง branch protection ให้ `main` (Settings → Branches → require PR + CI)
 - [x] 👤 ใส่ชื่อสมาชิกในตาราง Team roles (`docs/project-overview.md` §7)
 
 **ผ่านเมื่อ:** `pnpm test` / `pnpm typecheck` ผ่าน, CI เขียว
 
 ## เฟส 1 — Engine คณิตควอนตัม (18 พ.ย. – 1 ธ.ค.)
 
-- [ ] P-1.1 Complex + matrix
-- [ ] P-1.2 Gates + 42 gate tests (T-G-01..46)
-- [ ] P-1.3 Two-qubit state, CNOT, Measure, fog (T-C-01..10)
-- [ ] P-1.4 Board lines generator
+- [x] P-1.1 Complex + matrix
+- [x] P-1.2 Gates + 42 gate tests (T-G-01..46)
+- [x] P-1.3 Two-qubit state, CNOT, Measure, fog (T-C-01..10)
+- [x] P-1.4 Board lines generator
 
 **ผ่านเมื่อ:** T-G และ T-C ผ่านทั้งหมด, coverage engine ≥ 90 %
 
 ## เฟส 2 — Engine ตัวเกม (2–15 ธ.ค.)
 
-- [ ] P-2.1 Deck, opening roll, kickoff (T-R-01..04b, T-R-24)
-- [ ] P-2.2 Turns, scoring, game end (T-R-05..19, T-R-23)
-- [ ] P-2.3 Quantum Challenge (T-R-20..22)
-- [ ] P-2.4 Filtered view, bot, simulation 10,000 เกม
+- [x] P-2.1 Deck, opening roll, kickoff (T-R-01..04b, T-R-24)
+- [x] P-2.2 Turns, scoring, game end (T-R-05..19, T-R-23)
+- [x] P-2.3 Quantum Challenge (T-R-20..22)
+- [x] P-2.4 Filtered view, bot, simulation 10,000 เกม
 
 **ผ่านเมื่อ:** T-R ผ่านทั้งหมด, `pnpm sim` 10,000 เกมไม่พัง
 
@@ -67,13 +67,13 @@
 
 ## เฟส 4 — Client 2D (11–31 ม.ค.)
 
-- [ ] P-4.1 App shell + WebSocket + store
-- [ ] P-4.2 2D board + hand + preview
-- [ ] P-4.3 State panel + team chat
+- [ ] P-4.1 App shell + theme tokens + menu/lobby/room + WebSocket + store (ตาม `docs/ui-spec.md`)
+- [ ] P-4.2 Game screen: 2D board + gate cards + hand + preview + action log
+- [ ] P-4.3 State panel + team chat + Quantum Challenge + Result + Settings
 - [ ] P-4.4 Playwright T-E-01..05
 - [ ] 👤 ทีมเล่นทดสอบกันเอง 3 เกม (Solo 1, Team 2) จดสิ่งที่งงลง GitHub Issues
 
-**ผ่านเมื่อ:** เล่น Solo และ Team ผ่านเบราว์เซอร์จนจบเกมได้
+**ผ่านเมื่อ:** เล่น Solo และ Team ผ่านเบราว์เซอร์จนจบเกมได้ และหน้าจอตรงกับ `docs/ui-spec.md`
 
 ## เฟส 5 — 3D + tutorial (1–15 ก.พ.) → Feature freeze
 
@@ -97,7 +97,7 @@
 - [ ] P-7.2 Online soak test (4 ผู้เล่นจริง/บอท 2 ชั่วโมง)
 - [ ] P-7.3 Learning check + survey pages ในเกม (ตาม `docs/user-study.md`)
 - [ ] P-7.4 Export ผลการศึกษาเป็น CSV
-- [ ] 👤 ขออนุมัติจากอาจารย์ที่ปรึกษาก่อนเก็บข้อมูลผู้ใช้ (และ ethics ถ้าคณะกำหนด)
+- [x] 👤 ขออนุมัติจากอาจารย์ที่ปรึกษาก่อนเก็บข้อมูลผู้ใช้ (และ ethics ถ้าคณะกำหนด)
 - [ ] 👤 รับสมัครผู้เข้าร่วม (เป้าหมาย ≥ 20 คน) และจัด session
 - [ ] P-7.5 วิเคราะห์ผล user study → `docs/report/user-study-results.md`
 - [ ] P-7.6 แก้บั๊กและปรับสมดุลจากผลทดสอบ (สร้าง issue ทีละเรื่อง)
@@ -133,3 +133,9 @@
 |---|---|---|
 | 10 พ.ย. 2026 | Proposal, spec, rules, test plan, prompts | เข้าเฟส Implementation |
 | 11 พ.ย. 2026 | ใส่ชื่อบทบาททีม | engine: Bunyakorn · server: Ayumu · client: Kittiyakarn |
+| 11 พ.ย. 2026 | เฟส 0 ครบ (P-0.1, P-0.2) | PR #1: monorepo + CI · branch protection ของ `main` (ต้องมี PR + approve 1 คน) |
+| 11 พ.ย. 2026 | เฟส 1 ครบ (P-1.1 – P-1.4) | PR #2: T-G-01..46, T-C-01..10 ผ่าน, coverage engine 99 % lines |
+| 11 พ.ย. 2026 | เฟส 2 ครบ (P-2.1 – P-2.4) | PR #3: T-R-01..24 ผ่าน, coverage engine 98.8 % lines, `pnpm sim` 10,000 เกมผ่าน (~6 วินาที) · เร็วกว่าแผนประมาณ 5 สัปดาห์ |
+| 11 พ.ย. 2026 | ธีมอวกาศ + กระดานแบบ Blender | PR #4: `docs/visual-design.md`, `boardPoint()`, `boardEdges()` |
+| 11 พ.ย. 2026 | อาจารย์อนุมัติ user study | ไม่ต้องขออนุมัติเพิ่มก่อนเก็บข้อมูลในเฟส 7 |
+| 11 พ.ย. 2026 | UI spec + ภาพ reference | `docs/ui-spec.md` (หน้าจอ, HUD, การ์ด) + `docs/visual-design.md` (กระดาน); เอาแค่ UI ไม่เปลี่ยนกฎ |
