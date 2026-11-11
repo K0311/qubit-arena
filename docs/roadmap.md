@@ -133,4 +133,9 @@
 |---|---|---|
 | 10 พ.ย. 2026 | Proposal, spec, rules, test plan, prompts | เข้าเฟส Implementation |
 | 11 พ.ย. 2026 | ใส่ชื่อบทบาททีม | engine: Bunyakorn · server: Ayumu · client: Kittiyakarn |
+| 11 พ.ย. 2026 | เฟส 0 ครบ (P-0.1, P-0.2) | PR #1: monorepo + CI · branch protection ของ `main` (ต้องมี PR + approve 1 คน) |
+| 11 พ.ย. 2026 | เฟส 1 ครบ (P-1.1 – P-1.4) | PR #2: T-G-01..46, T-C-01..10 ผ่าน, coverage engine 99 % lines |
+| 11 พ.ย. 2026 | เฟส 2 ครบ (P-2.1 – P-2.4) | PR #3: T-R-01..24 ผ่าน, coverage engine 98.8 % lines, `pnpm sim` 10,000 เกมผ่าน (~6 วินาที) · เร็วกว่าแผนประมาณ 5 สัปดาห์ |
+| 11 พ.ย. 2026 | ธีมอวกาศ + กระดานแบบ Blender | PR #4: `docs/visual-design.md`, `boardPoint()`, `boardEdges()` |
+| 11 พ.ย. 2026 | อาจารย์อนุมัติ user study | ไม่ต้องขออนุมัติเพิ่มก่อนเก็บข้อมูลในเฟส 7 |
 | 11 พ.ย. 2026 | UI spec + ภาพ reference | `docs/ui-spec.md` (หน้าจอ, HUD, การ์ด) + `docs/visual-design.md` (กระดาน); เอาแค่ UI ไม่เปลี่ยนกฎ |
