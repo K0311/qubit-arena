@@ -121,7 +121,7 @@ export function applyAction(state: GameState, action: Action, rng: Rng): ApplyRe
       if (state.phase !== 'PLAYING' || state.timeUp) return { state, events: [] };
       return commit({ state: { ...state, timeUp: true }, events: [{ type: 'TIME_UP' }] }, state);
     case 'CHALLENGE_ANSWER': {
-      const res = answerChallenge(state, action);
+      const res = answerChallenge(state, action, rng);
       return 'code' in res ? reject(state, res.code, res.message) : commit(res, state);
     }
     default:
