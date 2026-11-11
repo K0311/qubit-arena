@@ -1,2 +1,5 @@
-// Placeholder entry point; the WebSocket server arrives in round 3.
-console.log('[server] Qubit Arena server placeholder running');
+import { startServer } from './server';
+
+const port = Number(process.env.PORT ?? 8080);
+const server = await startServer({ port });
+console.log(`[server] Qubit Arena listening on ws://localhost:${server.port}`);
