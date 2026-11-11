@@ -398,6 +398,13 @@ export class GameServer {
   }
 
   private closeRoom(room: Room): void {
+    // Disconnected players' sessions only existed to get back into this room.
+    for (const seat of room.seats.values()) {
+      if (seat && seat.session.room === room && !seat.session.conn) {
+        seat.session.room = null;
+        this.sessions.delete(seat.session.token);
+      }
+    }
     this.stopClocks(room);
     for (const t of room.timers.seats.values()) this.scheduler.clear(t);
     room.timers.seats.clear();
@@ -444,6 +451,10 @@ export class GameServer {
     this.pushGame(room, res.events);
     if (res.state.phase === 'FINISHED') {
       room.status = 'FINISHED';
+      if (room.isEmpty()) {
+        this.closeRoom(room);
+        return;
+      }
       this.broadcastRoom(room);
     }
     this.afterGameChange(room, res.events);
