@@ -20,7 +20,7 @@ Senior project · Faculty of ICT, Mahidol University · Aug 2026 – Apr 2027
 
 ## Status
 
-SDLC phase: **Implementation** (Planning, Analysis and Design done).
+Development step: **Production** (Planning, Pre-production and Prototyping done). We follow the five-step game development process; see [docs/project-overview.md](docs/project-overview.md) §5.
 With Claude Code open in this folder, type `/next` to do the next task in the roadmap, or `/status` to see progress.
 
 ## Quick start (after round 0)
