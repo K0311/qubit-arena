@@ -3,7 +3,7 @@
 Used in phase 7 (Testing & Integration). Implements the user evaluation in [test-plan.md](test-plan.md) §4.
 The questions below are also the content for the in-game study pages (prompt P-7.3).
 
-> 👤 Get approval from the project advisor (and the faculty ethics process if required) **before** collecting data.
+> ✓ Approved by the project advisor (Rawesak Tanawongsuwan) on 11 Nov 2026. No further approval or ethics review is needed before collecting data.
 
 ## 1. Procedure (about 30 minutes)
 
