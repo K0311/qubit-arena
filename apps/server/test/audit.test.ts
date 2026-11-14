@@ -8,15 +8,11 @@ import {
   type PlayerId,
   type Rng,
 } from '@qa/engine';
-import {
-  encodeMessage,
-  parseServerMessage,
-  type ClientMessage,
-  type ServerMessage,
-} from '@qa/protocol';
+import { encodeMessage, type ClientMessage, type ServerMessage } from '@qa/protocol';
 import { GameServer } from '../src/game-server';
-import type { Connection, Session } from '../src/room';
+import type { Session } from '../src/room';
 import { ManualScheduler } from '../src/scheduler';
+import { MemClient, NO_LIMITS } from './mem-client';
 
 // Fixed match seeds so the 50 games are the same every run, and the audit knows each seed.
 const seeds: number[] = [];
@@ -31,36 +27,6 @@ vi.mock('../src/random', async (importOriginal) => {
     },
   };
 });
-
-const NO_LIMITS = {
-  messages: { capacity: 1e6, perSecond: 1e6 },
-  chat: { capacity: 1e6, perSecond: 1e6 },
-};
-
-/** In-memory client: the GameServer is transport-free, so 50 games run in a second. */
-class MemClient implements Connection {
-  readonly msgs: ServerMessage[] = [];
-  session!: Session;
-  constructor(private readonly server: GameServer) {
-    this.session = server.connect(this);
-  }
-  send(text: string): void {
-    const res = parseServerMessage(text);
-    if (!res.ok) throw new Error(`invalid server message: ${res.error}`);
-    this.msgs.push(res.msg);
-  }
-  close(): void {}
-  say(msg: ClientMessage): void {
-    this.server.receive(this.session, encodeMessage(msg));
-  }
-  latest<T extends ServerMessage['type']>(type: T): Extract<ServerMessage, { type: T }> {
-    for (let i = this.msgs.length - 1; i >= 0; i--) {
-      const m = this.msgs[i];
-      if (m?.type === type) return m as Extract<ServerMessage, { type: T }>;
-    }
-    throw new Error(`no ${type}`);
-  }
-}
 
 type Card = { id: number; kind: string };
 function cardsIn(x: unknown, out: Card[] = []): Card[] {
@@ -156,7 +122,7 @@ function playGame(i: number, server: GameServer, clock: ManualScheduler, stats: 
   const dropped = new Set<PlayerId>();
   if (i % 2 === 1) {
     const p = pick(TURN_ORDER[mode].filter((s) => s !== 'P1'));
-    server.disconnect(clients[p].session, clients[p]);
+    clients[p].drop();
     dropped.add(p);
     clock.advance(30_000);
   }
