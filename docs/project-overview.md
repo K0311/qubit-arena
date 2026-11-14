@@ -49,32 +49,33 @@ The game supports learning; it does not replace a quantum computing course.
 
 **Out of scope:** local hot-seat play, replays, mobile apps. **Optional:** sound and music, only if time allows.
 
-## 5. Development process (SDLC)
+## 5. Development process (game development process)
 
-| Phase | Main activities | Outputs | Status (Nov 2026) |
+We follow the five-step game development process and stop after Testing.
+
+| Step | Main activities | Outputs | Status (Nov 2026) |
 |---|---|---|---|
-| 1. Planning | Goals, MVP scope, schedule, roles, risks | Proposal and timeline | ✓ Done |
-| 2. Analysis | Study Qubit Touchdown rules and Blender prototype, review related games, requirements | Requirements, rule spec | ✓ Done |
-| 3. Design | Rules (CNOT, fog), architecture, UI, test plan | GDD, architecture, mockups, test plan | ✓ Done |
-| 4. Implementation | Engine → server → client → tutorial, bots, accounts | Playable build after each part | **← now** |
-| 5. Testing & Integration | 42 gate cases, bot games, online consistency, user study | Test and evaluation reports | |
-| 6. Maintenance | Deploy (Docker, CI), fix playtest bugs, balance deck, sound if time | Deployed game, final report | |
+| 1. Planning | Concept, goals, target users, MVP scope, schedule, roles, risks | Proposal and timeline | ✓ Done |
+| 2. Pre-production | Study Qubit Touchdown and related games; game design (rules, CNOT and fog, 55-card deck); board, UI and server design; test plan | GDD (rules.md), architecture, ui-spec, test plan | ✓ Done |
+| 3. Prototyping | Blender prototype (42 transitions, 73 self-tests); TypeScript rules engine with tests; 10,000-game bot simulation | Working prototypes, simulation results | ✓ Done |
+| 4. Production | Online server → 2D client → 3D client → tutorial; accounts and ranking if time; feature freeze 15 Feb 2027 | Playable build after each part | **← now** |
+| 5. Testing | Automated tests (42 gate cases, CNOT/fog, rules, server, E2E), playtests, user study (≥ 20 players), bug fixing and deck balance | Test and evaluation reports, final build | |
 
-Implementation and testing repeat in rounds: **rules engine → server → client → bots, accounts and ranking.**
+Production and Testing repeat in rounds for each part of the system: **rules engine → server → client → tutorial.**
 
 ## 6. Schedule (Aug 2026 – Apr 2027)
 
-| Phase | Aug | Sep | Oct | Nov | Dec | Jan | Feb | Mar | Apr |
+| Step | Aug | Sep | Oct | Nov | Dec | Jan | Feb | Mar | Apr |
 |---|---|---|---|---|---|---|---|---|---|
 | Planning | ■ | ■ | | | | | | | |
-| Analysis | | ■ | ■ | | | | | | |
-| Design | | | ■ | ■ | | | | | |
-| Implementation | | | | | ■ | ■ | ■ | | |
-| Testing & Integration | | | | | | | ■ | ■ | |
-| Maintenance | | | | | | | | ■ | ■ |
+| Pre-production | | ■ | ■ | | | | | | |
+| Prototyping | | | ■ | ■ | | | | | |
+| Production | | | | ■ | ■ | ■ | ■ | | |
+| Testing | | | | | | | ■ | ■ | |
+| Report & final | | | | | | | | ■ | ■ |
 | Milestones | | | | Proposal | | | | | Final |
 
-### Implementation milestones (suggested)
+### Production milestones (suggested)
 
 | By | Milestone |
 |---|---|

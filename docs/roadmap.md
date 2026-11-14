@@ -14,18 +14,18 @@
 
 ## ภาพรวม
 
-| เฟส | งาน | ช่วงเวลา | SDLC |
+| เฟส | งาน | ช่วงเวลา | ขั้น (Game dev process) |
 |---|---|---|---|
-| 0 | ตั้งโครง monorepo + CI | 11–17 พ.ย. 2026 | Implementation |
-| 1 | Engine: คณิตควอนตัม | 18 พ.ย. – 1 ธ.ค. | Implementation |
-| 2 | Engine: ตัวเกม + simulation | 2–15 ธ.ค. | Implementation ↔ Testing |
-| 3 | Server ออนไลน์ | 16 ธ.ค. – 10 ม.ค. 2027 | Implementation ↔ Testing |
-| 4 | Client 2D เล่นได้จนจบ | 11–31 ม.ค. | Implementation ↔ Testing |
-| 5 | 3D + tutorial → **feature freeze 15 ก.พ.** | 1–15 ก.พ. | Implementation |
-| 6 | ฟีเจอร์เสริม (บัญชี, ranking, เสียง) — ตัดได้ | 16 ก.พ. – 10 มี.ค. | Implementation |
-| 7 | Testing & Integration + deploy beta + user study | 16 ก.พ. – 20 มี.ค. | Testing & Integration |
-| 8 | Maintenance + deploy final + เขียนรายงาน | 1 มี.ค. – 10 เม.ย. | Maintenance |
-| 9 | Final presentation + ส่งมอบ | เม.ย. 2027 (วันสอบตามคณะ) | Maintenance |
+| 0 | ตั้งโครง monorepo + CI | 11–17 พ.ย. 2026 | Production |
+| 1 | Engine: คณิตควอนตัม | 18 พ.ย. – 1 ธ.ค. | Production |
+| 2 | Engine: ตัวเกม + simulation | 2–15 ธ.ค. | Production ↔ Testing |
+| 3 | Server ออนไลน์ | 16 ธ.ค. – 10 ม.ค. 2027 | Production ↔ Testing |
+| 4 | Client 2D เล่นได้จนจบ | 11–31 ม.ค. | Production ↔ Testing |
+| 5 | 3D + tutorial → **feature freeze 15 ก.พ.** | 1–15 ก.พ. | Production |
+| 6 | ฟีเจอร์เสริม (บัญชี, ranking, เสียง) — ตัดได้ | 16 ก.พ. – 10 มี.ค. | Production |
+| 7 | Testing + deploy beta + user study | 16 ก.พ. – 20 มี.ค. | Testing |
+| 8 | Deploy final + เขียนรายงาน | 1 มี.ค. – 10 เม.ย. | Report & final |
+| 9 | Final presentation + ส่งมอบ | เม.ย. 2027 (วันสอบตามคณะ) | Report & final |
 
 ---
 
@@ -90,7 +90,7 @@
 - [ ] P-6.3 เสียง (optional)
 - [ ] P-6.4 Greedy bot
 
-## เฟส 7 — Testing & Integration + user study (16 ก.พ. – 20 มี.ค.)
+## เฟส 7 — Testing + user study (16 ก.พ. – 20 มี.ค.)
 
 - [ ] P-6.2 Docker Compose + deploy **beta** (ต้องมี URL ให้ผู้ทดสอบเข้าได้)
 - [ ] P-7.1 Full system test run + test report (SE-1..SE-6)
@@ -104,7 +104,7 @@
 
 **ผ่านเมื่อ:** มี test report + ผล user study ครบ
 
-## เฟส 8 — Maintenance + รายงาน (1 มี.ค. – 10 เม.ย.)
+## เฟส 8 — Deploy final + รายงาน (1 มี.ค. – 10 เม.ย.)
 
 - [ ] P-8.1 Deploy **final** + README วิธีรันด้วยคำสั่งเดียว
 - [ ] P-8.2 Release v1.0 (tag + CHANGELOG)
@@ -120,7 +120,7 @@
 
 - [ ] P-9.1 Demo script + seed สำหรับเดโมที่ผลแน่นอน
 - [ ] P-9.2 Final slide content → `docs/report/final-slides.md`
-- [ ] 👤 อัปเดต Canva: SDLC → Maintenance, ใส่ผลทดสอบ, ภาพเกมจริง
+- [ ] 👤 อัปเดต Canva: ขั้น Testing เสร็จ, ใส่ผลทดสอบ, ภาพเกมจริง
 - [ ] P-9.3 Handover check: repo สะอาด, docs ครบ, CI เขียว, URL ใช้ได้
 - [ ] 👤 ซ้อมพรีเซนต์ + เดโมสด (มีวิดีโอสำรอง)
 - [ ] 👤 ส่งรายงาน + repo + URL + วิดีโอ

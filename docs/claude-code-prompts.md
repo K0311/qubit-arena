@@ -274,7 +274,7 @@ With Playwright, record the screens needed for the report and slides at 1920x108
 ```
 **P-8.4 Chapter 4 — Implementation**
 ```
-Draft docs/report/ch4-implementation.md for the final report (academic English, past tense, 12–15 pages of content). Sections: 4.1 Development process (how the SDLC rounds actually went, with dates from git history), 4.2 System architecture as built, 4.3 Rules engine (state model, matrices, CNOT and fog, RNG), 4.4 Game server (rooms, filtered views, clocks, reconnection), 4.5 Web client (screens, 3D board, preview, visualisation), 4.6 Tutorial and study mode, 4.7 Testing infrastructure and CI, 4.8 Deployment. Reference figures in docs/report/figures/ as "Figure 4.x" with captions, and tables as "Table 4.x". Only describe what exists in the code; mark anything uncertain with [CHECK].
+Draft docs/report/ch4-implementation.md for the final report (academic English, past tense, 12–15 pages of content). Sections: 4.1 Development process (how the game development process (Production ↔ Testing rounds) actually went, with dates from git history), 4.2 System architecture as built, 4.3 Rules engine (state model, matrices, CNOT and fog, RNG), 4.4 Game server (rooms, filtered views, clocks, reconnection), 4.5 Web client (screens, 3D board, preview, visualisation), 4.6 Tutorial and study mode, 4.7 Testing infrastructure and CI, 4.8 Deployment. Reference figures in docs/report/figures/ as "Figure 4.x" with captions, and tables as "Table 4.x". Only describe what exists in the code; mark anything uncertain with [CHECK].
 ```
 **P-8.5 Chapter 5 — Evaluation and Results**
 ```
