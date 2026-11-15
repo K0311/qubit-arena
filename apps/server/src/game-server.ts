@@ -17,6 +17,7 @@ import {
   PROTOCOL_VERSION,
   type ClientMessage,
   type ErrorCode,
+  type RoomSettings,
   type ServerMessage,
 } from '@qa/protocol';
 import { newRoomCode, newSeed, newToken } from './random';
@@ -227,11 +228,38 @@ export class GameServer {
         }));
       case 'CHAT':
         return this.chat(session, msg.text);
+      case 'LIST_ROOMS': {
+        const rooms = [...this.rooms.values()]
+          .filter((r) => r.visibility === 'PUBLIC' && r.status !== 'FINISHED')
+          .filter((r) => !msg.mode || r.mode === msg.mode)
+          .map((r) => r.summary());
+        this.send(session, { type: 'ROOM_LIST', rooms });
+        return;
+      }
+      case 'UPDATE_SETTINGS':
+        return this.updateSettings(session, msg.settings);
       case 'LEAVE':
         if (!session.room) return fail('NOT_IN_ROOM', 'not in a room');
         this.leaveRoom(session);
         return;
     }
+  }
+
+  private updateSettings(session: Session, settings: RoomSettings): Failure | void {
+    const room = session.room;
+    if (!room) return fail('NOT_IN_ROOM', 'join a room first');
+    if (room.host !== session) return fail('NOT_HOST', 'only the host can change settings');
+    if (room.status !== 'WAITING') return fail('GAME_IN_PROGRESS', 'the game has started');
+    const next = { ...room.config, ...settings };
+    const cards = Object.values(next.deckCounts).reduce((a, b) => a + b, 0);
+    const needed = room.seatIds().length * next.handSize;
+    if (cards < needed) {
+      return fail('BAD_MESSAGE', `deck has ${cards} cards; ${room.mode} needs at least ${needed}`);
+    }
+    room.config = next;
+    // Everyone must see the new settings before they are ready again.
+    for (const seat of room.seats.values()) if (seat) seat.ready = false;
+    this.broadcastRoom(room);
   }
 
   private join(

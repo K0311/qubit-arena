@@ -135,6 +135,25 @@ describe('server → client messages (architecture.md §5)', () => {
     ['ERROR (engine code)', { type: 'ERROR', code: 'NOT_YOUR_TURN', message: "it is P3's turn" }],
     ['ERROR (protocol code)', { type: 'ERROR', code: 'ROOM_NOT_FOUND', message: 'no such room' }],
     ['PONG', { type: 'PONG', t: 123 }],
+    [
+      'ROOM_LIST',
+      {
+        type: 'ROOM_LIST',
+        rooms: [
+          {
+            code: 'QX7-42',
+            name: 'Room A',
+            mode: 'TEAM',
+            status: 'WAITING',
+            players: 3,
+            seats: 4,
+            spectators: 0,
+            settings: { ...defaultConfig('TEAM') },
+          },
+        ],
+      },
+    ],
+    ['ROOM_LIST (empty)', { type: 'ROOM_LIST', rooms: [] }],
   ])('accepts a valid %s', (_, msg) => {
     expect(accept(msg)).toEqual(msg);
   });
@@ -149,6 +168,8 @@ describe('server → client messages (architecture.md §5)', () => {
       you: { seat: null, host: false },
     });
     reject({ type: 'CHAT', from: 'P1', name: 'a', text: 'x'.repeat(201), at: 1 });
+    // A room summary never says who sits where or carries a token.
+    reject({ type: 'ROOM_LIST', rooms: [{ ...room, players: 1, seats: 2 }] });
     reject('{"type":');
   });
 });

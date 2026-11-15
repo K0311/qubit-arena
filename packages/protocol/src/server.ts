@@ -125,6 +125,18 @@ export const roomSchema = z.strictObject({
   spectators: count,
 });
 
+/** One row of the lobby list (ui-spec §5): counts only, never who sits where. */
+export const roomSummarySchema = z.strictObject({
+  code: roomCodeSchema,
+  name: roomNameSchema,
+  mode: modeSchema,
+  status: z.enum(['WAITING', 'PLAYING', 'FINISHED']),
+  players: count,
+  seats: z.union([z.literal(2), z.literal(4)]),
+  spectators: count,
+  settings: gameConfigSchema,
+});
+
 const ENGINE_ERROR_CODES = [
   'UNKNOWN_ACTION',
   'WRONG_PHASE',
@@ -192,9 +204,11 @@ export const serverMessageSchema = z.discriminatedUnion('type', [
     message: z.string().max(200),
   }),
   z.strictObject({ type: z.literal('PONG'), t: z.number() }),
+  z.strictObject({ type: z.literal('ROOM_LIST'), rooms: z.array(roomSummarySchema) }),
 ]);
 
 export type ServerMessage = z.infer<typeof serverMessageSchema>;
 export type ServerMessageType = ServerMessage['type'];
 export type ErrorCode = z.infer<typeof errorCodeSchema>;
 export type Room = z.infer<typeof roomSchema>;
+export type RoomSummary = z.infer<typeof roomSummarySchema>;

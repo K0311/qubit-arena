@@ -9,9 +9,17 @@ export default defineConfig({
   reporter: process.env.CI ? 'github' : 'list',
   use: { baseURL, trace: 'on-first-retry' },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
-  webServer: {
-    command: 'pnpm --filter @qa/client dev',
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-  },
+  // The client talks to the game server, so both run for every e2e test.
+  webServer: [
+    {
+      command: 'pnpm --filter @qa/server start',
+      port: 8080,
+      reuseExistingServer: !process.env.CI,
+    },
+    {
+      command: 'pnpm --filter @qa/client dev',
+      url: baseURL,
+      reuseExistingServer: !process.env.CI,
+    },
+  ],
 });

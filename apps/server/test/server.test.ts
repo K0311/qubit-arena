@@ -252,3 +252,74 @@ describe('T-S-08 spectators', () => {
     expect(next.view.hands).toEqual({});
   });
 });
+
+describe('lobby list and room settings (ui-spec §5, §6)', () => {
+  it('LIST_ROOMS lists public rooms only, filtered by mode', async () => {
+    await setup();
+    const a = await client();
+    const b = await client();
+    await a.request(
+      { type: 'CREATE_ROOM', mode: 'SOLO', visibility: 'PUBLIC', name: 'Open', playerName: 'A' },
+      'ROOM_STATE',
+    );
+    await b.request(
+      { type: 'CREATE_ROOM', mode: 'TEAM', visibility: 'PRIVATE', name: 'Hidden', playerName: 'B' },
+      'ROOM_STATE',
+    );
+    const c = await client();
+    const all = await c.request({ type: 'LIST_ROOMS' }, 'ROOM_LIST');
+    expect(all.rooms.map((r) => r.name)).toEqual(['Open']);
+    expect(all.rooms[0]).toMatchObject({ mode: 'SOLO', status: 'WAITING', players: 1, seats: 2 });
+    const team = await c.request({ type: 'LIST_ROOMS', mode: 'TEAM' }, 'ROOM_LIST');
+    expect(team.rooms).toEqual([]);
+  });
+
+  it('UPDATE_SETTINGS: host only, before the game, clears ready, checks the deck', async () => {
+    await setup();
+    const host = await client();
+    const created = await host.request(
+      { type: 'CREATE_ROOM', mode: 'TEAM', visibility: 'PUBLIC', name: 'R', playerName: 'A' },
+      'ROOM_STATE',
+    );
+    const guest = await client();
+    await guest.request(
+      { type: 'JOIN_ROOM', code: created.room.code, role: 'PLAYER', playerName: 'B' },
+      'ROOM_STATE',
+    );
+    await guest.request({ type: 'READY', ready: true }, 'ROOM_STATE');
+
+    const updated = await host.request(
+      { type: 'UPDATE_SETTINGS', settings: { targetScore: 5, turnTimerMs: 30_000 } },
+      'ROOM_STATE',
+    );
+    expect(updated.room.settings).toMatchObject({ targetScore: 5, turnTimerMs: 30_000 });
+    expect(updated.room.settings.timeLimitMs).toBe(15 * 60 * 1000);
+    expect(updated.room.seats.P2?.ready).toBe(false);
+
+    const notHost = await guest.request(
+      { type: 'UPDATE_SETTINGS', settings: { targetScore: 3 } },
+      'ERROR',
+    );
+    expect(notHost.code).toBe('NOT_HOST');
+    const tooSmall = await host.request(
+      {
+        type: 'UPDATE_SETTINGS',
+        settings: {
+          deckCounts: { H: 1, X: 1, Y: 1, Z: 1, S: 1, SX: 1, I: 1, MEASURE: 1, CNOT: 1 },
+        },
+      },
+      'ERROR',
+    );
+    expect(tooSmall.code).toBe('BAD_MESSAGE');
+  });
+
+  it('UPDATE_SETTINGS is refused once the game runs', async () => {
+    await setup();
+    const t = await table('SOLO');
+    const res = await t.host.request(
+      { type: 'UPDATE_SETTINGS', settings: { targetScore: 3 } },
+      'ERROR',
+    );
+    expect(res.code).toBe('GAME_IN_PROGRESS');
+  });
+});

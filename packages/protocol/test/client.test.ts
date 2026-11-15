@@ -27,6 +27,9 @@ const VALID: readonly ClientMessage[] = [
   { type: 'CHALLENGE_ANSWER', questionId: 'gate-H-ZERO', choice: 1 },
   { type: 'LEAVE' },
   { type: 'PING', t: 123 },
+  { type: 'LIST_ROOMS' },
+  { type: 'LIST_ROOMS', mode: 'TEAM' },
+  { type: 'UPDATE_SETTINGS', settings: { targetScore: 5, suddenDeath: false } },
 ];
 
 const reject = (raw: unknown) => {
@@ -37,8 +40,8 @@ const reject = (raw: unknown) => {
 
 describe('client → server messages (architecture.md §5)', () => {
   it('covers every client message type', () => {
-    // The 10 in architecture.md §5 plus READY.
-    expect(new Set(VALID.map((m) => m.type)).size).toBe(11);
+    // The 10 in architecture.md §5 plus READY, LIST_ROOMS and UPDATE_SETTINGS.
+    expect(new Set(VALID.map((m) => m.type)).size).toBe(13);
   });
 
   it.each(VALID.map((m) => [m.type, m] as const))('accepts a valid %s', (_, msg) => {
@@ -73,6 +76,14 @@ describe('client → server messages (architecture.md §5)', () => {
     reject({ type: 'CHAT', text: 'x'.repeat(201) });
     reject({ type: 'QUICK_MATCH', mode: 'SOLO', playerName: 'x'.repeat(25) });
     reject({ type: 'CREATE_ROOM', mode: 'SOLO', visibility: 'PUBLIC', name: '', playerName: 'a' });
+  });
+
+  it('checks LIST_ROOMS and UPDATE_SETTINGS', () => {
+    reject({ type: 'LIST_ROOMS', mode: 'DUO' });
+    reject({ type: 'UPDATE_SETTINGS' });
+    reject({ type: 'UPDATE_SETTINGS', settings: { targetScore: 0 } });
+    // Mode is fixed once a room exists; seats depend on it.
+    reject({ type: 'UPDATE_SETTINGS', settings: { mode: 'TEAM' } });
   });
 
   it('keeps room settings within bounds', () => {

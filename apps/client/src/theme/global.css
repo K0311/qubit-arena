@@ -1,0 +1,138 @@
+/* Design tokens (ui-spec §2). Keep in sync with tokens.ts. */
+:root {
+  --bg-deep: #060a22;
+  --bg-base: #0b1236;
+  --surface-panel: #101a4a;
+  --surface-raised: #16225c;
+  --stroke-subtle: #2a3a86;
+  --accent-cyan: #27e5f7;
+  --accent-gold: #ffd14d;
+  --accent-purple: #a26bff;
+  --accent-green: #3ddc97;
+  --team-blue: #1f5bd6;
+  --team-blue-soft: #7fb2ff;
+  --team-red: #c8323f;
+  --team-red-soft: #ff9aa3;
+  --text-primary: #f5f5fa;
+  --text-muted: #9aa6d6;
+
+  --gate-h: #8b5cf6;
+  --gate-x: #f43f5e;
+  --gate-y: #a855f7;
+  --gate-z: #10b981;
+  --gate-s: #2dd4bf;
+  --gate-sx: #f59e0b;
+  --gate-i: #94a3b8;
+  --gate-measure: #60a5fa;
+  --gate-cnot: #ec4899;
+
+  --font-display: 'Orbitron', system-ui, sans-serif;
+  --font-body: 'Exo 2', system-ui, sans-serif;
+  --font-ket: 'JetBrains Mono', ui-monospace, monospace;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --radius-panel: 20px;
+  --radius-button: 12px;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  height: 100%;
+}
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
+  margin: 0;
+}
+h1 {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+h2 {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+h3 {
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.caption {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ui-spec §1: every ket uses JetBrains Mono (many UI fonts lack ⟩). */
+.ket {
+  font-family: var(--font-ket);
+  font-weight: 700;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+input,
+select {
+  background: var(--surface-raised);
+  border: 1.5px solid var(--stroke-subtle);
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-height: 44px;
+}
+input:focus-visible,
+select:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+a {
+  color: var(--accent-cyan);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

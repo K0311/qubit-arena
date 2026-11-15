@@ -67,7 +67,7 @@
 
 ## เฟส 4 — Client 2D (11–31 ม.ค.)
 
-- [ ] P-4.1 App shell + theme tokens + menu/lobby/room + WebSocket + store (ตาม `docs/ui-spec.md`)
+- [x] P-4.1 App shell + theme tokens + menu/lobby/room + WebSocket + store (ตาม `docs/ui-spec.md`)
 - [ ] P-4.2 Game screen: 2D board + gate cards + hand + preview + action log
 - [ ] P-4.3 State panel + team chat + Quantum Challenge + Result + Settings
 - [ ] P-4.4 Playwright T-E-01..05
@@ -142,4 +142,6 @@
 | 11 พ.ย. 2026 | P-3.2 Server core | `apps/server`: WebSocket (`ws`), ห้อง public/private/quick match, ที่นั่ง, ready, เริ่มเกม, view แยกต่อคน, chat เฉพาะทีม, ผู้ชม; T-S-01..05, 08 ผ่าน |
 | 12 พ.ย. 2026 | P-3.3 Clocks, reconnection, bots | turn timer 60 วิ + นาฬิกาเกมบน server, กลับเข้าเกมด้วย token, bot เล่นแทนที่นั่งที่หลุดเกิน 30 วิ, rate limit chat/ข้อความ; T-S-06, 07, 09 ผ่าน |
 | 12 พ.ย. 2026 | P-3.4 Hidden data audit | T-S-03 ตรวจทุกข้อความขาออกใน 50 เกม (Solo/Team, ผู้ชม, bot, timeout, Quantum Challenge) ไม่มีกองไพ่ seed ไพ่ฝ่ายตรงข้าม หรือคำถามถัดไปหลุด; ปิดห้องที่จบแล้วเมื่อไม่มีใครอยู่; เพิ่ม `pnpm --filter @qa/server cli` ให้ 2 terminal เล่นกันได้ — เฟส 3 ครบ |
+| 12 พ.ย. 2026 | Challenge bot rule | rules.md §8.1: bot ตอบ Quantum Challenge แทนทีมเฉพาะเมื่อทีมไม่มีคนออนไลน์ (T-S-10) |
+| 15 พ.ย. 2026 | P-4.1 App shell | client: theme tokens, ฟอนต์, พื้นหลังอวกาศ, component กลาง, route ทุกหน้า, เมนู/เลือกโหมด/lobby/ห้อง, WebSocket + store; protocol เพิ่ม `LIST_ROOMS`/`ROOM_LIST`, `UPDATE_SETTINGS`; e2e quick match และสร้างห้อง→เริ่มเกม ผ่าน |
 | 11 พ.ย. 2026 | UI spec + ภาพ reference | `docs/ui-spec.md` (หน้าจอ, HUD, การ์ด) + `docs/visual-design.md` (กระดาน); เอาแค่ UI ไม่เปลี่ยนกฎ |
