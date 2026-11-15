@@ -6,8 +6,10 @@ import {
   viewFor,
   type Action,
   type GameEvent,
+  type GameState,
   type Mode,
   type PlayerId,
+  type Side,
 } from '@qa/engine';
 import {
   encodeMessage,
@@ -382,6 +384,8 @@ export class GameServer {
         this.scheduleBot(room);
       }, this.botDelayMs),
     );
+    // The last human of a side leaving can free a teammate's bot for the Challenge.
+    this.scheduleBot(room);
   }
 
   /** The human is back: cancel the pending bot or stop the running one. */
@@ -391,10 +395,9 @@ export class GameServer {
     this.scheduler.clear(room.timers.seats.get(p));
     room.timers.seats.delete(p);
     seat.left = false;
-    if (seat.bot) {
-      seat.bot = false;
-      this.scheduleBot(room);
-    }
+    seat.bot = false;
+    // Stops this seat's bot, and a teammate's bot in the Challenge (rules.md §8.1).
+    this.scheduleBot(room);
   }
 
   private closeRoom(room: Room): void {
@@ -488,20 +491,36 @@ export class GameServer {
     room.timers.bot = undefined;
     const state = room.state;
     if (!state || room.status !== 'PLAYING') return;
-    const answered = state.challenge?.answers ?? {};
-    const due = [...room.seats].find(([p, seat]) => {
-      if (!seat?.bot) return false;
-      if (state.phase === 'PLAYING') return state.turn === p;
-      return state.phase === 'CHALLENGE' && answered[room.sideOf(p)] === undefined;
-    });
-    if (!due) return;
-    const [p] = due;
+    const p = this.botDue(room, state);
+    if (!p) return;
     room.timers.bot = this.scheduler.set(() => {
       room.timers.bot = undefined;
-      if (!room.state || !room.rng || !room.seats.get(p)?.bot) return;
+      if (!room.state || !room.rng || this.botDue(room, room.state) !== p) return;
       const action = botAction(room.state, p, room.rng);
       if (action) this.apply(room, action);
     }, this.botThinkMs);
+  }
+
+  /** The bot seat that should act now, if any. */
+  private botDue(room: Room, state: GameState): PlayerId | undefined {
+    if (state.phase === 'PLAYING') {
+      return room.seats.get(state.turn)?.bot ? state.turn : undefined;
+    }
+    const answers = state.challenge?.answers;
+    if (state.phase !== 'CHALLENGE' || !answers) return undefined;
+    for (const [p, seat] of room.seats) {
+      const side = room.sideOf(p);
+      // rules.md §8.1: a bot answers for its side only when that side has no connected human.
+      if (seat?.bot && answers[side] === undefined && !this.hasHuman(room, side)) return p;
+    }
+    return undefined;
+  }
+
+  private hasHuman(room: Room, side: Side): boolean {
+    for (const [p, seat] of room.seats) {
+      if (seat && !seat.bot && room.sideOf(p) === side && room.isConnected(seat)) return true;
+    }
+    return false;
   }
 
   private stopClocks(room: Room): void {

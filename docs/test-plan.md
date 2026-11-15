@@ -94,6 +94,7 @@ Coverage goal: **≥ 90 % lines in `packages/engine`**, ≥ 70 % in `apps/server
 * **T-S-07** — Turn timer fires on the server even if the client is silent.
 * **T-S-08** — Spectator receives public state only.
 * **T-S-09** — Rate limit: 50 chat messages in 1 s are throttled.
+* **T-S-10** — Quantum Challenge: a bot answers for its side only when no human player of that side is connected (rules.md §8.1).
 
 ### 3.5 End-to-end (Playwright)
 

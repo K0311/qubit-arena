@@ -116,7 +116,7 @@ Tests first: integration tests T-S-01..T-S-05 and T-S-08 on a random port.
 **P-3.3 Clocks, reconnection, bot seats**
 ```
 Add the game time limit and the 60 s turn timer on the server (TIMEOUT action), reconnection by token, and a bot that takes over a disconnected seat after the delay in rules.md §10. Add chat and action rate limits.
-Tests: T-S-06, T-S-07, T-S-09.
+Tests: T-S-06, T-S-07, T-S-09. In the Quantum Challenge a bot answers for its side only when that side has no connected human (rules.md §8.1, T-S-10).
 ```
 **P-3.4 Hidden data audit**
 ```

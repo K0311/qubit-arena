@@ -241,6 +241,7 @@ The side with more points wins. If the score is tied → **Quantum Challenge**.
 
 * Five multiple-choice questions about the gates, states and measurement used in the game.
 * Both sides answer every question; in Team mode the team submits one answer (any member may submit; the first submission counts). [OPEN]
+* A bot answers the Quantum Challenge for its side only when that side has no connected human player.
 * One point per correct answer; the higher total wins.
 * If still tied and **sudden death** is on: one more question at a time until one side is right and the other is wrong.
 * If still tied and sudden death is off: the game is a draw.
@@ -299,3 +300,5 @@ Local hot-seat play, replays, mobile apps. Sound and music are optional and adde
 | 3 | Delay before a bot replaces a disconnected player | 30 seconds |
 
 Decided on 10 Nov 2026: opening roll in both modes (higher roll plays first, tie re-rolls); Solo uses the same target score (7) and time limit (15 min) as Team; Team order P1 → P3 → P2 → P4.
+
+Decided on 12 Nov 2026: in the Quantum Challenge a bot answers for its side only when that side has no connected human player.
