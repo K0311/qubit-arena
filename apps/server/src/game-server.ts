@@ -238,6 +238,8 @@ export class GameServer {
       }
       case 'UPDATE_SETTINGS':
         return this.updateSettings(session, msg.settings);
+      case 'REMATCH':
+        return this.rematch(session);
       case 'LEAVE':
         if (!session.room) return fail('NOT_IN_ROOM', 'not in a room');
         this.leaveRoom(session);
@@ -440,6 +442,39 @@ export class GameServer {
     for (const t of room.timers.seats.values()) this.scheduler.clear(t);
     room.timers.seats.clear();
     this.rooms.delete(room.code);
+  }
+
+  /**
+   * Play Again (ui-spec §10): the finished room goes back to WAITING with the same seats.
+   * Seats that were left or taken over by a bot open up; nobody is ready, so everyone presses
+   * Ready again before the host starts. That is the rematch vote.
+   */
+  private rematch(session: Session): Failure | void {
+    const room = session.room;
+    const me = room?.seatOf(session);
+    if (!room || !me) return fail('NOT_SEATED', 'only players can ask for a rematch');
+    if (room.status !== 'FINISHED') return fail('GAME_IN_PROGRESS', 'the game is not over');
+    this.stopClocks(room);
+    for (const t of room.timers.seats.values()) this.scheduler.clear(t);
+    room.timers.seats.clear();
+    for (const [p, seat] of room.seats) {
+      if (!seat) continue;
+      if (seat.left || seat.bot) {
+        room.seats.set(p, null);
+        if (seat.session.room === room && !seat.session.conn) {
+          seat.session.room = null;
+          this.sessions.delete(seat.session.token);
+        }
+        continue;
+      }
+      seat.ready = false;
+    }
+    const hostSeated = [...room.seats.values()].some((s) => s?.session === room.host);
+    if (!hostSeated) room.host = session;
+    room.state = null;
+    room.rng = null;
+    room.status = 'WAITING';
+    this.broadcastRoom(room);
   }
 
   private maybeQuickStart(room: Room): void {

@@ -167,6 +167,66 @@ describe('T-S-07 server clocks', () => {
   });
 });
 
+describe('Play Again (ui-spec §10)', () => {
+  /** Time up at 0 : 0 → Challenge; both sides give the same answer five times → draw. */
+  async function finishByDraw(t: Table) {
+    clock.advance(60_000);
+    const up = await t.host.waitFor('EVENT', (m) => m.events.some((e) => e.type === 'TIME_UP'));
+    const view = (await t.host.waitFor('GAME_VIEW', (m) => m.stateVersion >= up.stateVersion)).view;
+    const mover = t.clients[view.turn];
+    const card = (await mover.waitFor('GAME_VIEW', (m) => m.stateVersion >= up.stateVersion)).view
+      .hands[view.turn]![0]!;
+    let latest = await mover.request({ type: 'PLAY_CARD', cardId: card.id }, 'GAME_VIEW');
+    for (let i = 0; i < 5 && latest.view.challenge; i++) {
+      const q = latest.view.challenge.question;
+      await t.clients.P1.request(
+        { type: 'CHALLENGE_ANSWER', questionId: q.id, choice: 0 },
+        'GAME_VIEW',
+      );
+      // Wait for the view after this question, not a late copy of the one before it.
+      latest = await t.clients.P2.request(
+        { type: 'CHALLENGE_ANSWER', questionId: q.id, choice: 0 },
+        'GAME_VIEW',
+        (m) => m.view.phase === 'FINISHED' || m.view.challenge?.question.id !== q.id,
+      );
+    }
+    expect(latest.view.phase).toBe('FINISHED');
+  }
+
+  it('REMATCH is refused while the game runs', async () => {
+    const t = await table('SOLO');
+    const err = await t.host.request({ type: 'REMATCH' }, 'ERROR');
+    expect(err.code).toBe('GAME_IN_PROGRESS');
+  });
+
+  it('after the game, REMATCH reopens the room with the same seats, nobody ready', async () => {
+    const t = await table('SOLO', {
+      timeLimitMs: 60_000,
+      turnTimerMs: 300_000,
+      suddenDeath: false,
+    });
+    await finishByDraw(t);
+    const back = await t.clients.P2.request(
+      { type: 'REMATCH' },
+      'ROOM_STATE',
+      (m) => m.room.status === 'WAITING',
+    );
+    expect(back.room.seats.P1).toMatchObject({ name: 'P1', ready: false });
+    expect(back.room.seats.P2).toMatchObject({ name: 'P2', ready: false });
+    const hostSees = await t.host.waitFor('ROOM_STATE', (m) => m.room.status === 'WAITING');
+    expect(hostSees.you).toEqual({ seat: 'P1', host: true });
+
+    // Ready again and start: a fresh game with a full clock.
+    for (const c of [t.clients.P1, t.clients.P2]) {
+      await c.request({ type: 'READY', ready: true }, 'ROOM_STATE');
+    }
+    const fresh = await t.host.request({ type: 'START_GAME' }, 'GAME_VIEW');
+    expect(fresh.view.phase).toBe('PLAYING');
+    expect(fresh.view.score).toEqual({ BLUE: 0, RED: 0 });
+    expect(fresh.clocks.gameMs).toBe(60_000);
+  });
+});
+
 describe('T-S-09 rate limit', () => {
   it('throttles 50 chat messages in one second', async () => {
     const t = await table('TEAM');

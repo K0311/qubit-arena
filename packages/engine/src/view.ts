@@ -20,6 +20,8 @@ export type ChallengeView = {
   readonly index: number;
   readonly scores: Readonly<Record<Side, number>>;
   readonly answered: Readonly<Record<Side, boolean>>;
+  /** The viewer's own side's submitted choice (Team: maybe the teammate's). Never the other side's. */
+  readonly sideChoice?: number;
   /** The current question without its answer; upcoming questions are never included. */
   readonly question: {
     readonly id: string;
@@ -51,7 +53,7 @@ export type GameView = {
   readonly challenge?: ChallengeView;
 };
 
-function challengeView(state: GameState): ChallengeView | undefined {
+function challengeView(state: GameState, side: Side | undefined): ChallengeView | undefined {
   const ch = state.challenge;
   const id = ch?.questionIds[ch.index];
   if (!ch || state.phase !== 'CHALLENGE' || id === undefined) return undefined;
@@ -61,6 +63,9 @@ function challengeView(state: GameState): ChallengeView | undefined {
     scores: ch.scores,
     answered: { BLUE: ch.answers.BLUE !== undefined, RED: ch.answers.RED !== undefined },
     question: { id: q.id, prompt: q.prompt, choices: q.choices },
+    ...(side !== undefined && ch.answers[side] !== undefined
+      ? { sideChoice: ch.answers[side] }
+      : {}),
   };
 }
 
@@ -79,7 +84,7 @@ export function viewFor(state: GameState, viewer: Viewer): GameView {
     if (canSee(p)) hands[p] = hand;
   }
 
-  const challenge = challengeView(state);
+  const challenge = challengeView(state, mySide);
   return {
     viewer,
     config: state.config,

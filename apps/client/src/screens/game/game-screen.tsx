@@ -6,16 +6,21 @@ import { CardBack, GateCard } from '../../components/cards/gate-card';
 import { Button } from '../../components/ui/button';
 import { Modal } from '../../components/ui/modal';
 import { en } from '../../i18n/en';
-import { KET } from '../../lib/format';
 import { buildLog } from '../../lib/game-log';
 import { previewMove } from '../../lib/preview';
 import { useNow } from '../../lib/use-now';
 import { send } from '../../net/connection';
+import { useSettings } from '../../state/settings';
 import { useGame, type GameViewData } from '../../state/store';
 import { ActionLog } from './action-log';
+import { ChallengeOverlay, useChallengeReveal } from './challenge-overlay';
+import { ResultOverlay } from './result-overlay';
+import { StatePanel } from './state-panel';
+import { TeamChat } from './team-chat';
 import { Banner, Clocks, Scoreboard, TurnBar } from './hud';
 import { GateReference, TeamPanel } from './side-panels';
 import './game.css';
+import './overlays.css';
 
 const STAGE_W = 1920;
 const STAGE_H = 1080;
@@ -67,6 +72,8 @@ export function GameScreen() {
   const [help, setHelp] = useState(false);
   const [confirmLeave, setConfirmLeave] = useState(false);
   const { gameMs, turnMs } = useClocks(view);
+  const reveal = useChallengeReveal(view);
+  const settings = useSettings();
 
   const viewer = view?.viewer ?? 'SPECTATOR';
   const you: PlayerId | null = viewer === 'SPECTATOR' ? null : viewer;
@@ -186,19 +193,10 @@ export function GameScreen() {
             orientation={orientation}
             playable={playable}
             preview={preview}
+            showLabels={settings.showLabels}
+            ballShape={settings.ball}
+            swirl={settings.swirl}
           />
-          {view.phase === 'FINISHED' && view.winner && (
-            <div className="game-over panel panel--gold">
-              <span className="caption">{en.game.gameOver}</span>
-              <strong>{en.banner.gameOver(view.winner)}</strong>
-              <span className="ket">
-                {view.score.BLUE} : {view.score.RED}
-              </span>
-              <Button size="small" onClick={leave}>
-                {en.common.back}
-              </Button>
-            </div>
-          )}
         </div>
 
         <div className="game-deck">
@@ -247,41 +245,17 @@ export function GameScreen() {
         )}
         {!you && <p className="game-spectating caption">{en.game.spectating}</p>}
 
-        <section className="game-state panel" aria-label={en.game.quantumState}>
-          <h2 className="panel__title">{en.game.quantumState}</h2>
-          <div className="game-state__kets">
-            <div>
-              <span className="caption">{en.game.football}</span>
-              <span className={`ket game-state__ket${view.ball === 'FOG' ? ' is-fog' : ''}`}>
-                {KET[view.ball]}
-              </span>
-            </div>
-            <div>
-              <span className="caption">{en.game.partner}</span>
-              <span className={`ket game-state__ket${view.partner === 'FOG' ? ' is-fog' : ''}`}>
-                {KET[view.partner]}
-              </span>
-            </div>
-          </div>
-          <p
-            className={`game-state__fog ${view.ball === 'FOG' ? 'is-fog' : ''}`}
-            data-testid="state-fog-indicator"
-            data-fog={view.ball === 'FOG'}
-          >
-            {view.ball === 'FOG' ? en.game.entangled : en.game.notEntangled}
-          </p>
-          <p className="muted game-state__soon">{en.game.stateSoon}</p>
-        </section>
+        <StatePanel qubits={view.qubits} ball={view.ball} partner={view.partner} />
 
         <ActionLog rows={rows} room={room} />
 
-        {team && you && (
-          <section className="game-chat panel" data-testid="team-chat">
-            <h2 className="panel__title">{en.game.teamChat(mySide === 'BLUE' ? 'BLUE' : 'RED')}</h2>
-            <p className="muted">{en.game.chatSoon}</p>
-          </section>
-        )}
+        {team && you && mySide && <TeamChat side={mySide} />}
       </Stage>
+
+      {(view.phase === 'CHALLENGE' || reveal) && (
+        <ChallengeOverlay view={view} room={room} reveal={reveal} />
+      )}
+      {view.phase === 'FINISHED' && !reveal && <ResultOverlay view={view} room={room} />}
 
       <Modal open={help} title={en.game.gateReference}>
         <GateReference />
