@@ -17,6 +17,7 @@ import {
   PROTOCOL_VERSION,
   type ClientMessage,
   type ErrorCode,
+  type RoomSettings,
   type ServerMessage,
 } from '@qa/protocol';
 import { newRoomCode, newSeed, newToken } from './random';
@@ -227,11 +228,38 @@ export class GameServer {
         }));
       case 'CHAT':
         return this.chat(session, msg.text);
+      case 'LIST_ROOMS': {
+        const rooms = [...this.rooms.values()]
+          .filter((r) => r.visibility === 'PUBLIC' && r.status !== 'FINISHED')
+          .filter((r) => !msg.mode || r.mode === msg.mode)
+          .map((r) => r.summary());
+        this.send(session, { type: 'ROOM_LIST', rooms });
+        return;
+      }
+      case 'UPDATE_SETTINGS':
+        return this.updateSettings(session, msg.settings);
       case 'LEAVE':
         if (!session.room) return fail('NOT_IN_ROOM', 'not in a room');
         this.leaveRoom(session);
         return;
     }
+  }
+
+  private updateSettings(session: Session, settings: RoomSettings): Failure | void {
+    const room = session.room;
+    if (!room) return fail('NOT_IN_ROOM', 'join a room first');
+    if (room.host !== session) return fail('NOT_HOST', 'only the host can change settings');
+    if (room.status !== 'WAITING') return fail('GAME_IN_PROGRESS', 'the game has started');
+    const next = { ...room.config, ...settings };
+    const cards = Object.values(next.deckCounts).reduce((a, b) => a + b, 0);
+    const needed = room.seatIds().length * next.handSize;
+    if (cards < needed) {
+      return fail('BAD_MESSAGE', `deck has ${cards} cards; ${room.mode} needs at least ${needed}`);
+    }
+    room.config = next;
+    // Everyone must see the new settings before they are ready again.
+    for (const seat of room.seats.values()) if (seat) seat.ready = false;
+    this.broadcastRoom(room);
   }
 
   private join(
@@ -427,13 +455,17 @@ export class GameServer {
     room.state = state;
     room.status = 'PLAYING';
     this.broadcastRoom(room);
-    this.pushGame(room, events);
     // Game clock (rules.md §8 item 2); the engine ends the game after the current turn.
+    room.clock.gameEndsAt = this.scheduler.now() + room.config.timeLimitMs;
+    room.clock.gameStoppedMs = null;
+    room.clock.logGameMs = [];
     room.timers.game = this.scheduler.set(() => {
       room.timers.game = undefined;
       this.apply(room, { type: 'TIME_UP' });
     }, room.config.timeLimitMs);
-    this.afterGameChange(room, events);
+    this.resetTurnTimer(room, events);
+    this.pushGame(room, events);
+    this.scheduleBot(room);
   }
 
   private act(session: Session, build: (player: PlayerId) => Action): Failure | void {
@@ -451,6 +483,8 @@ export class GameServer {
     if (res.error) return fail(res.error.code, res.error.message);
     if (res.events.length === 0) return;
     room.state = res.state;
+    // Timers first, so the views below already report the new turn's clock.
+    this.resetTurnTimer(room, res.events);
     this.pushGame(room, res.events);
     if (res.state.phase === 'FINISHED') {
       room.status = 'FINISHED';
@@ -459,12 +493,13 @@ export class GameServer {
         return;
       }
       this.broadcastRoom(room);
+      return;
     }
-    this.afterGameChange(room, res.events);
+    this.scheduleBot(room);
   }
 
-  /** Restart the turn timer after every card and give bots their move. */
-  private afterGameChange(room: Room, events: readonly GameEvent[]): void {
+  /** Restart the turn timer after every card; stop the clocks when the game is over. */
+  private resetTurnTimer(room: Room, events: readonly GameEvent[]): void {
     const state = room.state;
     if (!state || state.phase === 'FINISHED') {
       this.stopClocks(room);
@@ -473,6 +508,7 @@ export class GameServer {
     if (state.phase !== 'PLAYING') {
       this.scheduler.clear(room.timers.turn);
       room.timers.turn = undefined;
+      room.clock.turnEndsAt = null;
     } else if (!room.timers.turn || events.some((e) => e.type === 'CARD_PLAYED')) {
       this.scheduler.clear(room.timers.turn);
       const player = state.turn;
@@ -481,8 +517,12 @@ export class GameServer {
         room.timers.turn = undefined;
         this.apply(room, { type: 'TIMEOUT', player });
       }, room.config.turnTimerMs);
+      room.clock.turnEndsAt = this.scheduler.now() + room.config.turnTimerMs;
     }
-    this.scheduleBot(room);
+  }
+
+  private gameMsLeft(room: Room): number {
+    return room.clock.gameStoppedMs ?? Math.max(0, room.clock.gameEndsAt - this.scheduler.now());
   }
 
   /** At most one pending bot move per room; recomputed after every change. */
@@ -524,6 +564,10 @@ export class GameServer {
   }
 
   private stopClocks(room: Room): void {
+    if (room.state && room.clock.gameStoppedMs === null) {
+      room.clock.gameStoppedMs = this.gameMsLeft(room);
+    }
+    room.clock.turnEndsAt = null;
     for (const key of ['game', 'turn', 'bot'] as const) {
       this.scheduler.clear(room.timers[key]);
       room.timers[key] = undefined;
@@ -534,6 +578,8 @@ export class GameServer {
 
   private pushGame(room: Room, events: readonly GameEvent[]): void {
     room.version++;
+    const at = this.gameMsLeft(room);
+    for (let i = 0; i < events.length; i++) room.clock.logGameMs.push(at);
     const members = room.members();
     if (events.length > 0) {
       for (const s of members) {
@@ -549,7 +595,18 @@ export class GameServer {
     if (!room.state || !role) return;
     const view = viewFor(room.state, role);
     // The engine's view is deeply readonly; the schema type is not. Same shape (protocol tests).
-    this.send(session, { type: 'GAME_VIEW', stateVersion: room.version, view } as ServerMessage);
+    const turnEndsAt = room.clock.turnEndsAt;
+    const clocks = {
+      gameMs: this.gameMsLeft(room),
+      turnMs: turnEndsAt === null ? null : Math.max(0, turnEndsAt - this.scheduler.now()),
+      logGameMs: room.clock.logGameMs.slice(0, view.log.length),
+    };
+    this.send(session, {
+      type: 'GAME_VIEW',
+      stateVersion: room.version,
+      view,
+      clocks,
+    } as ServerMessage);
   }
 
   private broadcastRoom(room: Room): void {

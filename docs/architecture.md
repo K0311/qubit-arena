@@ -110,17 +110,20 @@ type Action =
 
 All messages are JSON with a `type` field and are validated with zod on both sides.
 
-**Client → server:** `CREATE_ROOM`, `JOIN_ROOM`, `QUICK_MATCH`, `TAKE_SEAT`, `READY`, `START_GAME`, `PLAY_CARD`, `CHAT`, `CHALLENGE_ANSWER`, `LEAVE`, `PING`.
+**Client → server:** `CREATE_ROOM`, `JOIN_ROOM`, `QUICK_MATCH`, `TAKE_SEAT`, `READY`, `START_GAME`, `PLAY_CARD`, `CHAT`, `CHALLENGE_ANSWER`, `LEAVE`, `PING`, `LIST_ROOMS`, `UPDATE_SETTINGS`.
 
-**Server → client:** `WELCOME` (session token), `ROOM_STATE` (lobby), `GAME_VIEW` (filtered state), `EVENT` (card played, touchdown, kickoff, measure result, timeout, game over), `CHAT`, `ERROR`, `PONG`.
+**Server → client:** `WELCOME` (session token), `ROOM_STATE` (lobby), `GAME_VIEW` (filtered state), `EVENT` (card played, touchdown, kickoff, measure result, timeout, game over), `CHAT`, `ERROR`, `PONG`, `ROOM_LIST` (lobby rows).
 
 Rules:
 * `GAME_VIEW` is built per player with `viewFor()`; never broadcast one object to all.
+* `GAME_VIEW` also carries `clocks`: `gameMs` (match time left), `turnMs` (turn time left, `null` when no turn timer runs) and `logGameMs` (match time left when each `view.log` entry happened, for the action log). These are remaining times, not deadlines, so the client counts down locally without trusting its own clock. They are not secret.
 * Every message from the client carries no trusted data other than the intent and ids. Schemas are strict: unknown fields are rejected, and there is no `player` field (the server knows who is on each connection).
 * Include a `stateVersion` number (on `ROOM_STATE`, `GAME_VIEW` and `EVENT`) so clients can ignore stale messages.
 * `WELCOME` is the first message on every connection and gives the client a token. The client reconnects with that token in the connection URL to get its seat back (rules.md §10).
 * `READY` drives the ready pill in the room (ui-spec.md §6). `CREATE_ROOM`, `JOIN_ROOM` and `QUICK_MATCH` carry the player's display name.
 * Client messages over 4,096 characters are rejected before parsing.
+* `LIST_ROOMS` (optional mode filter) is answered with `ROOM_LIST`: public rooms only, with player and seat counts but no names or seats (ui-spec.md §5). The lobby asks again every few seconds.
+* `UPDATE_SETTINGS` lets the host change the match settings before the game (ui-spec.md §6). The mode cannot change; the server checks the deck can deal every seat and clears everyone's ready.
 
 ## 6. Server (`apps/server`)
 

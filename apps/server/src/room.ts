@@ -9,7 +9,7 @@ import {
   type Rng,
   type Side,
 } from '@qa/engine';
-import type { Room as RoomInfo, RoomSettings } from '@qa/protocol';
+import type { Room as RoomInfo, RoomSettings, RoomSummary } from '@qa/protocol';
 import type { TimerHandle } from './scheduler';
 
 export interface Connection {
@@ -66,13 +66,24 @@ export class Room {
     bot?: TimerHandle;
     seats: Map<PlayerId, TimerHandle>;
   } = { seats: new Map() };
+  /**
+   * Clock readings for GAME_VIEW (ui-spec §7.1, §7.5), in scheduler time. `gameStoppedMs` freezes
+   * the match clock once it has stopped; `logGameMs` grows with state.log.
+   */
+  readonly clock: {
+    gameEndsAt: number;
+    turnEndsAt: number | null;
+    gameStoppedMs: number | null;
+    logGameMs: number[];
+  } = { gameEndsAt: 0, turnEndsAt: null, gameStoppedMs: null, logGameMs: [] };
 
   constructor(
     readonly code: string,
     readonly name: string,
     readonly mode: Mode,
     readonly visibility: RoomInfo['visibility'],
-    readonly config: GameConfig,
+    /** Host may change it before the game (UPDATE_SETTINGS); fixed once the game starts. */
+    public config: GameConfig,
     /** Made by QUICK_MATCH: players arrive ready and the game starts when full. */
     readonly quick = false,
   ) {
@@ -128,6 +139,21 @@ export class Room {
     if (this.members().length > 0) return false;
     if (this.status !== 'PLAYING') return true;
     return [...this.seats.values()].every((s) => !s || s.left);
+  }
+
+  /** Lobby row: counts only (ui-spec §5). */
+  summary(): RoomSummary {
+    const seats = this.seatIds().length === 4 ? 4 : 2;
+    return {
+      code: this.code,
+      name: this.name,
+      mode: this.mode,
+      status: this.status,
+      players: [...this.seats.values()].filter((s) => s && !s.left).length,
+      seats,
+      spectators: this.spectators.size,
+      settings: this.config,
+    };
   }
 
   info(): RoomInfo {

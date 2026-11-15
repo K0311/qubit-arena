@@ -83,6 +83,13 @@ export const clientMessageSchema = z.discriminatedUnion('type', [
   }),
   z.strictObject({ type: z.literal('LEAVE') }),
   z.strictObject({ type: z.literal('PING'), t: z.number() }),
+  /** Lobby room list (ui-spec §5); the server answers with ROOM_LIST of public rooms. */
+  z.strictObject({ type: z.literal('LIST_ROOMS'), mode: modeSchema.optional() }),
+  /**
+   * Host edits the match settings before the game (ui-spec §6). The mode cannot change: it
+   * fixes the seats. The server checks the deck against the room's mode.
+   */
+  z.strictObject({ type: z.literal('UPDATE_SETTINGS'), settings: roomSettingsSchema }),
 ]);
 
 export type ClientMessage = z.infer<typeof clientMessageSchema>;
