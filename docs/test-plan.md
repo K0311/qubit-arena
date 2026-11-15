@@ -133,7 +133,7 @@ Procedure (about 30 minutes per session):
 3. Tutorial (5 min), then one Solo or Team game (15 min).
 4. Post-test learning check + survey (5 min).
 
-Analysis: compare pre- and post-test scores (paired comparison); report Likert medians. Number of participants: [OPEN], recruit ICT students early.
+Analysis: compare pre- and post-test scores (paired comparison); report Likert medians. Number of participants: at least 20 (see project-overview §5); recruit ICT students early.
 
 ---
 
