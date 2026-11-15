@@ -335,6 +335,76 @@
   text-align: right;
 }
 
+/* ---- settings (ui-spec §12) ---- */
+.settings-screen {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+.settings-grid .toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 52px;
+  gap: var(--space-4);
+}
+.settings-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--stroke-subtle);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font: inherit;
+}
+.settings-screen .settings-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+}
+.settings-screen form.settings-row {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.settings-screen form.settings-row label {
+  width: 100%;
+}
+.segmented {
+  display: inline-flex;
+  align-self: flex-start;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  border: 1px solid var(--stroke-subtle);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.segmented button {
+  padding: 7px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.segmented button.is-on {
+  background: var(--accent-cyan);
+  color: var(--bg-deep);
+  font-weight: 700;
+}
+.segmented button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* ---- 1280 × 720 ---- */
 @media (max-width: 1400px) {
   .menu-scene {

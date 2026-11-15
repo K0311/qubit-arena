@@ -67,4 +67,28 @@ describe('filtered view (rules.md §9)', () => {
     for (const upcoming of ids.slice(1)) expect(JSON.stringify(v)).not.toContain(`"${upcoming}"`);
     expect(v.challenge?.answered).toEqual({ BLUE: false, RED: false });
   });
+
+  it("Challenge: a side sees its own team's choice, never the other side's", () => {
+    const hand = cards('I', 'I', 'I', 'I');
+    let s = scenario('TEAM', { turn: 'P1', ball: 'ZERO', hands: { P1: hand } });
+    s = applyAction(s, { type: 'TIME_UP' }, mulberry32(1)).state;
+    s = applyAction(
+      s,
+      { type: 'PLAY_CARD', player: 'P1', cardId: (hand[0] as { id: number }).id },
+      mulberry32(1),
+    ).state;
+    const id = (s.challenge?.questionIds ?? [])[0] as string;
+    expect(viewFor(s, 'P2').challenge?.sideChoice).toBeUndefined();
+    s = applyAction(
+      s,
+      { type: 'CHALLENGE_ANSWER', player: 'P1', questionId: id, choice: 1 },
+      mulberry32(1),
+    ).state;
+    expect(viewFor(s, 'P1').challenge?.sideChoice).toBe(1);
+    expect(viewFor(s, 'P2').challenge?.sideChoice).toBe(1);
+    for (const other of ['P3', 'P4', 'SPECTATOR'] as const) {
+      expect(viewFor(s, other).challenge?.sideChoice).toBeUndefined();
+      expect(viewFor(s, other).challenge?.answered.BLUE).toBe(true);
+    }
+  });
 });

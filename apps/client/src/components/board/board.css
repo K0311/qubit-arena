@@ -114,16 +114,22 @@
 }
 
 .board2d__ball {
-  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform calc(600ms / var(--anim-speed, 1)) cubic-bezier(0.4, 0, 0.2, 1);
 }
 .board2d__ball-glow {
   fill: var(--accent-gold);
   opacity: 0.4;
 }
-.board2d__football {
+.board2d__token {
   transform-box: fill-box;
   transform-origin: center;
   animation: b-rock 2.6s ease-in-out infinite;
+}
+.board2d__token--heart {
+  animation: b-beat 1.2s ease-in-out infinite;
+}
+.board2d__token--star {
+  animation: b-twinkle 2s ease-in-out infinite;
 }
 .board2d__fog {
   transform-origin: 0 0;
@@ -172,6 +178,27 @@
     transform: rotate(8deg);
   }
 }
+@keyframes b-beat {
+  0%,
+  40%,
+  100% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.18);
+  }
+}
+@keyframes b-twinkle {
+  0%,
+  100% {
+    transform: rotate(-10deg);
+    filter: brightness(1);
+  }
+  50% {
+    transform: rotate(10deg);
+    filter: brightness(1.4);
+  }
+}
 @keyframes b-pulse {
   0%,
   100% {
@@ -188,7 +215,7 @@
   .board2d__swirl-layer,
   .board2d__node,
   .board2d__eyes,
-  .board2d__football,
+  .board2d__token,
   .board2d__fog,
   .board2d__target {
     animation: none;
@@ -196,4 +223,16 @@
   .board2d__ball {
     transition-duration: 200ms;
   }
+}
+/* The same, switched on in Settings (ui-spec §12 Reduce motion). */
+:root[data-motion='reduce'] .board2d__swirl-layer,
+:root[data-motion='reduce'] .board2d__node,
+:root[data-motion='reduce'] .board2d__eyes,
+:root[data-motion='reduce'] .board2d__token,
+:root[data-motion='reduce'] .board2d__fog,
+:root[data-motion='reduce'] .board2d__target {
+  animation: none;
+}
+:root[data-motion='reduce'] .board2d__ball {
+  transition-duration: 200ms;
 }

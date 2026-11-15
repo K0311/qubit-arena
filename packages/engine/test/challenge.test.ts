@@ -62,6 +62,14 @@ describe('question bank (rules.md §8.1)', () => {
     }
   });
 
+  it('every question has a one-line explanation shown after the answer (ui-spec §9)', () => {
+    for (const q of QUESTION_BANK) {
+      expect(q.explanation.length).toBeGreaterThan(10);
+      expect(q.explanation).not.toMatch(/[\r\n]/);
+    }
+    expect(questionById('gate-X-ZERO').explanation).toBe('X sends |0⟩ to |1⟩.');
+  });
+
   it('gate questions agree with GATE_TABLE', () => {
     const gateQs = QUESTION_BANK.filter((q) => q.gate !== undefined);
     expect(gateQs.length).toBeGreaterThan(0);
@@ -133,6 +141,8 @@ describe('Quantum Challenge', () => {
       mulberry32(1),
     );
     expect(first.error).toBeUndefined();
+    // The answering player is public so the HUD can say "Answer submitted by P1".
+    expect(first.events).toEqual([{ type: 'CHALLENGE_ANSWERED', side: 'BLUE', player: 'P1' }]);
     expect(sideOf('TEAM', 'P2')).toBe('BLUE');
     const second = applyAction(
       first.state,
@@ -140,6 +150,20 @@ describe('Quantum Challenge', () => {
       mulberry32(1),
     );
     expect(second.error?.code).toBe('ALREADY_ANSWERED');
+  });
+
+  it('the result event carries the correct choice and its explanation', () => {
+    let s = toChallenge('SOLO');
+    const q = current(s);
+    s = answerRound(s, { BLUE: true, RED: false });
+    const result = [...s.log].reverse().find((e) => e.type === 'CHALLENGE_RESULT');
+    expect(result).toEqual({
+      type: 'CHALLENGE_RESULT',
+      questionId: q.id,
+      correctChoice: q.answer,
+      correct: { BLUE: true, RED: false },
+      explanation: q.explanation,
+    });
   });
 
   it('rejects an answer to a question that is not the current one', () => {
