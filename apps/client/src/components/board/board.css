@@ -1,0 +1,199 @@
+/* 2D board (visual-design §2–§3). Idle motion stops under reduced motion (§4). */
+.board2d {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  font-family: var(--font-ket);
+}
+
+.board2d__swirl ellipse {
+  fill: none;
+  stroke-width: 0.35;
+  opacity: 0.32;
+}
+.board2d__swirl-layer {
+  transform-origin: 0 0;
+  animation: b-spin 90s linear infinite;
+}
+.board2d__swirl-layer--1 {
+  animation-duration: 150s;
+  animation-direction: reverse;
+}
+.board2d__swirl-layer--2 {
+  animation-duration: 60s;
+}
+
+.board2d__edge line {
+  stroke-width: 1.3;
+  opacity: 0.45;
+  transition:
+    opacity 200ms,
+    stroke-width 200ms;
+}
+.board2d__edge.is-playable line {
+  opacity: 0.95;
+  stroke-width: 1.8;
+}
+.board2d__edge.is-preview line {
+  opacity: 1;
+  stroke-width: 2.6;
+  filter: drop-shadow(0 0 3px var(--accent-gold));
+}
+.board2d__edge-label {
+  font-size: 6.5px;
+  fill: var(--text-muted);
+  text-anchor: middle;
+  dominant-baseline: middle;
+  paint-order: stroke;
+  stroke: var(--bg-deep);
+  stroke-width: 2px;
+}
+.board2d__edge.is-playable .board2d__edge-label {
+  fill: var(--text-primary);
+}
+.board2d__edge.is-preview .board2d__edge-label {
+  fill: var(--accent-gold);
+  font-weight: 700;
+}
+
+.board2d__node {
+  animation: b-bob 4.2s ease-in-out infinite;
+}
+.board2d__ring {
+  fill: none;
+  stroke-width: 1;
+  opacity: 0.7;
+}
+.board2d__ring--zone {
+  stroke-width: 1.6;
+  opacity: 0.95;
+}
+.board2d__node.has-ball .board2d__ring {
+  stroke-width: 1.6;
+  opacity: 1;
+}
+.board2d__eyes {
+  fill: #fff;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: b-blink 4.6s infinite;
+}
+.board2d__node.is-confused .board2d__eyes {
+  animation: b-look 2.4s ease-in-out infinite;
+}
+.board2d__happy {
+  font-size: 6px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: #fff;
+}
+.board2d__ket {
+  font-size: 9px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: var(--text-primary);
+  paint-order: stroke;
+  stroke: var(--bg-deep);
+  stroke-width: 2px;
+}
+.board2d__zone-label {
+  font-family: var(--font-display);
+  font-size: 6px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-anchor: middle;
+}
+.board2d__target {
+  fill: none;
+  stroke: var(--accent-gold);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: b-spin 6s linear infinite;
+}
+
+.board2d__ball {
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.board2d__ball-glow {
+  fill: var(--accent-gold);
+  opacity: 0.4;
+}
+.board2d__football {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: b-rock 2.6s ease-in-out infinite;
+}
+.board2d__fog {
+  transform-origin: 0 0;
+  animation: b-pulse 5s ease-in-out infinite;
+}
+
+@keyframes b-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes b-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.6px);
+  }
+}
+@keyframes b-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+@keyframes b-look {
+  0%,
+  100% {
+    transform: translateX(-1px);
+  }
+  50% {
+    transform: translateX(1px);
+  }
+}
+@keyframes b-rock {
+  0%,
+  100% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+@keyframes b-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board2d__swirl-layer,
+  .board2d__node,
+  .board2d__eyes,
+  .board2d__football,
+  .board2d__fog,
+  .board2d__target {
+    animation: none;
+  }
+  .board2d__ball {
+    transition-duration: 200ms;
+  }
+}

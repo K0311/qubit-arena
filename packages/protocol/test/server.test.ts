@@ -23,6 +23,7 @@ const gameView = (state: GameState, viewer: PlayerId | 'SPECTATOR', stateVersion
   type: 'GAME_VIEW' as const,
   stateVersion,
   view: viewFor(state, viewer),
+  clocks: { gameMs: 600_000, turnMs: 45_000, logGameMs: state.log.map(() => 900_000) },
 });
 
 const accept = (msg: unknown) => {
@@ -83,11 +84,17 @@ describe('server → client messages (architecture.md §5)', () => {
   describe('hidden data (rules.md §9, safety net for T-S-03)', () => {
     const state = createGame(defaultConfig('TEAM'), mulberry32(7)).state;
     const view = viewFor(state, 'P1');
+    const clocks = { gameMs: 0, turnMs: null, logGameMs: [] };
 
     it('rejects a GAME_VIEW that carries the deck or the seed', () => {
-      reject({ type: 'GAME_VIEW', stateVersion: 1, view: { ...view, deck: state.deck } });
-      reject({ type: 'GAME_VIEW', stateVersion: 1, view: { ...view, seed: 1234 } });
-      reject({ type: 'GAME_VIEW', stateVersion: 1, view: { ...view, challenge: undefined, x: 1 } });
+      reject({ type: 'GAME_VIEW', stateVersion: 1, clocks, view: { ...view, deck: state.deck } });
+      reject({ type: 'GAME_VIEW', stateVersion: 1, clocks, view: { ...view, seed: 1234 } });
+      reject({
+        type: 'GAME_VIEW',
+        stateVersion: 1,
+        clocks,
+        view: { ...view, challenge: undefined, x: 1 },
+      });
     });
 
     it('rejects a Challenge view that leaks the answer', () => {
@@ -97,7 +104,26 @@ describe('server → client messages (architecture.md §5)', () => {
         answered: { BLUE: false, RED: false },
         question: { id: 'q', prompt: 'p', choices: ['a', 'b'], answer: 1 },
       };
-      reject({ type: 'GAME_VIEW', stateVersion: 1, view: { ...view, challenge } });
+      reject({ type: 'GAME_VIEW', stateVersion: 1, clocks, view: { ...view, challenge } });
+    });
+  });
+
+  describe('GAME_VIEW clocks (ui-spec §7.1 clocks, §7.5 log times)', () => {
+    const state = createGame(defaultConfig('SOLO'), mulberry32(1)).state;
+    const base = gameView(state, 'P1');
+
+    it('accepts a running turn and a turn with no timer', () => {
+      accept(base);
+      accept({ ...base, clocks: { ...base.clocks, turnMs: null } });
+    });
+
+    it('rejects a view without clocks, negative times or extra fields', () => {
+      const noClocks: Partial<typeof base> = { ...base };
+      delete noClocks.clocks;
+      reject(noClocks);
+      reject({ ...base, clocks: { ...base.clocks, gameMs: -1 } });
+      reject({ ...base, clocks: { ...base.clocks, logGameMs: [-5] } });
+      reject({ ...base, clocks: { ...base.clocks, seed: 1 } });
     });
   });
 

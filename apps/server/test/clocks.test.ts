@@ -131,12 +131,34 @@ describe('T-S-07 server clocks', () => {
     expect(timeout.events[0]).toMatchObject({ byTimeout: true });
   });
 
+  it('GAME_VIEW carries the time left on both clocks and per log entry (ui-spec §7.1, §7.5)', async () => {
+    const t = await table('SOLO', { timeLimitMs: 600_000, turnTimerMs: 60_000 });
+    const start = await t.host.waitFor('GAME_VIEW');
+    expect(start.clocks).toEqual({
+      gameMs: 600_000,
+      turnMs: 60_000,
+      logGameMs: start.view.log.map(() => 600_000),
+    });
+
+    clock.advance(20_000);
+    const mover = t.clients[start.view.turn];
+    const card = (await mover.waitFor('GAME_VIEW')).view.hands[start.view.turn]![0]!;
+    const after = await mover.request({ type: 'PLAY_CARD', cardId: card.id }, 'GAME_VIEW');
+    // The new turn starts with a full timer; the match clock keeps running.
+    expect(after.clocks.gameMs).toBe(580_000);
+    expect(after.clocks.turnMs).toBe(60_000);
+    expect(after.clocks.logGameMs).toHaveLength(after.view.log.length);
+    expect(after.clocks.logGameMs.at(-1)).toBe(580_000);
+    expect(after.clocks.logGameMs[0]).toBe(600_000);
+  });
+
   it('the game clock fires TIME_UP and the game ends after that turn (rules.md §8)', async () => {
     const t = await table('SOLO', { timeLimitMs: 60_000, turnTimerMs: 300_000 });
     clock.advance(60_000);
     const up = await t.host.waitFor('EVENT', (m) => m.events.some((e) => e.type === 'TIME_UP'));
     const view = (await t.host.waitFor('GAME_VIEW', (m) => m.stateVersion >= up.stateVersion)).view;
     expect(view.timeUp).toBe(true);
+    expect(t.host.latest('GAME_VIEW')!.clocks.gameMs).toBe(0);
     const mover = t.clients[view.turn];
     const card = (await mover.waitFor('GAME_VIEW', (m) => m.stateVersion >= up.stateVersion)).view
       .hands[view.turn]![0]!;

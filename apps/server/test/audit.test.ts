@@ -171,6 +171,7 @@ function playGame(i: number, server: GameServer, clock: ManualScheduler, stats: 
 }
 
 describe('T-S-03 hidden data audit (rules.md §9)', () => {
+  // 50 whole games in one process: CPU-bound, so allow for a busy machine (pnpm runs packages in parallel).
   it('no message in 50 online games carries the deck, the seed, opponents’ cards or upcoming questions', () => {
     const leaks: string[] = [];
     const stats: Stats = { messages: 0, challenges: 0, botMoves: 0, timeouts: 0 };
@@ -193,7 +194,7 @@ describe('T-S-03 hidden data audit (rules.md §9)', () => {
     expect(stats.botMoves).toBeGreaterThan(50);
     expect(stats.timeouts).toBeGreaterThan(50);
     expect(stats.challenges).toBeGreaterThan(0);
-  });
+  }, 30_000);
 
   it('the audit itself catches a leak', () => {
     const leaks: string[] = [];

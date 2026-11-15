@@ -116,6 +116,7 @@ All messages are JSON with a `type` field and are validated with zod on both sid
 
 Rules:
 * `GAME_VIEW` is built per player with `viewFor()`; never broadcast one object to all.
+* `GAME_VIEW` also carries `clocks`: `gameMs` (match time left), `turnMs` (turn time left, `null` when no turn timer runs) and `logGameMs` (match time left when each `view.log` entry happened, for the action log). These are remaining times, not deadlines, so the client counts down locally without trusting its own clock. They are not secret.
 * Every message from the client carries no trusted data other than the intent and ids. Schemas are strict: unknown fields are rejected, and there is no `player` field (the server knows who is on each connection).
 * Include a `stateVersion` number (on `ROOM_STATE`, `GAME_VIEW` and `EVENT`) so clients can ignore stale messages.
 * `WELCOME` is the first message on every connection and gives the client a token. The client reconnects with that token in the connection URL to get its seat back (rules.md §10).

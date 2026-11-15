@@ -66,6 +66,16 @@ export class Room {
     bot?: TimerHandle;
     seats: Map<PlayerId, TimerHandle>;
   } = { seats: new Map() };
+  /**
+   * Clock readings for GAME_VIEW (ui-spec §7.1, §7.5), in scheduler time. `gameStoppedMs` freezes
+   * the match clock once it has stopped; `logGameMs` grows with state.log.
+   */
+  readonly clock: {
+    gameEndsAt: number;
+    turnEndsAt: number | null;
+    gameStoppedMs: number | null;
+    logGameMs: number[];
+  } = { gameEndsAt: 0, turnEndsAt: null, gameStoppedMs: null, logGameMs: [] };
 
   constructor(
     readonly code: string,

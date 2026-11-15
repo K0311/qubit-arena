@@ -9,7 +9,7 @@ import { MainMenu } from './screens/main-menu';
 import { ModeSelect } from './screens/mode-select';
 import { Lobby } from './screens/lobby';
 import { RoomScreen } from './screens/room';
-import { GameScreen } from './screens/game';
+import { GameScreen } from './screens/game/game-screen';
 import { Placeholder } from './screens/placeholder';
 import { en } from './i18n/en';
 

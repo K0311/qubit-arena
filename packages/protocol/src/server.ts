@@ -105,6 +105,20 @@ export const gameViewSchema = z.strictObject({
     .optional(),
 }) satisfies z.ZodType<GameView>;
 
+/**
+ * Clock readings at the moment the server sent a GAME_VIEW (ui-spec §7.1 clocks, §7.5 log).
+ * Remaining times rather than wall-clock deadlines, so the client never depends on its own
+ * clock matching the server's; it counts down locally from these values.
+ */
+export const clocksSchema = z.strictObject({
+  /** Match time left. */
+  gameMs: count,
+  /** Turn time left; null when no turn timer runs (Challenge, finished game). */
+  turnMs: count.nullable(),
+  /** Match time left when each entry of view.log happened (same length as view.log). */
+  logGameMs: z.array(count),
+});
+
 const seatInfoSchema = z.strictObject({
   name: playerNameSchema,
   ready: z.boolean(),
@@ -185,6 +199,7 @@ export const serverMessageSchema = z.discriminatedUnion('type', [
     type: z.literal('GAME_VIEW'),
     stateVersion: stateVersionSchema,
     view: gameViewSchema,
+    clocks: clocksSchema,
   }),
   z.strictObject({
     type: z.literal('EVENT'),
@@ -212,3 +227,4 @@ export type ServerMessageType = ServerMessage['type'];
 export type ErrorCode = z.infer<typeof errorCodeSchema>;
 export type Room = z.infer<typeof roomSchema>;
 export type RoomSummary = z.infer<typeof roomSummarySchema>;
+export type Clocks = z.infer<typeof clocksSchema>;
