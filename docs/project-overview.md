@@ -61,7 +61,7 @@ We follow the five-step game development process and stop after Testing.
 | 4. Production | Online server → 2D client → 3D client → tutorial; accounts and ranking if time; feature freeze 15 Feb 2027 | Playable build after each part | **← now** |
 | 5. Testing | Automated tests (42 gate cases, CNOT/fog, rules, server, E2E), playtests, user study (≥ 20 players), bug fixing and deck balance | Test and evaluation reports, final build | |
 
-Production and Testing repeat in rounds for each part of the system: **rules engine → server → client → tutorial.**
+Prototyping builds and tests the rules engine (roadmap phases 0–2). Production and Testing then repeat in rounds for each part of the system: **server → client → tutorial.**
 
 ## 6. Schedule (Aug 2026 – Apr 2027)
 
@@ -75,7 +75,7 @@ Production and Testing repeat in rounds for each part of the system: **rules eng
 | Report & final | | | | | | | | ■ | ■ |
 | Milestones | | | | Proposal | | | | | Final |
 
-### Production milestones (suggested)
+### Prototyping and production milestones (suggested)
 
 | By | Milestone |
 |---|---|

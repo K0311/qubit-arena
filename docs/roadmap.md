@@ -16,9 +16,9 @@
 
 | เฟส | งาน | ช่วงเวลา | ขั้น (Game dev process) |
 |---|---|---|---|
-| 0 | ตั้งโครง monorepo + CI | 11–17 พ.ย. 2026 | Production |
-| 1 | Engine: คณิตควอนตัม | 18 พ.ย. – 1 ธ.ค. | Production |
-| 2 | Engine: ตัวเกม + simulation | 2–15 ธ.ค. | Production ↔ Testing |
+| 0 | ตั้งโครง monorepo + CI | 11–17 พ.ย. 2026 | Prototyping |
+| 1 | Engine: คณิตควอนตัม | 18 พ.ย. – 1 ธ.ค. | Prototyping |
+| 2 | Engine: ตัวเกม + simulation | 2–15 ธ.ค. | Prototyping ↔ Testing |
 | 3 | Server ออนไลน์ | 16 ธ.ค. – 10 ม.ค. 2027 | Production ↔ Testing |
 | 4 | Client 2D เล่นได้จนจบ | 11–31 ม.ค. | Production ↔ Testing |
 | 5 | 3D + tutorial → **feature freeze 15 ก.พ.** | 1–15 ก.พ. | Production |
