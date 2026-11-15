@@ -1,0 +1,209 @@
+/* Gate cards (ui-spec §8.1): same frame for every card, only colour, letter and text change. */
+.gate-card {
+  --gate: var(--gate-i);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  background:
+    radial-gradient(
+      120% 80% at 50% 0%,
+      color-mix(in srgb, var(--gate) 28%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--surface-raised), var(--bg-base));
+  border: 2px solid color-mix(in srgb, var(--gate) 70%, transparent);
+  clip-path: polygon(
+    14px 0,
+    100% 0,
+    100% calc(100% - 14px),
+    calc(100% - 14px) 100%,
+    0 100%,
+    0 14px
+  );
+}
+
+.gate-card--hand {
+  width: 150px;
+  height: 210px;
+  padding: 34px 10px 12px;
+  cursor: pointer;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    filter 200ms ease;
+}
+.gate-card--hand:hover:not(:disabled) {
+  transform: translateY(-6px);
+}
+.gate-card--hand.is-selected {
+  transform: translateY(-24px);
+  border-color: var(--accent-gold);
+  filter: drop-shadow(0 0 14px rgb(255 209 77 / 0.65));
+}
+.gate-card--hand:disabled {
+  cursor: default;
+}
+.gate-card--hand:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 3px;
+}
+
+.gate-card__tag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 34px;
+  padding: 3px 8px 3px 10px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--bg-deep);
+  background: var(--gate);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+.gate-card__letter {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--gate);
+  text-shadow: 0 0 18px var(--gate);
+}
+.gate-card--hand .gate-card__letter {
+  font-size: 50px;
+}
+.gate-card--hand[aria-label*='CNOT'] .gate-card__letter {
+  font-size: 30px;
+  margin: 10px 0 6px;
+}
+.gate-card__name {
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+.gate-card__footer {
+  margin-top: auto;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--gate);
+}
+.gate-card__preview {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-gold);
+  text-align: center;
+}
+.gate-card__preview em {
+  font-style: normal;
+  font-size: 10px;
+  font-family: var(--font-display);
+  color: var(--text-primary);
+}
+
+.gate-card--detail {
+  width: 300px;
+  min-height: 420px;
+  padding: 40px 20px 18px;
+}
+.gate-card__bloch {
+  width: 90px;
+  height: 90px;
+}
+.gate-card__sphere {
+  fill: rgb(89 140 255 / 0.12);
+  stroke: rgb(89 140 255 / 0.6);
+}
+.gate-card__equator {
+  fill: none;
+  stroke: rgb(89 140 255 / 0.35);
+  stroke-dasharray: 2 2;
+}
+.gate-card__axis {
+  stroke: rgb(245 245 250 / 0.3);
+  stroke-width: 0.8;
+}
+.gate-card__text {
+  margin: 0;
+  font-size: 14px;
+  text-align: center;
+  color: var(--text-muted);
+}
+.gate-card__effect {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--gate) 45%, transparent);
+  border-radius: 8px;
+  background: rgb(6 10 34 / 0.6);
+}
+.gate-card__effect p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* Full card on hover (ui-spec §8.1), above the hand. */
+.gate-card-slot {
+  position: relative;
+}
+.gate-card__hover {
+  position: absolute;
+  bottom: calc(100% + 30px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.96);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+  z-index: 20;
+}
+.gate-card-slot:hover .gate-card__hover {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+  transition-delay: 350ms;
+}
+
+.card-back {
+  width: 150px;
+  height: 210px;
+  display: grid;
+  place-items: center;
+  background:
+    repeating-linear-gradient(45deg, rgb(39 229 247 / 0.06) 0 6px, transparent 6px 12px), #0a1030;
+  border: 2px solid var(--accent-cyan);
+  border-radius: 12px;
+  box-shadow:
+    inset 0 0 0 6px #0a1030,
+    inset 0 0 0 7px rgb(39 229 247 / 0.4);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--accent-cyan);
+  text-shadow: 0 0 10px var(--accent-cyan);
+}
+
+.gate-tag {
+  --gate: var(--gate-i);
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gate);
+  background: color-mix(in srgb, var(--gate) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gate) 60%, transparent);
+}

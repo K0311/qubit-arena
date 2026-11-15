@@ -3,6 +3,7 @@ import type { Room, RoomSummary, ServerMessage } from '@qa/protocol';
 
 type Of<T extends ServerMessage['type']> = Extract<ServerMessage, { type: T }>;
 export type GameViewData = Of<'GAME_VIEW'>['view'];
+export type ClocksData = Of<'GAME_VIEW'>['clocks'];
 export type GameEventData = Of<'EVENT'>['events'][number];
 export type ChatLine = Of<'CHAT'>;
 export type You = Of<'ROOM_STATE'>['you'];
@@ -18,6 +19,9 @@ type GameState = {
   room: Room | null;
   you: You | null;
   view: GameViewData | null;
+  /** Clock readings of the latest GAME_VIEW and when they arrived (performance.now()). */
+  clocks: ClocksData | null;
+  clocksAt: number;
   events: GameEventData[];
   chat: ChatLine[];
   roomList: RoomSummary[] | null;
@@ -36,6 +40,8 @@ const emptyRoom = {
   room: null,
   you: null,
   view: null,
+  clocks: null,
+  clocksAt: 0,
   events: [],
   chat: [],
   stateVersion: -1,
@@ -77,7 +83,12 @@ export const useGame = create<GameState>()((set, get) => ({
       }
       case 'GAME_VIEW':
         if (msg.stateVersion < s.stateVersion) return;
-        set({ view: msg.view, stateVersion: msg.stateVersion });
+        set({
+          view: msg.view,
+          clocks: msg.clocks,
+          clocksAt: performance.now(),
+          stateVersion: msg.stateVersion,
+        });
         return;
       case 'EVENT':
         if (msg.stateVersion < s.stateVersion) return;

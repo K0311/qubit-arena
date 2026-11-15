@@ -21,7 +21,12 @@ const room = (code: string, version: number): ServerMessage => ({
 
 const state = createGame(defaultConfig('SOLO'), mulberry32(1)).state;
 const view = (version: number) =>
-  ({ type: 'GAME_VIEW', stateVersion: version, view: viewFor(state, 'P1') }) as ServerMessage;
+  ({
+    type: 'GAME_VIEW',
+    stateVersion: version,
+    view: viewFor(state, 'P1'),
+    clocks: { gameMs: 900_000, turnMs: 60_000, logGameMs: [] },
+  }) as unknown as ServerMessage;
 
 beforeEach(() => {
   useGame.getState().leftRoom();
