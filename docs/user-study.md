@@ -1,6 +1,6 @@
 # Qubit Arena — User Study Kit
 
-Used in phase 7 (Testing & Integration). Implements the user evaluation in [test-plan.md](test-plan.md) §4.
+Used in the Testing step of the game development process (roadmap phase 7). Implements the user evaluation in [test-plan.md](test-plan.md) §4.
 The questions below are also the content for the in-game study pages (prompt P-7.3).
 
 > ✓ Approved by the project advisor (Rawesak Tanawongsuwan) on 11 Nov 2026. No further approval or ethics review is needed before collecting data.

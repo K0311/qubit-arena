@@ -223,7 +223,7 @@ Add a greedy bot level in packages/engine/bot.ts: for each legal card, use the e
 
 ---
 
-## รอบ 7 — Testing & Integration + user study (เฟส 7)
+## รอบ 7 — Testing + user study (เฟส 7)
 
 **P-7.0 Feature freeze checklist**
 ```
@@ -258,7 +258,7 @@ Read docs/report/test-report.md, docs/report/user-study-results.md and the open 
 
 ---
 
-## รอบ 8 — Maintenance, deploy final, รายงาน (เฟส 8)
+## รอบ 8 — Deploy final + รายงาน (เฟส 8)
 
 **P-8.1 Final deployment**
 ```
