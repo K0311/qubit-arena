@@ -45,7 +45,7 @@ pnpm --filter @qa/engine test  # engine only
 pnpm typecheck
 pnpm lint
 pnpm format                    # Prettier write (format:check in CI)
-pnpm build                     # production builds (client only for now)
+pnpm build                     # production builds (client only for now; fails if the quiz bank leaks into the bundle)
 pnpm dev                       # server + client
 pnpm e2e                       # Playwright
 pnpm sim [games] [seed]        # bot-vs-bot simulation (default 10,000 games)

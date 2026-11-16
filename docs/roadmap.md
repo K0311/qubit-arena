@@ -69,7 +69,7 @@
 
 - [x] P-4.1 App shell + theme tokens + menu/lobby/room + WebSocket + store (ตาม `docs/ui-spec.md`)
 - [x] P-4.2 Game screen: 2D board + gate cards + hand + preview + action log
-- [ ] P-4.3 State panel + team chat + Quantum Challenge + Result + Settings
+- [x] P-4.3 State panel + team chat + Quantum Challenge + Result + Settings
 - [ ] P-4.4 Playwright T-E-01..05
 - [ ] 👤 ทีมเล่นทดสอบกันเอง 3 เกม (Solo 1, Team 2) จดสิ่งที่งงลง GitHub Issues
 
@@ -145,4 +145,5 @@
 | 12 พ.ย. 2026 | Challenge bot rule | rules.md §8.1: bot ตอบ Quantum Challenge แทนทีมเฉพาะเมื่อทีมไม่มีคนออนไลน์ (T-S-10) |
 | 15 พ.ย. 2026 | P-4.1 App shell | client: theme tokens, ฟอนต์, พื้นหลังอวกาศ, component กลาง, route ทุกหน้า, เมนู/เลือกโหมด/lobby/ห้อง, WebSocket + store; protocol เพิ่ม `LIST_ROOMS`/`ROOM_LIST`, `UPDATE_SETTINGS`; e2e quick match และสร้างห้อง→เริ่มเกม ผ่าน |
 | 15 พ.ย. 2026 | P-4.2 Game screen | กระดาน 2D (SVG, หมุนให้ end zone ตัวเองอยู่บน, หมอก), การ์ด gate (บรรทัด board effect สร้างจาก engine + snapshot), มือ + ตัวอย่างการเดิน, HUD, action log; protocol เพิ่ม `clocks` ใน `GAME_VIEW`; e2e เล่นการ์ด 1 ใบผ่าน |
+| 15 พ.ย. 2026 | P-4.3 State panel, chat, Challenge, Result, Settings | state panel (Bloch 2 ลูก, amplitude, ความน่าจะเป็น, global phase, หมอก), team chat, overlay Quantum Challenge (เฉลย+คำอธิบาย 3 วิ), หน้าผล + สถิติจาก log + Play Again (`REMATCH`), หน้า Settings; engine ส่งผู้ตอบ/คำอธิบาย/`sideChoice`; แก้คลังคำถามหลุดไปใน bundle ของ client (`sideEffects: false` + build check); e2e team chat 4 คนผ่าน |
 | 11 พ.ย. 2026 | UI spec + ภาพ reference | `docs/ui-spec.md` (หน้าจอ, HUD, การ์ด) + `docs/visual-design.md` (กระดาน); เอาแค่ UI ไม่เปลี่ยนกฎ |

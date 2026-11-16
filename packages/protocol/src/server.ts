@@ -59,12 +59,17 @@ export const gameEventSchema = z.discriminatedUnion('type', [
   z.strictObject({ type: z.literal('TOUCHDOWN'), side: sideSchema, player: seatSchema }),
   z.strictObject({ type: z.literal('TIME_UP') }),
   z.strictObject({ type: z.literal('CHALLENGE_STARTED'), questions: z.number().int().positive() }),
-  z.strictObject({ type: z.literal('CHALLENGE_ANSWERED'), side: sideSchema }),
+  z.strictObject({
+    type: z.literal('CHALLENGE_ANSWERED'),
+    side: sideSchema,
+    player: seatSchema,
+  }),
   z.strictObject({
     type: z.literal('CHALLENGE_RESULT'),
     questionId: z.string().min(1),
     correctChoice: count,
     correct: sideRecord(z.boolean()),
+    explanation: z.string().min(1).max(300),
   }),
   z.strictObject({ type: z.literal('GAME_OVER'), reason: endReasonSchema, winner: winnerSchema }),
 ]) satisfies z.ZodType<GameEvent>;
@@ -96,6 +101,7 @@ export const gameViewSchema = z.strictObject({
       index: count,
       scores: sideRecord(count),
       answered: sideRecord(z.boolean()),
+      sideChoice: z.number().int().min(0).max(5).optional(),
       question: z.strictObject({
         id: z.string().min(1),
         prompt: z.string().min(1),

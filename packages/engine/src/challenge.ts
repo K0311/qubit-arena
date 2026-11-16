@@ -12,6 +12,8 @@ export type Question = {
   readonly choices: readonly string[];
   /** Index into `choices`. Server only: never put this in a view. */
   readonly answer: number;
+  /** One line shown with the correct answer after both sides answered (ui-spec §9). */
+  readonly explanation: string;
   /** Set for questions generated from the gate table. */
   readonly gate?: SingleGate;
   readonly from?: Position;
@@ -43,6 +45,7 @@ const GATE_QUESTIONS: readonly Question[] = SINGLE_GATES.flatMap((gate) =>
     prompt: `The ball is at ${LABEL[from]}. Where does the ${GATE_LABEL[gate]} card send it?`,
     choices: POSITIONS.map((p) => LABEL[p]),
     answer: POSITIONS.indexOf(GATE_TABLE[gate][from]),
+    explanation: `${GATE_LABEL[gate]} sends ${LABEL[from]} to ${LABEL[GATE_TABLE[gate][from]]}.`,
     gate,
     from,
   })),
@@ -55,6 +58,7 @@ const CONCEPT_QUESTIONS: readonly Question[] = [
     prompt: 'You play Measure with the ball at |+⟩. What is the chance it lands on |0⟩?',
     choices: ['0 %', '25 %', '50 %', '100 %'],
     answer: 2,
+    explanation: '|+⟩ is an equal mix of |0⟩ and |1⟩, so Measure lands on |0⟩ half the time.',
   },
   {
     id: 'measure-zero',
@@ -66,36 +70,42 @@ const CONCEPT_QUESTIONS: readonly Question[] = [
       'It enters the fog',
     ],
     answer: 1,
+    explanation: '|0⟩ is already on the z axis, so Measure leaves it there: a failed punt.',
   },
   {
     id: 'measure-i',
     prompt: 'Measure with the ball at |i⟩ can land on…',
     choices: ['|+⟩ or |−⟩', 'only |i⟩', 'only |0⟩', '|0⟩ or |1⟩'],
     answer: 3,
+    explanation: 'Measure always collapses the ball to |0⟩ or |1⟩; from |i⟩ it is 50/50.',
   },
   {
     id: 'bloch-zero',
     prompt: 'Which Bloch vector (x, y, z) is the state |0⟩?',
     choices: ['(0, 0, −1)', '(+1, 0, 0)', '(0, 0, +1)', '(0, +1, 0)'],
     answer: 2,
+    explanation: '|0⟩ is the north pole of the Bloch sphere: (0, 0, +1).',
   },
   {
     id: 'bloch-minus',
     prompt: 'Which state has the Bloch vector (−1, 0, 0)?',
     choices: ['|−⟩', '|+⟩', '|1⟩', '|−i⟩'],
     answer: 0,
+    explanation: '|−⟩ points along the negative x axis: (−1, 0, 0).',
   },
   {
     id: 'global-phase',
     prompt: 'Y|0⟩ = i|1⟩. Which position is the ball at?',
     choices: ['|i⟩', '|1⟩', '|0⟩', '|−i⟩'],
     answer: 1,
+    explanation: 'i|1⟩ differs from |1⟩ only by a global phase, which does not move the ball.',
   },
   {
     id: 'cnot-fog',
     prompt: 'Partner at |+⟩, ball at |0⟩. After CNOT the ball is…',
     choices: ['at |1⟩', 'at |+⟩', 'still at |0⟩, not entangled', 'in the fog (entangled)'],
     answer: 3,
+    explanation: 'With the partner at |+⟩, CNOT entangles a ball at |0⟩, so it enters the fog.',
   },
   {
     id: 'cnot-plus',
@@ -107,6 +117,7 @@ const CONCEPT_QUESTIONS: readonly Question[] = [
       'The partner moves to |0⟩',
     ],
     answer: 1,
+    explanation: 'X leaves |+⟩ unchanged, so CNOT does nothing when the ball is at |+⟩.',
   },
   {
     id: 'cnot-kickback',
@@ -118,12 +129,14 @@ const CONCEPT_QUESTIONS: readonly Question[] = [
       'Nothing changes at all',
     ],
     answer: 2,
+    explanation: 'X|−⟩ = −|−⟩: the phase kicks back and the partner becomes |−⟩.',
   },
   {
     id: 'one-way-arrows',
     prompt: 'Which cards draw one-way arrows on the board?',
     choices: ['H and X', 'S and √X', 'Y and Z', 'I and H'],
     answer: 1,
+    explanation: 'S and √X are quarter turns, so they move the ball one way around a cycle.',
   },
 ];
 
@@ -181,7 +194,7 @@ export function answerChallenge(
   if (ch.answers[side] !== undefined) return reject('ALREADY_ANSWERED', `${side} already answered`);
 
   const answers = { ...ch.answers, [side]: action.choice };
-  const answered: GameEvent = { type: 'CHALLENGE_ANSWERED', side };
+  const answered: GameEvent = { type: 'CHALLENGE_ANSWERED', side, player: action.player };
   if (answers.BLUE === undefined || answers.RED === undefined) {
     return { state: { ...state, challenge: { ...ch, answers } }, events: [answered] };
   }
@@ -203,7 +216,13 @@ function resolveQuestion(
   };
   const events: GameEvent[] = [
     answered,
-    { type: 'CHALLENGE_RESULT', questionId: q.id, correctChoice: q.answer, correct },
+    {
+      type: 'CHALLENGE_RESULT',
+      questionId: q.id,
+      correctChoice: q.answer,
+      correct,
+      explanation: q.explanation,
+    },
   ];
   const regular = state.config.challengeQuestions;
   const asked = ch.index + 1;

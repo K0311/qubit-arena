@@ -31,6 +31,10 @@ export type Board2DProps = {
   playable?: readonly EdgeRef[];
   preview?: MovePreview | null;
   showLabels?: boolean;
+  /** Cosmetic only (visual-design §3, ui-spec §12). */
+  ballShape?: 'football' | 'heart' | 'star';
+  /** Swirl brightness and opacity in % (ui-spec §12). */
+  swirl?: number;
 };
 
 const matches = (e: BoardEdge, m: EdgeRef) =>
@@ -49,6 +53,8 @@ export function Board2D({
   playable = [],
   preview = null,
   showLabels = true,
+  ballShape = 'football',
+  swirl = 100,
 }: Board2DProps) {
   const flip = orientation === 'RED' ? -1 : 1;
   const pt = useMemo(() => {
@@ -121,7 +127,7 @@ export function Board2D({
         ))}
       </defs>
 
-      <g className="board2d__swirl" aria-hidden="true">
+      <g className="board2d__swirl" aria-hidden="true" style={{ opacity: swirl / 100 }}>
         {[0, 1, 2].map((layer) => (
           <g key={layer} className={`board2d__swirl-layer board2d__swirl-layer--${layer}`}>
             {POSITIONS.map((p, k) => (
@@ -280,19 +286,45 @@ export function Board2D({
           style={{ transform: `translate(${pt[ball].x}px, ${pt[ball].y - DOME - 2}px)` }}
         >
           <ellipse className="board2d__ball-glow" cy={DOME + 2} rx={DOME + 3} ry={4} />
-          <g className="board2d__football">
-            <ellipse rx={8} ry={5} fill="#8B4A22" stroke="#4A230E" strokeWidth={0.8} />
-            <path
-              d="M-6,-1.6 Q0,-4 6,-1.6"
-              stroke="#fff"
-              strokeWidth={0.6}
-              fill="none"
-              opacity={0.7}
-            />
-            <line x1={-3} y1={0} x2={3} y2={0} stroke="#fff" strokeWidth={0.9} />
-            {[-2, -0.7, 0.7, 2].map((lx) => (
-              <line key={lx} x1={lx} y1={-1.2} x2={lx} y2={1.2} stroke="#fff" strokeWidth={0.6} />
-            ))}
+          <g className={`board2d__token board2d__token--${ballShape}`} data-shape={ballShape}>
+            {ballShape === 'heart' ? (
+              <path
+                d="M0,5 C-9,-1 -6,-8 0,-3.5 C6,-8 9,-1 0,5 Z"
+                fill="#FF4F7B"
+                stroke="#B0173F"
+                strokeWidth={0.8}
+              />
+            ) : ballShape === 'star' ? (
+              <path
+                d="M0,-7 L2,-2.2 7,-2.2 3,1 4.5,6 0,3 -4.5,6 -3,1 -7,-2.2 -2,-2.2 Z"
+                fill="#FFD14D"
+                stroke="#C08A00"
+                strokeWidth={0.6}
+              />
+            ) : (
+              <>
+                <ellipse rx={8} ry={5} fill="#8B4A22" stroke="#4A230E" strokeWidth={0.8} />
+                <path
+                  d="M-6,-1.6 Q0,-4 6,-1.6"
+                  stroke="#fff"
+                  strokeWidth={0.6}
+                  fill="none"
+                  opacity={0.7}
+                />
+                <line x1={-3} y1={0} x2={3} y2={0} stroke="#fff" strokeWidth={0.9} />
+                {[-2, -0.7, 0.7, 2].map((lx) => (
+                  <line
+                    key={lx}
+                    x1={lx}
+                    y1={-1.2}
+                    x2={lx}
+                    y2={1.2}
+                    stroke="#fff"
+                    strokeWidth={0.6}
+                  />
+                ))}
+              </>
+            )}
           </g>
         </g>
       )}

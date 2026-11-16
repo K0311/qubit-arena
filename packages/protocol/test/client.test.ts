@@ -30,6 +30,7 @@ const VALID: readonly ClientMessage[] = [
   { type: 'LIST_ROOMS' },
   { type: 'LIST_ROOMS', mode: 'TEAM' },
   { type: 'UPDATE_SETTINGS', settings: { targetScore: 5, suddenDeath: false } },
+  { type: 'REMATCH' },
 ];
 
 const reject = (raw: unknown) => {
@@ -40,8 +41,8 @@ const reject = (raw: unknown) => {
 
 describe('client → server messages (architecture.md §5)', () => {
   it('covers every client message type', () => {
-    // The 10 in architecture.md §5 plus READY, LIST_ROOMS and UPDATE_SETTINGS.
-    expect(new Set(VALID.map((m) => m.type)).size).toBe(13);
+    // The 10 in architecture.md §5 plus READY, LIST_ROOMS, UPDATE_SETTINGS and REMATCH.
+    expect(new Set(VALID.map((m) => m.type)).size).toBe(14);
   });
 
   it.each(VALID.map((m) => [m.type, m] as const))('accepts a valid %s', (_, msg) => {
@@ -76,6 +77,10 @@ describe('client → server messages (architecture.md §5)', () => {
     reject({ type: 'CHAT', text: 'x'.repeat(201) });
     reject({ type: 'QUICK_MATCH', mode: 'SOLO', playerName: 'x'.repeat(25) });
     reject({ type: 'CREATE_ROOM', mode: 'SOLO', visibility: 'PUBLIC', name: '', playerName: 'a' });
+  });
+
+  it('REMATCH has no fields', () => {
+    reject({ type: 'REMATCH', seat: 'P1' });
   });
 
   it('checks LIST_ROOMS and UPDATE_SETTINGS', () => {

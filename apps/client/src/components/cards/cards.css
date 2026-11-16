@@ -207,3 +207,7 @@
   background: color-mix(in srgb, var(--gate) 16%, transparent);
   border: 1px solid color-mix(in srgb, var(--gate) 60%, transparent);
 }
+
+:root[data-tips='off'] .gate-card__hover {
+  display: none;
+}

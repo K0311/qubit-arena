@@ -55,12 +55,14 @@ export type GameEvent =
   | { readonly type: 'TOUCHDOWN'; readonly side: Side; readonly player: PlayerId }
   | { readonly type: 'TIME_UP' }
   | { readonly type: 'CHALLENGE_STARTED'; readonly questions: number }
-  | { readonly type: 'CHALLENGE_ANSWERED'; readonly side: Side }
+  | { readonly type: 'CHALLENGE_ANSWERED'; readonly side: Side; readonly player: PlayerId }
   | {
       readonly type: 'CHALLENGE_RESULT';
       readonly questionId: string;
       readonly correctChoice: number;
       readonly correct: Readonly<Record<Side, boolean>>;
+      /** Shown with the correct answer; sent only after both sides answered. */
+      readonly explanation: string;
     }
   | { readonly type: 'GAME_OVER'; readonly reason: EndReason; readonly winner: Winner };
 

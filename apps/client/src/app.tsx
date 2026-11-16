@@ -11,6 +11,8 @@ import { Lobby } from './screens/lobby';
 import { RoomScreen } from './screens/room';
 import { GameScreen } from './screens/game/game-screen';
 import { Placeholder } from './screens/placeholder';
+import { SettingsScreen } from './screens/settings';
+import { applyDocumentSettings, useSettings } from './state/settings';
 import { en } from './i18n/en';
 
 /** Follow the server: a room we are in opens its screen, a started game opens the game. */
@@ -34,6 +36,13 @@ export function App() {
   useEffect(() => {
     connection();
   }, []);
+  const motion = useSettings((s) => s.reduceMotion);
+  const tips = useSettings((s) => s.tips);
+  const speed = useSettings((s) => s.speed);
+  useEffect(
+    () => applyDocumentSettings({ reduceMotion: motion, tips, speed }),
+    [motion, tips, speed],
+  );
   return (
     <div className="app">
       <SpaceBackground />
@@ -47,7 +56,7 @@ export function App() {
         <Route path="/game/:id" element={<GameScreen />} />
         <Route path="/tutorial" element={<Placeholder title={en.menu.tutorial} />} />
         <Route path="/tutorial/:lesson" element={<Placeholder title={en.menu.tutorial} />} />
-        <Route path="/settings" element={<Placeholder title={en.menu.settings} />} />
+        <Route path="/settings" element={<SettingsScreen />} />
         <Route path="/about" element={<Placeholder title={en.menu.about} />} />
         <Route path="/study/*" element={<Placeholder title="Study" />} />
         <Route path="*" element={<Navigate to="/" replace />} />

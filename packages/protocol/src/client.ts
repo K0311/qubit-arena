@@ -90,6 +90,11 @@ export const clientMessageSchema = z.discriminatedUnion('type', [
    * fixes the seats. The server checks the deck against the room's mode.
    */
   z.strictObject({ type: z.literal('UPDATE_SETTINGS'), settings: roomSettingsSchema }),
+  /**
+   * Play Again (ui-spec §10): a seated player sends the finished room back to WAITING with the
+   * same seats; everyone presses Ready again, which is the rematch vote.
+   */
+  z.strictObject({ type: z.literal('REMATCH') }),
 ]);
 
 export type ClientMessage = z.infer<typeof clientMessageSchema>;
