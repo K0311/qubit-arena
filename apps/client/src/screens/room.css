@@ -1,0 +1,446 @@
+/* Room (ui-spec §6): Blue · VS · Red · settings, the two teams face each other. */
+
+.room {
+  min-height: 100vh;
+}
+.room__header {
+  align-items: flex-end;
+}
+.room__kicker {
+  margin-bottom: var(--space-2);
+}
+
+/* ---- room code + copy ---- */
+.room-code {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 44px;
+  padding: 0 6px 0 16px;
+  border-radius: 12px;
+  background: #27e5f714;
+  border: 1.5px solid #27e5f755;
+}
+.room-code .ket {
+  font-size: 20px;
+  color: var(--accent-cyan);
+  letter-spacing: 0.12em;
+}
+.room-code__copy {
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #27e5f72a;
+  color: var(--accent-cyan);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+}
+.room-code__copy:hover {
+  background: #27e5f744;
+}
+
+/* ---- stage ---- */
+.room__stage {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr) minmax(320px, 520px);
+  gap: var(--space-5);
+  min-height: 0;
+}
+.team-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.team-col--blue {
+  box-shadow: inset 0 90px 120px -90px #1f5bd666;
+}
+.team-col--red {
+  box-shadow: inset 0 90px 120px -90px #c8323f66;
+}
+.team-col__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.team-col__title--blue {
+  color: var(--team-blue-soft);
+}
+.team-col__title--red {
+  color: var(--team-red-soft);
+}
+.team-col__zone {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 14px 6px 6px;
+  border-radius: 999px;
+  background: #ffffff0d;
+}
+.zone-dot {
+  width: 28px;
+  height: 25px;
+  border-radius: 50% 50% 42% 42%;
+}
+.team-col__seats {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ---- seat cards ---- */
+.seat-card {
+  position: relative;
+  flex: 1;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border-radius: 18px;
+  background: var(--surface-raised);
+  border: 1.5px solid var(--stroke-subtle);
+  text-align: center;
+}
+.seat-card--you {
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 24px #ffd14d40;
+}
+.seat-card--away {
+  opacity: 0.6;
+}
+.seat-card--open {
+  background: transparent;
+  border: 1.5px dashed #3b4ea8;
+}
+.seat-card__who {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  max-width: 100%;
+}
+.seat-card__status {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.seat-card__ready {
+  color: var(--accent-green);
+}
+.seat-card__check,
+.seat-card__wait {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.seat-card__check {
+  background: #3ddc9722;
+  border: 2px solid var(--accent-green);
+  color: var(--accent-green);
+  font-size: 20px;
+  font-weight: 700;
+}
+.seat-card__wait {
+  border: 2px dashed var(--text-muted);
+}
+.seat-card__remove {
+  min-width: 40px;
+  padding: 0 10px;
+}
+.seat-card__name {
+  font-size: 26px;
+  font-weight: 700;
+  margin-top: var(--space-2);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.seat-card__name--open {
+  font-size: 22px;
+  color: var(--text-muted);
+}
+.seat-card__tags {
+  display: flex;
+  gap: var(--space-2);
+}
+.tag {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 3px 8px;
+  border: 1px solid var(--stroke-subtle);
+  border-radius: 6px;
+}
+.tag--you {
+  color: var(--accent-gold);
+  border-color: #ffd14d77;
+}
+
+/* Dome characters, the same shape as the board's (visual-design §2). */
+.seat-dome {
+  position: relative;
+  width: 112px;
+  height: 100px;
+  border-radius: 50% 50% 42% 42%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 20px;
+}
+.seat-dome::after {
+  content: '';
+  position: absolute;
+  top: 18%;
+  left: 22%;
+  width: 22%;
+  height: 16%;
+  border-radius: 50%;
+  background: #ffffff70;
+}
+.seat-dome--blue {
+  background: linear-gradient(#3f7cf0, var(--team-blue));
+  box-shadow: 0 0 24px #1f5bd680;
+}
+.seat-dome--red {
+  background: linear-gradient(#e0505c, var(--team-red));
+  box-shadow: 0 0 24px #c8323f80;
+}
+.seat-dome--open {
+  border: 2px dashed #5c6fc4;
+  color: #7b8bd4;
+}
+.seat-dome--open::after {
+  display: none;
+}
+
+/* ---- VS and turn order ---- */
+.versus {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+.versus__ring {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid #ffd14d99;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 34px;
+  color: var(--accent-gold);
+  box-shadow:
+    0 0 40px #ffd14d33,
+    inset 0 0 30px #ffd14d22;
+}
+.versus__order {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+.turn-chip {
+  position: relative;
+  width: 64px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-ket);
+  font-weight: 700;
+}
+.turn-chip + .turn-chip::before {
+  content: '▼';
+  position: absolute;
+  top: -17px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.turn-chip--blue {
+  background: #1f5bd640;
+  color: var(--team-blue-soft);
+}
+.turn-chip--red {
+  background: #c8323f40;
+  color: var(--team-red-soft);
+}
+.versus__note {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* ---- settings and start ---- */
+.room__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.room__side .match-settings {
+  flex: 1;
+}
+.room__go {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.room__status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.room__status-text {
+  color: var(--accent-gold);
+  font-weight: 700;
+}
+.ready-dots {
+  display: flex;
+  gap: 6px;
+}
+.ready-dots i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--text-muted);
+}
+.ready-dots i.is-on {
+  background: var(--accent-green);
+  border-color: var(--accent-green);
+}
+.room__actions {
+  display: flex;
+  gap: var(--space-3);
+}
+.room__actions .btn {
+  flex: 1;
+}
+/* Start before everyone is ready: clearly "not yet", not broken. */
+.btn.btn--waiting:disabled {
+  opacity: 1;
+  background: #27e5f70f;
+  color: #27e5f799;
+  border: 1.5px dashed #27e5f755;
+  box-shadow: none;
+}
+
+/* ---- 1280 × 720 ---- */
+@media (max-width: 1400px) {
+  .room__stage {
+    grid-template-columns: minmax(0, 1fr) 100px minmax(0, 1fr) 360px;
+    gap: var(--space-4);
+  }
+  .seat-card {
+    min-height: 160px;
+    padding: var(--space-4);
+  }
+  .seat-dome {
+    width: 80px;
+    height: 72px;
+  }
+  .seat-card__name {
+    font-size: 22px;
+  }
+  .versus__ring {
+    width: 88px;
+    height: 88px;
+    font-size: 26px;
+  }
+  .room__actions .btn {
+    white-space: nowrap;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+}
+/* Short screens (720 p): keep the whole room on one screen, no scrolling. */
+@media (max-height: 820px) {
+  .room.screen {
+    padding-top: 24px;
+    padding-bottom: 24px;
+    gap: var(--space-4);
+  }
+  .room h1 {
+    font-size: 32px;
+  }
+  .room .panel {
+    padding: 18px 20px;
+  }
+  .team-col,
+  .team-col__seats {
+    gap: var(--space-3);
+  }
+  .seat-card {
+    min-height: 0;
+    padding: 12px 16px;
+    gap: 4px;
+  }
+  .seat-card__who {
+    gap: 4px;
+  }
+  .seat-dome {
+    width: 60px;
+    height: 54px;
+    font-size: 16px;
+  }
+  .seat-card__name {
+    font-size: 18px;
+    margin-top: 0;
+  }
+  .seat-card__status {
+    top: 10px;
+    right: 10px;
+    gap: var(--space-2);
+  }
+  .seat-card__check,
+  .seat-card__wait {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+  }
+  .seat-card--open .muted {
+    font-size: 13px;
+  }
+  .versus {
+    gap: var(--space-3);
+  }
+  .versus__ring {
+    width: 72px;
+    height: 72px;
+    font-size: 22px;
+  }
+  .room .settings-row,
+  .room .stepper,
+  .room .toggle {
+    min-height: 40px;
+  }
+}
+@media (max-width: 1000px) {
+  .room__stage {
+    grid-template-columns: 1fr;
+  }
+}

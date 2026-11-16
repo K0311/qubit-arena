@@ -142,10 +142,13 @@ Solo and Team carry a green **ONLINE** pill; Bot Arena a cyan **VS BOT** pill. T
 
 Uses the "Game Settings" panel of `ref-06` for the room settings.
 
-* Header: room name, pills: mode, `CODE QX7-42`, `n / 4 READY`. "Leave" (Danger) top right.
-* Team columns: **BLUE TEAM** (subtitle "End zone \|+⟩") and **RED TEAM** ("End zone \|−⟩"). Each seat shows a player chip (seat, name) and a ✓ Ready pill, or an empty dashed seat "Waiting for player…". Solo shows one seat per side.
-* Bots (Bot Arena): the host sees **+ Bot** beside each empty seat (`ADD_BOT`) and **✕** beside each bot (`REMOVE_BOT`). A bot's chip reads "Q-Bot P2 · bot", it is always ready, and it stays after Play Again. Players joining by code take free seats, never a bot's.
-* Line under the teams: "Turn order: P1 → P3 → P2 → P4 (opening roll decides which side starts)". Solo: "P1 ⇄ P2".
+Layout (1920 × 1080, fits on one screen at 1280 × 720 too): **Blue team · VS · Red team · settings**, so the two teams face each other.
+
+* Header: small caption "Room · waiting for players", room name (H1), pills: mode, Public/Private. Top right: the code box `CODE QX7-42` with a **COPY** button (copies the code to the clipboard; shows "COPIED" for 2 s; the clipboard needs https or localhost) and "Leave" (Danger).
+* Team columns: **BLUE TEAM** and **RED TEAM**, each with an end-zone pill (a dome in the state colour of \|+⟩ or \|−⟩, visual-design §2, then "End zone \|+⟩"). The column's seats fill its height. Solo shows one seat per side.
+* Seat card: a dome character in the team colour with the seat (P1…P4) on it, the name, tags (**you**, **host**, **bot · Easy/Hard**, **away**; "player" when there is none), and top right the ready state (green ✓ "READY" or a dashed circle "NOT READY"). Your own card has a gold border. An open seat is a dashed card with a dashed dome, "Open seat", a hint and **Take seat** (`TAKE_SEAT`).
+* Bots (Bot Arena): the host sees **+ Bot** on each open seat (`ADD_BOT`) and **✕** on each bot (`REMOVE_BOT`). A bot's card reads "Q-Bot P2" with the tag "bot · Hard" (the room's level), it is always ready, and it stays after Play Again. Players joining by code take free seats, never a bot's.
+* Between the teams: a gold **VS** ring and the turn order as seat chips in team colours, from the engine's `TURN_ORDER` (rules.md §6): Team P1 → P3 → P2 → P4, Solo P1 → P2, with "Opening roll picks who starts".
 * **Match settings** panel (host can edit, others read-only). Defaults come from rules.md:
 
   | Field | Control | Default |
@@ -158,7 +161,7 @@ Uses the "Game Settings" panel of `ref-06` for the room settings.
   | Sudden death (tie-break) | toggle | engine default config (rules.md §8.1) |
   | Bot level | segmented **Easy · Hard** | Easy (Bot Arena rooms: what the player picked, Hard by default). Easy = random bot v1 (rules.md §10); Hard = greedy bot (P-6.4), `NORMAL` in the protocol. Used by every bot in the room, including bots that take over a disconnected seat. |
 
-* **Ready** and **START GAME** buttons bottom right; Start is enabled only for the host when every seat is filled.
+* Under the settings, the start panel: one dot per seat (green when ready), `n / 4 READY`, and a gold line that says what the room is waiting for ("Waiting for you (P1) · 1 open seat"; when all are set: "Everyone is ready. Start when you like." for the host, "…Waiting for the host to start." for others). Then **Ready / Not ready** and **START GAME**. Start is enabled only for the host when every seat is filled and ready; until then it is drawn dashed (waiting), not greyed out. The panel turns gold when everything is set.
 
 ## 7. Game screen (`/game/:id`)
 
@@ -354,7 +357,7 @@ The board animations are in **visual-design §4** (hop along the edge, Bloch vec
 
 ## 14. Test ids (for Playwright)
 
-Use `data-testid` on: `menu-play`, `mode-solo`, `mode-team`, `mode-bot-solo`, `mode-bot-team`, `mode-bot-level-{EASY|NORMAL}`, `setting-bot-level-{EASY|NORMAL}`, `seat-{seat}-add-bot`, `seat-{seat}-remove-bot`, `game-fullscreen`, `lobby-quick-solo`, `lobby-quick-team`, `room-start`, `turn-active`, `clock-game`, `clock-turn`, `score-blue`, `score-red`, `board-node-{ZERO|PLUS|MINUS_I|ONE|MINUS|PLUS_I}`, `ball` (with `data-position`; absent in the fog), `fog`, `preview-target`, `hand-card-{0..3}` (with `data-gate`), `play-card`, `opponent-count-{seat}`, `state-fog-indicator`, `action-log`, `team-chat`, `challenge-option-{0..5}`, `result-winner`, `result-reason`.
+Use `data-testid` on: `menu-play`, `mode-solo`, `mode-team`, `mode-bot-solo`, `mode-bot-team`, `mode-bot-level-{EASY|NORMAL}`, `setting-bot-level-{EASY|NORMAL}`, `seat-{seat}` (with `data-ready` on a filled seat), `seat-{seat}-take`, `seat-{seat}-add-bot`, `seat-{seat}-remove-bot`, `player-chip-{seat}`, `room-code`, `room-copy-code`, `room-ready`, `room-ready-count`, `room-status`, `room-turn-order`, `room-leave`, `game-fullscreen`, `lobby-quick-solo`, `lobby-quick-team`, `room-start`, `turn-active`, `clock-game`, `clock-turn`, `score-blue`, `score-red`, `board-node-{ZERO|PLUS|MINUS_I|ONE|MINUS|PLUS_I}`, `ball` (with `data-position`; absent in the fog), `fog`, `preview-target`, `hand-card-{0..3}` (with `data-gate`), `play-card`, `opponent-count-{seat}`, `state-fog-indicator`, `action-log`, `team-chat`, `challenge-option-{0..5}`, `result-winner`, `result-reason`.
 
 ## 15. Differences from the reference images
 

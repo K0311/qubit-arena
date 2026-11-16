@@ -13,6 +13,7 @@ import '@fontsource/jetbrains-mono/700.css';
 import './theme/global.css';
 import './components/ui.css';
 import './screens/screens.css';
+import './screens/room.css';
 import { App } from './app';
 
 const root = document.getElementById('root');

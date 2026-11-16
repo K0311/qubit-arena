@@ -146,6 +146,7 @@
 | 12 พ.ย. 2026 | Challenge bot rule | rules.md §8.1: bot ตอบ Quantum Challenge แทนทีมเฉพาะเมื่อทีมไม่มีคนออนไลน์ (T-S-10) |
 | 15 พ.ย. 2026 | P-4.1 App shell | client: theme tokens, ฟอนต์, พื้นหลังอวกาศ, component กลาง, route ทุกหน้า, เมนู/เลือกโหมด/lobby/ห้อง, WebSocket + store; protocol เพิ่ม `LIST_ROOMS`/`ROOM_LIST`, `UPDATE_SETTINGS`; e2e quick match และสร้างห้อง→เริ่มเกม ผ่าน |
 | 15 พ.ย. 2026 | P-4.2 Game screen | กระดาน 2D (SVG, หมุนให้ end zone ตัวเองอยู่บน, หมอก), การ์ด gate (บรรทัด board effect สร้างจาก engine + snapshot), มือ + ตัวอย่างการเดิน, HUD, action log; protocol เพิ่ม `clocks` ใน `GAME_VIEW`; e2e เล่นการ์ด 1 ใบผ่าน |
+| 17 พ.ย. 2026 | Room redesign | หน้าห้องแบบสองทีมเผชิญหน้า: การ์ดที่นั่งมีโดมสีทีม, สถานะพร้อม, วง VS + ลำดับเทิร์นจาก `TURN_ORDER`, ปุ่ม COPY รหัสห้อง, บรรทัดบอกว่ารอใคร/ที่นั่งว่างกี่ที่, ปุ่ม Start ตอนยังไม่พร้อมเป็นเส้นประ; พอดีจอทั้ง 1920×1080 และ 1280×720 (ui-spec §6) |
 | 17 พ.ย. 2026 | Bot level Hard | เปลี่ยนชื่อระดับบอทที่ผู้เล่นเห็นจาก Normal เป็น Hard (การ์ด Bot Arena + ตั้งค่าห้อง); ค่าใน protocol/engine ยังเป็น `NORMAL` บอทเหมือนเดิม |
 | 17 พ.ย. 2026 | Fullscreen | ปุ่มเต็มจอข้างปุ่ม ? ในหน้าเกม + ปุ่ม F; ซ่อนบน iPhone Safari ที่ไม่มี Fullscreen API |
 | 17 พ.ย. 2026 | Bot pace | บอทรอ 2.5 วิก่อนเล่น (เดิม 1 วิ) ให้ animation ตาก่อนหน้าจบก่อน (ยาวสุดราว 2.4 วิ); ใช้กับบอททุกระดับ |
