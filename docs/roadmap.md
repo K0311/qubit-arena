@@ -146,6 +146,7 @@
 | 12 พ.ย. 2026 | Challenge bot rule | rules.md §8.1: bot ตอบ Quantum Challenge แทนทีมเฉพาะเมื่อทีมไม่มีคนออนไลน์ (T-S-10) |
 | 15 พ.ย. 2026 | P-4.1 App shell | client: theme tokens, ฟอนต์, พื้นหลังอวกาศ, component กลาง, route ทุกหน้า, เมนู/เลือกโหมด/lobby/ห้อง, WebSocket + store; protocol เพิ่ม `LIST_ROOMS`/`ROOM_LIST`, `UPDATE_SETTINGS`; e2e quick match และสร้างห้อง→เริ่มเกม ผ่าน |
 | 15 พ.ย. 2026 | P-4.2 Game screen | กระดาน 2D (SVG, หมุนให้ end zone ตัวเองอยู่บน, หมอก), การ์ด gate (บรรทัด board effect สร้างจาก engine + snapshot), มือ + ตัวอย่างการเดิน, HUD, action log; protocol เพิ่ม `clocks` ใน `GAME_VIEW`; e2e เล่นการ์ด 1 ใบผ่าน |
+| 17 พ.ย. 2026 | Fullscreen | ปุ่มเต็มจอข้างปุ่ม ? ในหน้าเกม + ปุ่ม F; ซ่อนบน iPhone Safari ที่ไม่มี Fullscreen API |
 | 17 พ.ย. 2026 | Bot pace | บอทรอ 2.5 วิก่อนเล่น (เดิม 1 วิ) ให้ animation ตาก่อนหน้าจบก่อน (ยาวสุดราว 2.4 วิ); ใช้กับบอททุกระดับ |
 | 16 พ.ย. 2026 | P-6.4 Greedy bot | engine `botAction(..., 'NORMAL')`: คิดจากสถานะควอนตัมจริง (Measure ใช้ความน่าจะเป็นจาก amplitude ไม่แอบดู RNG) เลือก ทัชดาวน์ > ออกจากหมอกเมื่อดีกว่า > เข้าใกล้ end zone ตัวเอง > ห่าง end zone ฝ่ายตรงข้าม เสมอกันสุ่ม; ชนะบอทสุ่ม ~86 % ใน 1,000 เกม (เกณฑ์ > 60 %); ระดับ Easy/Normal ในห้อง (host ตั้ง) และบนการ์ด Bot Arena (ค่าเริ่ม Normal); ห้องทั่วไปเริ่มที่ Easy ตาม rules.md §10 |
 | 16 พ.ย. 2026 | Bot Arena | หน้าเลือกโหมดมีการ์ด Bot Arena (Solo vs Bot / Team with Bots) เริ่มเกมกับบอททันทีในห้อง private; host ใส่/เอาบอทออกจากที่นั่งว่างในห้องได้ (`ADD_BOT`/`REMOVE_BOT`/`BOT_GAME`); บอทอยู่ต่อหลัง Play Again; T-S-11, T-E-07 |

@@ -171,13 +171,16 @@
 }
 
 .game-actions {
-  left: 1376px;
+  /* Leave, ?, full screen; ends before the clocks panel at x 1530. */
+  left: 1322px;
   top: 46px;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 .game-help {
+  display: grid;
+  place-items: center;
   width: 44px;
   height: 44px;
   border-radius: 50%;

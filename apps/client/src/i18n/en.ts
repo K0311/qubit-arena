@@ -118,6 +118,8 @@ export const en = {
     mateHand: "Teammate's hand",
     gateReference: 'GATE REFERENCE',
     help: 'Gate reference and rules',
+    fullscreen: 'Full screen',
+    exitFullscreen: 'Exit full screen',
     leave: 'Leave',
     leaveConfirm: 'Leave the game? A bot takes your seat after 30 s.',
     stay: 'Stay',

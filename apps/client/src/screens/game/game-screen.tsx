@@ -30,6 +30,7 @@ import { AnimatedBoard2D, AnimatedStatePanel, CardFly, Dice } from './anim-hud';
 import { TeamChat } from './team-chat';
 import { Banner, Clocks, Scoreboard, TurnBar } from './hud';
 import { GateReference, TeamPanel } from './side-panels';
+import { FullscreenButton } from './fullscreen';
 import './game.css';
 import './overlays.css';
 
@@ -204,6 +205,7 @@ export function GameScreen() {
           >
             ?
           </button>
+          <FullscreenButton />
         </div>
         <Clocks
           gameMs={gameMs}
