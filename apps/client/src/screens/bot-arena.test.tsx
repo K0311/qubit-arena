@@ -58,7 +58,10 @@ describe('Bot Arena', () => {
     expect(send).toHaveBeenLastCalledWith(
       expect.objectContaining({ type: 'BOT_GAME', mode: 'SOLO', level: 'NORMAL' }),
     );
-    // P-6.4: Easy / Normal picker on the card, Normal by default.
+    // P-6.4: Easy / Hard picker on the card, Hard (the greedy bot, NORMAL inside) by default.
+    expect(screen.getByTestId('mode-bot-level-EASY').textContent).toContain('Easy');
+    expect(screen.getByTestId('mode-bot-level-NORMAL').textContent).toContain('Hard');
+    expect(screen.queryByText('Normal')).toBeNull();
     fireEvent.click(screen.getByTestId('mode-bot-level-EASY'));
     fireEvent.click(screen.getByTestId('mode-bot-solo'));
     expect(send).toHaveBeenLastCalledWith(
@@ -82,6 +85,7 @@ describe('Bot Arena', () => {
   it('P-6.4: the host picks the bot level in the room; guests only see it', () => {
     showRoom({ P1: human, P2: bot, P3: null, P4: null }, true);
     expect(screen.getByTestId('setting-bot-level-EASY').getAttribute('aria-checked')).toBe('true');
+    expect(screen.getByTestId('setting-bot-level-NORMAL').textContent).toContain('Hard');
     fireEvent.click(screen.getByTestId('setting-bot-level-NORMAL'));
     expect(send).toHaveBeenLastCalledWith({
       type: 'UPDATE_SETTINGS',

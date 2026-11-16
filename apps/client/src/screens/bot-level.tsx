@@ -1,7 +1,7 @@
 import { BOT_LEVELS, type BotLevel } from '@qa/engine';
 import { en } from '../i18n/en';
 
-/** Easy (random bot v1) / Normal (greedy bot, P-6.4), as a two-button segmented control. */
+/** Easy (random bot v1) / Hard (greedy bot, P-6.4; NORMAL in the protocol), as a two-button segmented control. */
 export function BotLevelPicker({
   value,
   onChange,
