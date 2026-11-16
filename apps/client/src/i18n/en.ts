@@ -28,7 +28,7 @@ export const en = {
   botLevel: {
     label: 'Bot level',
     EASY: 'Easy',
-    NORMAL: 'Normal',
+    NORMAL: 'Hard',
     hint: {
       EASY: 'Plays a random card from its hand.',
       NORMAL: 'Looks for touchdowns and moves the ball towards its own end zone.',

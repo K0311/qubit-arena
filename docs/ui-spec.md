@@ -128,7 +128,7 @@ Reconnecting, errors and "waiting for server" are shown as a toast or a full-scr
 |---|---|---|---|---|
 | Blue frame | 2 people | **Solo 1v1** | "Compete against another player online." | Select |
 | Purple frame | 4 people | **Team 2v2** | "Blue P1, P2 vs Red P3, P4. Plan with your partner in team chat." | Select |
-| Cyan frame | person + robot | **Bot Arena** | "Practise against bots right away, no other players needed." | Bot level **Easy · Normal** (Normal selected), then **Solo vs Bot** · **Team with Bots** |
+| Cyan frame | person + robot | **Bot Arena** | "Practise against bots right away, no other players needed." | Bot level **Easy · Hard** (Hard selected), then **Solo vs Bot** · **Team with Bots** |
 
 Solo and Team carry a green **ONLINE** pill; Bot Arena a cyan **VS BOT** pill. There is no local or hot-seat mode (out of scope). "Select" opens the lobby filtered to that mode. Bot Arena buttons send `BOT_GAME`: the server opens a private room "Bot Arena" with the player in P1 and bots (rules.md §10) in every other seat, and starts at once, so the game screen opens directly. In Team the player's partner P2 is a bot too.
 
@@ -156,7 +156,7 @@ Uses the "Game Settings" panel of `ref-06` for the room settings.
   | Turn timer | stepper | **60 s** |
   | Deck | read-only text + "Edit counts" | 55 cards (H7 X4 Y9 Z7 S7 √X12 I3 M3 CNOT3) |
   | Sudden death (tie-break) | toggle | engine default config (rules.md §8.1) |
-  | Bot level | segmented **Easy · Normal** | Easy (Bot Arena rooms: what the player picked, Normal by default). Easy = random bot v1 (rules.md §10); Normal = greedy bot (P-6.4). Used by every bot in the room, including bots that take over a disconnected seat. |
+  | Bot level | segmented **Easy · Hard** | Easy (Bot Arena rooms: what the player picked, Hard by default). Easy = random bot v1 (rules.md §10); Hard = greedy bot (P-6.4), `NORMAL` in the protocol. Used by every bot in the room, including bots that take over a disconnected seat. |
 
 * **Ready** and **START GAME** buttons bottom right; Start is enabled only for the host when every seat is filled.
 
