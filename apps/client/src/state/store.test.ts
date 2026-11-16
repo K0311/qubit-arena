@@ -15,6 +15,7 @@ const room = (code: string, version: number): ServerMessage => ({
     settings: { ...defaultConfig('SOLO') },
     seats: { P1: null, P2: null },
     spectators: 0,
+    botLevel: 'EASY',
   } satisfies Room,
   you: { seat: 'P1', host: true },
 });

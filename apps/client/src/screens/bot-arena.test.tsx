@@ -31,6 +31,7 @@ function showRoom(seats: Room['seats'], host: boolean) {
       settings: { ...config, deckCounts: { ...config.deckCounts } },
       seats,
       spectators: 0,
+      botLevel: 'EASY',
     },
     you: { seat: 'P1', host },
   } as ServerMessage);
@@ -55,7 +56,13 @@ describe('Bot Arena', () => {
     expect(screen.getByText('Bot Arena')).toBeTruthy();
     fireEvent.click(screen.getByTestId('mode-bot-solo'));
     expect(send).toHaveBeenLastCalledWith(
-      expect.objectContaining({ type: 'BOT_GAME', mode: 'SOLO' }),
+      expect.objectContaining({ type: 'BOT_GAME', mode: 'SOLO', level: 'NORMAL' }),
+    );
+    // P-6.4: Easy / Normal picker on the card, Normal by default.
+    fireEvent.click(screen.getByTestId('mode-bot-level-EASY'));
+    fireEvent.click(screen.getByTestId('mode-bot-solo'));
+    expect(send).toHaveBeenLastCalledWith(
+      expect.objectContaining({ type: 'BOT_GAME', mode: 'SOLO', level: 'EASY' }),
     );
     fireEvent.click(screen.getByTestId('mode-bot-team'));
     expect(send).toHaveBeenLastCalledWith(
@@ -70,6 +77,23 @@ describe('Bot Arena', () => {
     fireEvent.click(screen.getByTestId('seat-P2-remove-bot'));
     expect(send).toHaveBeenLastCalledWith({ type: 'REMOVE_BOT', seat: 'P2' });
     expect(screen.queryByTestId('seat-P1-remove-bot')).toBeNull();
+  });
+
+  it('P-6.4: the host picks the bot level in the room; guests only see it', () => {
+    showRoom({ P1: human, P2: bot, P3: null, P4: null }, true);
+    expect(screen.getByTestId('setting-bot-level-EASY').getAttribute('aria-checked')).toBe('true');
+    fireEvent.click(screen.getByTestId('setting-bot-level-NORMAL'));
+    expect(send).toHaveBeenLastCalledWith({
+      type: 'UPDATE_SETTINGS',
+      settings: { botLevel: 'NORMAL' },
+    });
+  });
+
+  it('P-6.4: guests cannot change the bot level', () => {
+    showRoom({ P1: { ...human, host: false }, P2: bot, P3: null, P4: null }, false);
+    expect((screen.getByTestId('setting-bot-level-NORMAL') as HTMLButtonElement).disabled).toBe(
+      true,
+    );
   });
 
   it('guests see the bots but cannot add or remove them', () => {

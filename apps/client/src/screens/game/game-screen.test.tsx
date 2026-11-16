@@ -36,6 +36,7 @@ function room(mode: Mode): Room {
         ? { P1: seat('Ann'), P2: seat('Bo') }
         : { P1: seat('Ann'), P2: seat('Bo'), P3: seat('Cy'), P4: seat('Di') },
     spectators: 0,
+    botLevel: 'EASY',
   };
 }
 

@@ -36,6 +36,8 @@ const VALID: readonly ClientMessage[] = [
   { type: 'REMOVE_BOT', seat: 'P4' },
   { type: 'BOT_GAME', mode: 'SOLO', playerName: 'Ann' },
   { type: 'BOT_GAME', mode: 'TEAM', playerName: 'Bo' },
+  { type: 'BOT_GAME', mode: 'SOLO', playerName: 'Cy', level: 'EASY' },
+  { type: 'UPDATE_SETTINGS', settings: { botLevel: 'NORMAL' } },
 ];
 
 const reject = (raw: unknown) => {
@@ -89,6 +91,8 @@ describe('client → server messages (architecture.md §5)', () => {
     reject({ type: 'REMOVE_BOT' });
     reject({ type: 'BOT_GAME', mode: 'SOLO' });
     reject({ type: 'BOT_GAME', mode: 'DUO', playerName: 'x' });
+    reject({ type: 'BOT_GAME', mode: 'SOLO', playerName: 'x', level: 'HARD' });
+    reject({ type: 'UPDATE_SETTINGS', settings: { botLevel: 'HARD' } });
   });
 
   it('REMATCH has no fields', () => {

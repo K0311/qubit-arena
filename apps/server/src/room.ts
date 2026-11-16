@@ -1,5 +1,6 @@
 import {
   defaultConfig,
+  type BotLevel,
   sideOf,
   TURN_ORDER,
   type GameConfig,
@@ -63,6 +64,8 @@ export class Room {
   host: Session | null = null;
   state: GameState | null = null;
   rng: Rng | null = null;
+  /** Every bot in this room plays at this level (P-6.4); EASY is the rules.md §10 bot v1. */
+  botLevel: BotLevel = 'EASY';
   /** stateVersion on ROOM_STATE, GAME_VIEW and EVENT (architecture.md §5). */
   version = 0;
   readonly timers: {
@@ -181,6 +184,7 @@ export class Room {
       settings: this.config,
       seats,
       spectators: this.spectators.size,
+      botLevel: this.botLevel,
     };
   }
 }

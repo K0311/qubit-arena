@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { GameEvent, GameView } from '@qa/engine';
 import {
   ballPositionSchema,
+  botLevelSchema,
   cardKindSchema,
   chatTextSchema,
   count,
@@ -143,6 +144,8 @@ export const roomSchema = z.strictObject({
   settings: gameConfigSchema,
   seats: z.partialRecord(seatSchema, seatInfoSchema.nullable()),
   spectators: count,
+  /** Bot strength in this room (P-6.4); host may change it before the game. */
+  botLevel: botLevelSchema,
 });
 
 /** One row of the lobby list (ui-spec §5): counts only, never who sits where. */

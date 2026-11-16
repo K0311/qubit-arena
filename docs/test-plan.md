@@ -95,7 +95,7 @@ Coverage goal: **≥ 90 % lines in `packages/engine`**, ≥ 70 % in `apps/server
 * **T-S-08** — Spectator receives public state only.
 * **T-S-09** — Rate limit: 50 chat messages in 1 s are throttled.
 * **T-S-10** — Quantum Challenge: a bot answers for its side only when no human player of that side is connected (rules.md §8.1).
-* **T-S-11** — Bot Arena: only the host adds/removes bots, only before the game; bots are ready, never take a human's seat, play their own turns, stay after Play Again; the room closes when its last human leaves; `BOT_GAME` starts a private Solo/Team game at once.
+* **T-S-11** — Bot Arena: only the host adds/removes bots, only before the game; bots are ready, never take a human's seat, play their own turns, stay after Play Again; the room closes when its last human leaves; `BOT_GAME` starts a private Solo/Team game at once. P-6.4: rooms start at bot level EASY, only the host changes it (`UPDATE_SETTINGS { botLevel }`), and a NORMAL bot takes the touchdown its hand offers.
 
 ### 3.5 End-to-end (Playwright)
 
@@ -118,6 +118,7 @@ Screenshots of every screen at 1920 × 1080: `pnpm --filter @qa/e2e screens` →
 * After **every** action check the invariants in architecture.md §4.3.
 * Every game must finish (no infinite loop): cap at 2,000 turns and fail if reached.
 * Record and print the seed of any failing game so it can be replayed.
+* **P-6.4 greedy bot** (`packages/engine/test/greedy-bot.test.ts`): the NORMAL bot takes a touchdown when its hand has one, leaves the fog when that helps, steps towards its own end zone, keeps away from the other end zone, breaks ties with the RNG; EASY stays the random bot v1. Over 1,000 games (Solo and Team, each side greedy half the time) greedy must beat random in more than 60 % (measured: about 86 %).
 
 ---
 

@@ -2,6 +2,7 @@ import { describe, expectTypeOf, it } from 'vitest';
 import type { z } from 'zod';
 import type {
   BallPosition,
+  BotLevel,
   CardKind,
   EndReason,
   ErrorCode as EngineErrorCode,
@@ -14,6 +15,7 @@ import type {
 } from '@qa/engine';
 import {
   ballPositionSchema,
+  botLevelSchema,
   cardKindSchema,
   endReasonSchema,
   engineErrorCodeSchema,
@@ -38,6 +40,7 @@ describe('protocol enums match the engine types exactly', () => {
     expectTypeOf<z.infer<typeof phaseSchema>>().toEqualTypeOf<Phase>();
     expectTypeOf<z.infer<typeof endReasonSchema>>().toEqualTypeOf<EndReason>();
     expectTypeOf<z.infer<typeof winnerSchema>>().toEqualTypeOf<Winner>();
+    expectTypeOf<z.infer<typeof botLevelSchema>>().toEqualTypeOf<BotLevel>();
     expectTypeOf<z.infer<typeof engineErrorCodeSchema>>().toEqualTypeOf<EngineErrorCode>();
   });
 });

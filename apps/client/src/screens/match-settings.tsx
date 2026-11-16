@@ -1,10 +1,11 @@
-import type { Mode } from '@qa/engine';
+import type { BotLevel, Mode } from '@qa/engine';
 import type { RoomSettings } from '@qa/protocol';
 import { Panel } from '../components/ui/panel';
 import { Stepper } from '../components/ui/stepper';
 import { Toggle } from '../components/ui/toggle';
 import { en } from '../i18n/en';
 import { deckSummary, minutesSeconds, seconds } from '../lib/format';
+import { BotLevelPicker } from './bot-level';
 
 export type MatchConfig = {
   mode: Mode;
@@ -23,10 +24,13 @@ const MIN = 60_000;
  */
 export function MatchSettings({
   config,
+  botLevel,
   editable,
   onChange,
 }: {
   config: MatchConfig;
+  /** Room setting, not a rule (P-6.4); left out where no room exists. */
+  botLevel?: BotLevel;
   editable: boolean;
   onChange?: (settings: RoomSettings) => void;
 }) {
@@ -78,6 +82,17 @@ export function MatchSettings({
         disabled={!editable}
         onChange={(v) => onChange?.({ suddenDeath: v })}
       />
+      {botLevel && (
+        <div className="settings-row">
+          <span className="stepper__label">{en.botLevel.label}</span>
+          <BotLevelPicker
+            value={botLevel}
+            disabled={!editable}
+            testId="setting-bot-level"
+            onChange={(level) => onChange?.({ botLevel: level })}
+          />
+        </div>
+      )}
     </Panel>
   );
 }

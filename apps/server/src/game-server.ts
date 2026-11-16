@@ -5,6 +5,7 @@ import {
   mulberry32,
   viewFor,
   type Action,
+  type BotLevel,
   type GameEvent,
   type GameState,
   type Mode,
@@ -177,6 +178,7 @@ export class GameServer {
           msg.name,
           roomConfig(msg.mode, msg.settings),
         );
+        if (msg.settings?.botLevel) room.botLevel = msg.settings.botLevel;
         this.sit(room, session, 'P1', false);
         room.host = session;
         this.broadcastRoom(room);
@@ -249,7 +251,7 @@ export class GameServer {
       case 'REMOVE_BOT':
         return this.removeBot(session, msg.seat);
       case 'BOT_GAME':
-        return this.botGame(session, msg.mode, msg.playerName);
+        return this.botGame(session, msg.mode, msg.playerName, msg.level ?? 'NORMAL');
       case 'LEAVE':
         if (!session.room) return fail('NOT_IN_ROOM', 'not in a room');
         this.leaveRoom(session);
@@ -262,7 +264,10 @@ export class GameServer {
     if (!room) return fail('NOT_IN_ROOM', 'join a room first');
     if (room.host !== session) return fail('NOT_HOST', 'only the host can change settings');
     if (room.status !== 'WAITING') return fail('GAME_IN_PROGRESS', 'the game has started');
-    const next = { ...room.config, ...settings };
+    // The bot level is a room setting, not part of the game config (P-6.4).
+    const { botLevel, ...rules } = settings;
+    if (botLevel) room.botLevel = botLevel;
+    const next = { ...room.config, ...rules };
     const cards = Object.values(next.deckCounts).reduce((a, b) => a + b, 0);
     const needed = room.seatIds().length * next.handSize;
     if (cards < needed) {
@@ -301,11 +306,12 @@ export class GameServer {
   }
 
   /** Bot Arena shortcut: a private room, you in P1, bots in every other seat, started now. */
-  private botGame(session: Session, mode: Mode, name: string): Failure | void {
+  private botGame(session: Session, mode: Mode, name: string, level: BotLevel): Failure | void {
     const problem = this.leaveForNewRoom(session);
     if (problem) return problem;
     session.name = name;
     const room = this.newRoom(mode, 'PRIVATE', 'Bot Arena', roomConfig(mode));
+    room.botLevel = level;
     this.sit(room, session, 'P1', true);
     room.host = session;
     for (const p of room.seatIds()) if (p !== 'P1') this.seatBot(room, p);
@@ -644,7 +650,7 @@ export class GameServer {
     room.timers.bot = this.scheduler.set(() => {
       room.timers.bot = undefined;
       if (!room.state || !room.rng || this.botDue(room, room.state) !== p) return;
-      const action = botAction(room.state, p, room.rng);
+      const action = botAction(room.state, p, room.rng, room.botLevel);
       if (action) this.apply(room, action);
     }, this.botThinkMs);
   }
