@@ -1,0 +1,312 @@
+/* Lobby (ui-spec §5): open rooms on the left, quick match / create / join on the right. */
+
+.lobby {
+  min-height: 100vh;
+}
+.lobby__header {
+  align-items: flex-end;
+}
+.lobby__kicker {
+  margin-bottom: var(--space-2);
+}
+.lobby__grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 600px);
+  gap: var(--space-5);
+  align-items: stretch;
+  min-height: 0;
+}
+
+/* ---- open rooms ---- */
+.lobby-rooms {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.lobby-rooms__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2);
+}
+.lobby-rooms__head .panel__title {
+  margin: 0;
+}
+.lobby-live {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.lobby-live i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 8px var(--accent-green);
+}
+.lobby-rooms__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.lobby-rooms__rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.lobby-room {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px 150px 130px 110px 110px;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 16px 24px;
+  border-radius: 16px;
+  background: var(--surface-raised);
+  border: 1.5px solid var(--stroke-subtle);
+}
+.lobby-room--live {
+  background: #16225c88;
+}
+.lobby-room--head {
+  padding: 0 24px;
+  background: none;
+  border: 0;
+}
+.lobby-room__name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.lobby-room__name strong {
+  font-size: 19px;
+  line-height: 1.25;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.lobby-room .btn {
+  width: 100%;
+}
+.seat-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.seat-dot {
+  width: 20px;
+  height: 18px;
+  border-radius: 50% 50% 42% 42%;
+  border: 2px dashed #5c6fc4;
+}
+.seat-dot.is-on {
+  border: 0;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px #27e5f766;
+}
+.seat-dot--blue {
+  border: 0;
+  background: #3f7cf0;
+}
+.seat-dot--red {
+  border: 0;
+  background: #e0505c;
+}
+.seat-dots .ket {
+  margin-left: 4px;
+}
+
+/* ---- empty state ---- */
+.lobby-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: var(--space-6) 0;
+}
+.lobby-empty p {
+  max-width: 520px;
+  line-height: 1.6;
+}
+.empty-ring {
+  position: relative;
+  width: 240px;
+  height: 190px;
+  margin-bottom: var(--space-2);
+}
+.empty-ring__orbit {
+  position: absolute;
+  inset: 18px 30px;
+  border-radius: 50%;
+  border: 1.5px solid #27e5f744;
+  box-shadow: 0 0 40px #27e5f722 inset;
+}
+.empty-ring__dome {
+  position: absolute;
+  width: 40px;
+  height: 36px;
+  margin: -18px 0 0 -20px;
+  border-radius: 50% 50% 42% 42%;
+  box-shadow: 0 0 16px #ffffff22;
+}
+.empty-ring__ball {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 56px;
+  height: 34px;
+  margin: -17px 0 0 -28px;
+  border-radius: 50%;
+  border: 2px dashed #ffd14d99;
+  animation: empty-ball 3s ease-in-out infinite;
+}
+@keyframes empty-ball {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .empty-ring__ball {
+    animation: none;
+  }
+}
+
+/* ---- right column ---- */
+.lobby__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.quick-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+.quick-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  border: 1.5px solid #27e5f788;
+  background: linear-gradient(135deg, #27e5f71c, #2a6fe01c);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s,
+    border-color 0.15s;
+}
+.quick-tile:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 24px #27e5f744;
+  transform: translateY(-2px);
+}
+.quick-tile:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+.quick-tile__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--accent-cyan);
+}
+/* Without this the code input keeps its intrinsic width and pushes Join out of the panel. */
+.lobby .code-input {
+  min-width: 0;
+}
+.quick-tile__seats {
+  display: flex;
+  gap: 8px;
+}
+
+/* ---- 1280 × 720 ---- */
+@media (max-width: 1400px) {
+  .lobby__grid {
+    grid-template-columns: minmax(0, 1fr) 380px;
+  }
+  .lobby-room {
+    grid-template-columns: minmax(0, 1fr) 110px 130px 110px 100px;
+    gap: var(--space-3);
+    padding: 12px 16px;
+  }
+  /* The match column goes first on narrow screens; the name and code still say enough. */
+  .lobby-room > :nth-child(4) {
+    display: none;
+  }
+  .lobby-room--head {
+    padding: 0 16px;
+  }
+  .quick-tiles {
+    gap: var(--space-3);
+  }
+  .quick-tile {
+    padding: 14px;
+  }
+  .quick-tile__title {
+    font-size: 16px;
+  }
+}
+@media (max-height: 820px) {
+  .lobby.screen {
+    padding-top: 24px;
+    padding-bottom: 24px;
+    gap: var(--space-4);
+  }
+  .lobby h1 {
+    font-size: 32px;
+  }
+  .lobby .panel {
+    padding: 18px 20px;
+  }
+  .lobby__side {
+    gap: var(--space-3);
+  }
+  .lobby .form {
+    gap: var(--space-2);
+  }
+  .lobby .panel__title {
+    margin-bottom: var(--space-2);
+  }
+  /* The tiles say what quick match does; the hint line is the first thing to go. */
+  .lobby__side .panel--cyan > p {
+    display: none;
+  }
+  .quick-tiles {
+    margin-top: var(--space-2);
+  }
+  .quick-tile {
+    padding: 10px 14px;
+    gap: 6px;
+  }
+  .lobby .btn:not(.btn--small) {
+    height: 48px;
+  }
+  .empty-ring {
+    transform: scale(0.75);
+    margin: -24px 0;
+  }
+}
+@media (max-width: 1000px) {
+  .lobby__grid {
+    grid-template-columns: 1fr;
+  }
+}
