@@ -1,7 +1,17 @@
-import { useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import { useNavigate } from 'react-router';
 import { sideOf, type Card, type PlayerId, type Side } from '@qa/engine';
 import { Board2D, type EdgeRef } from '../../components/board/board-2d';
+import { CAMERA_VIEWS, hasWebGL } from '../../components/board3d/layout';
+import '../../components/board3d/board-3d.css';
 import { CardBack, GateCard } from '../../components/cards/gate-card';
 import { Button } from '../../components/ui/button';
 import { Modal } from '../../components/ui/modal';
@@ -61,7 +71,10 @@ function useClocks(view: GameViewData | null) {
   };
 }
 
-/** ui-spec §7 game screen (2D board). */
+/** three.js loads only when a game opens (about 600 KB), so menus stay light. */
+const Board3D = lazy(() => import('../../components/board3d/board-3d'));
+
+/** ui-spec §7 game screen. */
 export function GameScreen() {
   const navigate = useNavigate();
   const room = useGame((s) => s.room);
@@ -74,6 +87,11 @@ export function GameScreen() {
   const { gameMs, turnMs } = useClocks(view);
   const reveal = useChallengeReveal(view);
   const settings = useSettings();
+  const [webgl] = useState(hasWebGL);
+  const use3D = settings.board === '3D' && webgl;
+  const reduceMotion =
+    settings.reduceMotion === 'on' ||
+    (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   const viewer = view?.viewer ?? 'SPECTATOR';
   const you: PlayerId | null = viewer === 'SPECTATOR' ? null : viewer;
@@ -149,6 +167,17 @@ export function GameScreen() {
       ? en.game.waitTurn(view.turn)
       : en.game.spectating;
 
+  const boardProps = {
+    ball: view.ball,
+    orientation,
+    playable,
+    preview,
+    showLabels: settings.showLabels,
+    ballShape: settings.ball,
+    swirl: settings.swirl,
+  };
+  const board2d = <Board2D {...boardProps} />;
+
   return (
     <main
       className={`game game--${team ? 'team' : 'solo'}${you ? '' : ' game--spectator'}`}
@@ -187,16 +216,46 @@ export function GameScreen() {
           <GateReference />
         </div>
 
-        <div className="game-board">
-          <Board2D
-            ball={view.ball}
-            orientation={orientation}
-            playable={playable}
-            preview={preview}
-            showLabels={settings.showLabels}
-            ballShape={settings.ball}
-            swirl={settings.swirl}
-          />
+        <div className="game-board" data-board={use3D ? '3D' : '2D'}>
+          {use3D ? (
+            <>
+              <Suspense fallback={board2d}>
+                <Board3D
+                  {...boardProps}
+                  qubits={view.qubits}
+                  camera={settings.camera}
+                  active={sideOf(mode, view.turn)}
+                  reduceMotion={reduceMotion}
+                />
+              </Suspense>
+              <div className="board-minimap" aria-label={en.settings.minimap}>
+                <Board2D
+                  ball={view.ball}
+                  orientation={orientation}
+                  showLabels={false}
+                  swirl={0}
+                  decorative
+                />
+              </div>
+              <div className="board-cams" role="radiogroup" aria-label={en.settings.camera}>
+                {CAMERA_VIEWS.map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    role="radio"
+                    aria-checked={settings.camera === v}
+                    className={settings.camera === v ? 'is-on' : ''}
+                    onClick={() => settings.set({ camera: v })}
+                    data-testid={`camera-${v.toLowerCase()}`}
+                  >
+                    {en.settings.cameras[v]}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            board2d
+          )}
         </div>
 
         <div className="game-deck">

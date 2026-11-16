@@ -35,6 +35,8 @@ export type Board2DProps = {
   ballShape?: 'football' | 'heart' | 'star';
   /** Swirl brightness and opacity in % (ui-spec §12). */
   swirl?: number;
+  /** A copy for show only (the 3D board's minimap): no test ids, hidden from screen readers. */
+  decorative?: boolean;
 };
 
 const matches = (e: BoardEdge, m: EdgeRef) =>
@@ -55,7 +57,10 @@ export function Board2D({
   showLabels = true,
   ballShape = 'football',
   swirl = 100,
+  decorative = false,
 }: Board2DProps) {
+  // ui-spec §14 test ids must exist once per page, on the board people play on.
+  const tid = (id: string) => (decorative ? undefined : id);
   const flip = orientation === 'RED' ? -1 : 1;
   const pt = useMemo(() => {
     const out = {} as Record<Position, { x: number; y: number }>;
@@ -73,8 +78,9 @@ export function Board2D({
     <svg
       className="board2d"
       viewBox="-160 -100 320 200"
-      role="img"
-      aria-label="Board"
+      role={decorative ? undefined : 'img'}
+      aria-label={decorative ? undefined : 'Board'}
+      aria-hidden={decorative || undefined}
       data-orientation={orientation}
     >
       <defs>
@@ -203,7 +209,7 @@ export function Board2D({
             <g key={p} transform={`translate(${x} ${y})`}>
               <g
                 className={cls}
-                data-testid={`board-node-${p}`}
+                data-testid={tid(`board-node-${p}`)}
                 style={{ animationDelay: `${-k * 0.7}s` }}
               >
                 <ellipse
@@ -258,7 +264,7 @@ export function Board2D({
       </g>
 
       {preview && preview.targets.length > 0 && (
-        <g data-testid="preview-target" data-positions={preview.targets.join(' ')}>
+        <g data-testid={tid('preview-target')} data-positions={preview.targets.join(' ')}>
           {preview.targets.map((p) => (
             <circle key={p} className="board2d__target" cx={pt[p].x} cy={pt[p].y} r={DOME + 5} />
           ))}
@@ -266,7 +272,7 @@ export function Board2D({
       )}
 
       {inFog ? (
-        <g data-testid="fog" className="board2d__fog">
+        <g data-testid={tid('fog')} className="board2d__fog">
           <circle r={46} fill={colors.accentPurple} filter="url(#b-fog)" opacity={0.55} />
           <circle r={30} cx={10} cy={-6} fill="#ED298C" filter="url(#b-fog)" opacity={0.35} />
           <circle
@@ -280,7 +286,7 @@ export function Board2D({
         </g>
       ) : (
         <g
-          data-testid="ball"
+          data-testid={tid('ball')}
           data-position={ball}
           className="board2d__ball"
           style={{ transform: `translate(${pt[ball].x}px, ${pt[ball].y - DOME - 2}px)` }}

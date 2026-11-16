@@ -1,8 +1,11 @@
 import { create } from 'zustand';
+import type { CameraView } from '../components/board3d/layout';
 
 /** Personal settings (ui-spec §12, visual-design §7). None of them change the game state. */
 export type Settings = {
   board: '2D' | '3D';
+  /** 3D camera (visual-design §5). */
+  camera: CameraView;
   reduceMotion: 'system' | 'on';
   /** Swirl brightness and opacity, 0–100 %. */
   swirl: number;
@@ -14,8 +17,9 @@ export type Settings = {
 };
 
 export const DEFAULT_SETTINGS: Settings = {
-  // 3D is the spec default; it arrives in round 5, so 2D until then.
-  board: '2D',
+  // ui-spec §12: 3D by default; the game falls back to 2D when WebGL is missing.
+  board: '3D',
+  camera: 'GOAL',
   reduceMotion: 'system',
   swirl: 100,
   showLabels: true,
@@ -31,7 +35,7 @@ function load(): Settings {
     const raw = localStorage.getItem(KEY);
     if (!raw) return DEFAULT_SETTINGS;
     const saved = JSON.parse(raw) as Partial<Settings>;
-    return { ...DEFAULT_SETTINGS, ...saved, board: '2D' };
+    return { ...DEFAULT_SETTINGS, ...saved };
   } catch {
     return DEFAULT_SETTINGS;
   }
@@ -46,6 +50,7 @@ export const useSettings = create<Store>()((set, get) => ({
     const s = get();
     const values: Settings = {
       board: s.board,
+      camera: s.camera,
       reduceMotion: s.reduceMotion,
       swirl: s.swirl,
       showLabels: s.showLabels,
