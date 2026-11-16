@@ -187,6 +187,7 @@ Uses the "Game Settings" panel of `ref-06` for the room settings.
 | Turn bar | centred, y 34 | Pills in turn order. Active pill: full team colour, gold border + glow, text "P1 · YOUR TURN" when it is you. Others at 35 % opacity. Solo: `P1 → P2`. |
 | Banner | centred under the turn bar | The event banners of visual-design §4 (e.g. `H: |0⟩ → |+⟩`, `TOUCHDOWN!`, `CNOT: ball enters the fog`). |
 | Help | 44 px circle "?" left of the clocks | Opens the gate reference / rules summary as a drawer. |
+| Full screen | 44 px circle with a corner-brackets icon, right of "?" | Toggles browser full screen (Fullscreen API) so the 16:9 stage fills the display; the **F** key does the same (not while typing in chat); Esc leaves. Hidden where the browser has no Fullscreen API (iPhone Safari). |
 | Clocks | x 1530, y 20, 360 × 96 | GAME `mm:ss` (match timer counting down), TURN `0:47` in gold with a shrinking bar; under 10 s the turn clock turns red and pulses. Draw-pile count. |
 | Blue team panel | x 30, y 140, 360 × 214 | Chips P1, P2 (seat, name, "4 cards"). Active player chip highlighted. Your **teammate's hand** is shown as small gate tags (rules.md §9). |
 | Red team panel | x 30, y 366, 360 × 184 | Chips P3, P4 with **card count only**. |
@@ -353,7 +354,7 @@ The board animations are in **visual-design §4** (hop along the edge, Bloch vec
 
 ## 14. Test ids (for Playwright)
 
-Use `data-testid` on: `menu-play`, `mode-solo`, `mode-team`, `mode-bot-solo`, `mode-bot-team`, `mode-bot-level-{EASY|NORMAL}`, `setting-bot-level-{EASY|NORMAL}`, `seat-{seat}-add-bot`, `seat-{seat}-remove-bot`, `lobby-quick-solo`, `lobby-quick-team`, `room-start`, `turn-active`, `clock-game`, `clock-turn`, `score-blue`, `score-red`, `board-node-{ZERO|PLUS|MINUS_I|ONE|MINUS|PLUS_I}`, `ball` (with `data-position`; absent in the fog), `fog`, `preview-target`, `hand-card-{0..3}` (with `data-gate`), `play-card`, `opponent-count-{seat}`, `state-fog-indicator`, `action-log`, `team-chat`, `challenge-option-{0..5}`, `result-winner`, `result-reason`.
+Use `data-testid` on: `menu-play`, `mode-solo`, `mode-team`, `mode-bot-solo`, `mode-bot-team`, `mode-bot-level-{EASY|NORMAL}`, `setting-bot-level-{EASY|NORMAL}`, `seat-{seat}-add-bot`, `seat-{seat}-remove-bot`, `game-fullscreen`, `lobby-quick-solo`, `lobby-quick-team`, `room-start`, `turn-active`, `clock-game`, `clock-turn`, `score-blue`, `score-red`, `board-node-{ZERO|PLUS|MINUS_I|ONE|MINUS|PLUS_I}`, `ball` (with `data-position`; absent in the fog), `fog`, `preview-target`, `hand-card-{0..3}` (with `data-gate`), `play-card`, `opponent-count-{seat}`, `state-fog-indicator`, `action-log`, `team-chat`, `challenge-option-{0..5}`, `result-winner`, `result-reason`.
 
 ## 15. Differences from the reference images
 
