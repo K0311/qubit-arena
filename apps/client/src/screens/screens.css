@@ -195,7 +195,7 @@
 /* ---- mode select ---- */
 .mode-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(300px, 520px));
+  grid-template-columns: repeat(3, minmax(260px, 440px));
   justify-content: center;
   gap: var(--space-6);
   margin-top: var(--space-6);
@@ -298,6 +298,7 @@
   flex: 1;
 }
 .seat-empty {
+  flex: 1;
   min-height: 60px;
   border-radius: 14px;
   border: 1.5px dashed var(--stroke-subtle);

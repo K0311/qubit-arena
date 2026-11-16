@@ -244,6 +244,12 @@ export class GameServer {
         return this.updateSettings(session, msg.settings);
       case 'REMATCH':
         return this.rematch(session);
+      case 'ADD_BOT':
+        return this.addBot(session, msg.seat);
+      case 'REMOVE_BOT':
+        return this.removeBot(session, msg.seat);
+      case 'BOT_GAME':
+        return this.botGame(session, msg.mode, msg.playerName);
       case 'LEAVE':
         if (!session.room) return fail('NOT_IN_ROOM', 'not in a room');
         this.leaveRoom(session);
@@ -264,8 +270,58 @@ export class GameServer {
     }
     room.config = next;
     // Everyone must see the new settings before they are ready again.
-    for (const seat of room.seats.values()) if (seat) seat.ready = false;
+    for (const seat of room.seats.values()) if (seat && !seat.addedBot) seat.ready = false;
     this.broadcastRoom(room);
+  }
+
+  // ---- Bot Arena -------------------------------------------------------------------------
+
+  /** Host only, before the game: a bot (rules.md §10) sits in a free seat, ready. */
+  private addBot(session: Session, wanted?: PlayerId): Failure | void {
+    const room = session.room;
+    if (!room) return fail('NOT_IN_ROOM', 'join a room first');
+    if (room.host !== session) return fail('NOT_HOST', 'only the host can add bots');
+    if (room.status !== 'WAITING') return fail('GAME_IN_PROGRESS', 'seats are locked');
+    const seat = wanted ?? room.freeSeat();
+    if (!seat) return fail('ROOM_FULL', 'no free seat');
+    if (!room.seats.has(seat)) return fail('BAD_MESSAGE', `${room.mode} has no seat ${seat}`);
+    if (room.seats.get(seat)) return fail('SEAT_TAKEN', `${seat} is taken`);
+    this.seatBot(room, seat);
+    this.broadcastRoom(room);
+  }
+
+  private removeBot(session: Session, seat: PlayerId): Failure | void {
+    const room = session.room;
+    if (!room) return fail('NOT_IN_ROOM', 'join a room first');
+    if (room.host !== session) return fail('NOT_HOST', 'only the host can remove bots');
+    if (room.status !== 'WAITING') return fail('GAME_IN_PROGRESS', 'seats are locked');
+    if (!room.seats.get(seat)?.addedBot) return fail('BAD_MESSAGE', `${seat} is not a bot`);
+    room.seats.set(seat, null);
+    this.broadcastRoom(room);
+  }
+
+  /** Bot Arena shortcut: a private room, you in P1, bots in every other seat, started now. */
+  private botGame(session: Session, mode: Mode, name: string): Failure | void {
+    const problem = this.leaveForNewRoom(session);
+    if (problem) return problem;
+    session.name = name;
+    const room = this.newRoom(mode, 'PRIVATE', 'Bot Arena', roomConfig(mode));
+    this.sit(room, session, 'P1', true);
+    room.host = session;
+    for (const p of room.seatIds()) if (p !== 'P1') this.seatBot(room, p);
+    return this.startGame(room);
+  }
+
+  /** A stand-in session with no socket: never in `sessions`, so nobody can reconnect as it. */
+  private seatBot(room: Room, p: PlayerId): void {
+    const bot: Session = {
+      id: this.nextSessionId++,
+      token: `bot:${room.code}:${p}`,
+      name: `Q-Bot ${p}`,
+      conn: null,
+      room,
+    };
+    room.seats.set(p, { session: bot, ready: true, left: false, bot: true, addedBot: true });
   }
 
   private join(
@@ -360,7 +416,7 @@ export class GameServer {
 
   private sit(room: Room, session: Session, p: PlayerId, ready: boolean): void {
     room.spectators.delete(session);
-    room.seats.set(p, { session, ready, left: false, bot: false });
+    room.seats.set(p, { session, ready, left: false, bot: false, addedBot: false });
     session.room = room;
   }
 
@@ -394,7 +450,8 @@ export class GameServer {
       this.unseat(room, session);
     }
     if (room.host === session) {
-      room.host = [...room.seats.values()].find((s) => s && !s.left)?.session ?? null;
+      room.host =
+        [...room.seats.values()].find((s) => s && !s.left && !s.addedBot)?.session ?? null;
     }
     if (room.isEmpty()) {
       this.closeRoom(room);
@@ -450,8 +507,8 @@ export class GameServer {
 
   /**
    * Play Again (ui-spec §10): the finished room goes back to WAITING with the same seats.
-   * Seats that were left or taken over by a bot open up; nobody is ready, so everyone presses
-   * Ready again before the host starts. That is the rematch vote.
+   * Seats that were left or taken over by a bot open up; no human is ready, so everyone presses
+   * Ready again before the host starts. That is the rematch vote. Bots the host added stay.
    */
   private rematch(session: Session): Failure | void {
     const room = session.room;
@@ -463,6 +520,10 @@ export class GameServer {
     room.timers.seats.clear();
     for (const [p, seat] of room.seats) {
       if (!seat) continue;
+      if (seat.addedBot) {
+        seat.ready = true;
+        continue;
+      }
       if (seat.left || seat.bot) {
         room.seats.set(p, null);
         if (seat.session.room === room && !seat.session.conn) {

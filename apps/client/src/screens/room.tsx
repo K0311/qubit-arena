@@ -15,6 +15,8 @@ function TeamColumn({ side }: { side: Side }) {
   const room = useGame((s) => s.room);
   const you = useGame((s) => s.you);
   if (!room) return null;
+  // Only the host adds or removes bots, and only while the room waits (Bot Arena).
+  const host = !!you?.host && room.status === 'WAITING';
   const seats = (Object.keys(room.seats) as PlayerId[])
     .sort()
     .filter((p) => sideOf(room.mode, p) === side);
@@ -35,16 +37,28 @@ function TeamColumn({ side }: { side: Side }) {
           const seat = room.seats[p];
           if (!seat) {
             return (
-              <button
-                key={p}
-                type="button"
-                className="seat-empty"
-                data-testid={`seat-${p}`}
-                onClick={() => send({ type: 'TAKE_SEAT', seat: p })}
-                title={en.room.takeSeat}
-              >
-                <span className="ket">{p}</span> {en.room.waitingSeat}
-              </button>
+              <div key={p} className="seat">
+                <button
+                  type="button"
+                  className="seat-empty"
+                  data-testid={`seat-${p}`}
+                  onClick={() => send({ type: 'TAKE_SEAT', seat: p })}
+                  title={en.room.takeSeat}
+                >
+                  <span className="ket">{p}</span> {en.room.waitingSeat}
+                </button>
+                {host && (
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    data-testid={`seat-${p}-add-bot`}
+                    title={en.room.addBotTitle(p)}
+                    onClick={() => send({ type: 'ADD_BOT', seat: p })}
+                  >
+                    {en.room.addBot}
+                  </Button>
+                )}
+              </div>
             );
           }
           return (
@@ -59,6 +73,18 @@ function TeamColumn({ side }: { side: Side }) {
                 connected={seat.connected}
               />
               {seat.ready && <Pill tone="green">✓ {en.room.ready}</Pill>}
+              {host && seat.bot && (
+                <Button
+                  variant="secondary"
+                  size="small"
+                  data-testid={`seat-${p}-remove-bot`}
+                  aria-label={en.room.removeBot(p)}
+                  title={en.room.removeBot(p)}
+                  onClick={() => send({ type: 'REMOVE_BOT', seat: p })}
+                >
+                  ✕
+                </Button>
+              )}
             </div>
           );
         })}

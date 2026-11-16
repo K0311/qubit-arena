@@ -95,6 +95,14 @@ export const clientMessageSchema = z.discriminatedUnion('type', [
    * same seats; everyone presses Ready again, which is the rematch vote.
    */
   z.strictObject({ type: z.literal('REMATCH') }),
+  /**
+   * Bot Arena: the host puts a bot (rules.md §10 bot) in a free seat before the game, the given
+   * one or the first free one. The bot is always ready and never takes a human's seat.
+   */
+  z.strictObject({ type: z.literal('ADD_BOT'), seat: seatSchema.optional() }),
+  z.strictObject({ type: z.literal('REMOVE_BOT'), seat: seatSchema }),
+  /** Bot Arena shortcut: a private room with you in P1, bots everywhere else, started at once. */
+  z.strictObject({ type: z.literal('BOT_GAME'), mode: modeSchema, playerName: playerNameSchema }),
 ]);
 
 export type ClientMessage = z.infer<typeof clientMessageSchema>;

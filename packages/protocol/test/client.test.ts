@@ -31,6 +31,11 @@ const VALID: readonly ClientMessage[] = [
   { type: 'LIST_ROOMS', mode: 'TEAM' },
   { type: 'UPDATE_SETTINGS', settings: { targetScore: 5, suddenDeath: false } },
   { type: 'REMATCH' },
+  { type: 'ADD_BOT' },
+  { type: 'ADD_BOT', seat: 'P2' },
+  { type: 'REMOVE_BOT', seat: 'P4' },
+  { type: 'BOT_GAME', mode: 'SOLO', playerName: 'Ann' },
+  { type: 'BOT_GAME', mode: 'TEAM', playerName: 'Bo' },
 ];
 
 const reject = (raw: unknown) => {
@@ -41,8 +46,9 @@ const reject = (raw: unknown) => {
 
 describe('client → server messages (architecture.md §5)', () => {
   it('covers every client message type', () => {
-    // The 10 in architecture.md §5 plus READY, LIST_ROOMS, UPDATE_SETTINGS and REMATCH.
-    expect(new Set(VALID.map((m) => m.type)).size).toBe(14);
+    // The 10 in architecture.md §5 plus READY, LIST_ROOMS, UPDATE_SETTINGS, REMATCH and the
+    // Bot Arena messages ADD_BOT, REMOVE_BOT and BOT_GAME.
+    expect(new Set(VALID.map((m) => m.type)).size).toBe(17);
   });
 
   it.each(VALID.map((m) => [m.type, m] as const))('accepts a valid %s', (_, msg) => {
@@ -53,7 +59,6 @@ describe('client → server messages (architecture.md §5)', () => {
 
   it('rejects an unknown type, including a PASS (rules.md §6: no passing)', () => {
     reject({ type: 'PASS' });
-    reject({ type: 'ADD_BOT', seat: 'P2' });
   });
 
   it('rejects any trusted data beyond the intent and ids (no player field)', () => {
@@ -77,6 +82,13 @@ describe('client → server messages (architecture.md §5)', () => {
     reject({ type: 'CHAT', text: 'x'.repeat(201) });
     reject({ type: 'QUICK_MATCH', mode: 'SOLO', playerName: 'x'.repeat(25) });
     reject({ type: 'CREATE_ROOM', mode: 'SOLO', visibility: 'PUBLIC', name: '', playerName: 'a' });
+  });
+
+  it('checks the Bot Arena messages', () => {
+    reject({ type: 'ADD_BOT', seat: 'P5' });
+    reject({ type: 'REMOVE_BOT' });
+    reject({ type: 'BOT_GAME', mode: 'SOLO' });
+    reject({ type: 'BOT_GAME', mode: 'DUO', playerName: 'x' });
   });
 
   it('REMATCH has no fields', () => {
