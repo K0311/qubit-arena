@@ -106,6 +106,9 @@ Coverage goal: **≥ 90 % lines in `packages/engine`**, ≥ 70 % in `apps/server
 * **T-E-06** — Tutorial lesson 1 can be completed.
 
 Test hooks: the server accepts `TEST_SEED` and `TEST_DECK` **only** when `NODE_ENV=test`.
+`TEST_SEED` is a whole number used as every match's seed; `TEST_DECK` lists card counts such as `H3,X3,Z2,S2,SX2,MEASURE3,CNOT3` (missing kinds are 0) and replaces the deck of every game (`apps/server/src/test-hooks.ts`).
+The e2e run starts its own server on port 8091 and client on 5174 with these hooks (`e2e/playwright.config.ts`), so it never reuses a dev server.
+Screenshots of every screen at 1920 × 1080: `pnpm --filter @qa/e2e screens` → `e2e/screenshots/` with a review in `REVIEW.md`.
 
 ### 3.6 Simulation (SE-5)
 

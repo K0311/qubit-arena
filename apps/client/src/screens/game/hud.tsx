@@ -21,7 +21,10 @@ export function Scoreboard({ score, target }: { score: Record<Side, number>; tar
           </span>
         </div>
       ))}
-      <span className="hud-score__target">{en.game.target(target)}</span>
+      <span className="hud-score__target" aria-label={en.game.target(target)}>
+        {en.game.targetLabel}
+        <b className="hud-score__target-value ket">{target}</b>
+      </span>
     </div>
   );
 }
