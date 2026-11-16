@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import type { PlayerId } from '@qa/engine';
+import { BOT_THINK_MS } from '../src/game-server';
 import { ManualScheduler } from '../src/scheduler';
 import type { RunningServer } from '../src/server';
 import { closeAll, startTable, TestClient, withServer, type Table } from './helpers';
@@ -67,7 +68,7 @@ describe('T-S-06 disconnect, reconnect and bot seat (rules.md §10)', () => {
     clock.advance(1);
     const botOn = await watcher.waitFor('ROOM_STATE', (m) => !!m.room.seats[turn]?.bot, mark);
     expect(botOn.room.seats[turn]?.connected).toBe(false);
-    clock.advance(1_000);
+    clock.advance(BOT_THINK_MS);
     const played = await watcher.waitFor('EVENT', undefined, mark);
     expect(played.events[0]).toMatchObject({ type: 'CARD_PLAYED', player: turn, byTimeout: false });
 

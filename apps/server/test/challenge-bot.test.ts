@@ -10,7 +10,7 @@ import {
   type PlayerId,
   type Side,
 } from '@qa/engine';
-import { GameServer } from '../src/game-server';
+import { BOT_THINK_MS, GameServer } from '../src/game-server';
 import { ManualScheduler } from '../src/scheduler';
 import { MemClient, NO_LIMITS } from './mem-client';
 
@@ -79,7 +79,7 @@ describe('T-S-10 Quantum Challenge bots (rules.md §8.1)', () => {
     clients.P3.drop();
     clients.P4.drop();
     clock.advance(30_000);
-    clock.advance(1_000);
+    clock.advance(BOT_THINK_MS);
     expect(index()).toBe(0);
     expect(answered('RED')).toBe(true);
     expect(answered('BLUE')).toBe(false);
@@ -87,7 +87,7 @@ describe('T-S-10 Quantum Challenge bots (rules.md §8.1)', () => {
     // P1 drops too: Blue has no connected human now, so the P2 bot answers.
     const token = clients.P1.session.token;
     clients.P1.drop();
-    clock.advance(1_000);
+    clock.advance(BOT_THINK_MS);
     expect(index()).toBe(1);
 
     // P1 comes back: the bots stop answering for Blue again; Red's bots go on.
