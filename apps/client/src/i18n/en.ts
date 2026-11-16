@@ -83,6 +83,7 @@ export const en = {
     ball: 'Ball',
     score: 'Score',
     target: (n: number) => `TARGET ${n}`,
+    targetLabel: 'TARGET',
     endzone: (side: 'BLUE' | 'RED') => (side === 'BLUE' ? '+ endzone' : '− endzone'),
     yourTurn: 'YOUR TURN',
     clockGame: 'GAME',

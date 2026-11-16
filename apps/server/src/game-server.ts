@@ -24,6 +24,7 @@ import { newRoomCode, newSeed, newToken } from './random';
 import { LIMITS, newLimiter, type Limiter, type Limits } from './rate-limit';
 import { Room, roomConfig, type Connection, type Session } from './room';
 import { realScheduler, type Scheduler } from './scheduler';
+import type { TestHooks } from './test-hooks';
 
 export type GameServerOptions = {
   scheduler?: Scheduler;
@@ -35,6 +36,8 @@ export type GameServerOptions = {
   botThinkMs?: number;
   /** Flood limits per connection (defaults in rate-limit.ts). */
   limits?: Limits;
+  /** Fixed seed and deck for end-to-end tests; only set from NODE_ENV=test (test-hooks.ts). */
+  testHooks?: TestHooks;
 };
 
 /** rules.md §13 [OPEN] item 3 default. */
@@ -54,6 +57,7 @@ export class GameServer {
   private readonly botDelayMs: number;
   private readonly botThinkMs: number;
   private readonly limits: Limits;
+  private readonly testHooks: TestHooks | undefined;
   private readonly sessions = new Map<string, Session>();
   private readonly limiters = new WeakMap<Session, Limiter>();
   private readonly rooms = new Map<string, Room>();
@@ -65,6 +69,7 @@ export class GameServer {
     this.botDelayMs = options.botDelayMs ?? BOT_DELAY_MS;
     this.botThinkMs = options.botThinkMs ?? 1_000;
     this.limits = options.limits ?? LIMITS;
+    this.testHooks = options.testHooks;
   }
 
   // ---- connection layer ------------------------------------------------------------------
@@ -214,8 +219,7 @@ export class GameServer {
         if (!seats.every((s) => s?.ready)) {
           return fail('NOT_ALL_READY', 'every seat must be filled and ready');
         }
-        this.startGame(room);
-        return;
+        return this.startGame(room);
       }
       case 'PLAY_CARD':
         return this.act(session, (player) => ({ type: 'PLAY_CARD', player, cardId: msg.cardId }));
@@ -483,10 +487,18 @@ export class GameServer {
 
   // ---- game ------------------------------------------------------------------------------
 
-  private startGame(room: Room): void {
+  private startGame(room: Room): Failure | void {
+    const hooks = this.testHooks;
+    const config = hooks?.deckCounts
+      ? { ...room.config, deckCounts: hooks.deckCounts }
+      : room.config;
+    const cards = Object.values(config.deckCounts).reduce((a, b) => a + b, 0);
+    if (cards < room.seats.size * config.handSize) {
+      return fail('BAD_MESSAGE', `the deck has ${cards} cards, too few to deal every seat`);
+    }
     // One seeded RNG per match; the seed stays in this closure (architecture.md §6).
-    room.rng = mulberry32(newSeed());
-    const { state, events } = createGame(room.config, room.rng);
+    room.rng = mulberry32(hooks?.seed ?? newSeed());
+    const { state, events } = createGame(config, room.rng);
     room.state = state;
     room.status = 'PLAYING';
     this.broadcastRoom(room);

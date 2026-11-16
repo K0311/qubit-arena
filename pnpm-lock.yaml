@@ -300,6 +300,9 @@ importers:
       '@playwright/test':
         specifier: ^1.65.0
         version: 1.65.0
+      '@qa/engine':
+        specifier: workspace:*
+        version: link:../packages/engine
       '@types/node':
         specifier: ^26.6.6
         version: 26.6.6

@@ -807,7 +807,8 @@ export default function Board3D({
         dpr={[1, 2]}
         // The game stage is CSS-scaled; measure the unscaled box or the canvas shrinks twice.
         resize={{ offsetSize: true }}
-        camera={{ fov: 46, near: 0.1, far: 400, position: [0, 14, 9.5] }}
+        // 50° keeps the near end zone inside the frame in goal view (checked at 1920 × 1080).
+        camera={{ fov: 50, near: 0.1, far: 400, position: [0, 14, 9.5] }}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
         aria-label="Board"
       >

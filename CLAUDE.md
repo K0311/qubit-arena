@@ -47,7 +47,8 @@ pnpm lint
 pnpm format                    # Prettier write (format:check in CI)
 pnpm build                     # production builds (client only for now; fails if the quiz bank leaks into the bundle)
 pnpm dev                       # server + client
-pnpm e2e                       # Playwright
+pnpm e2e                       # Playwright (own server 8091 + client 5174, NODE_ENV=test with TEST_SEED/TEST_DECK)
+pnpm --filter @qa/e2e screens  # screenshots of every screen at 1920×1080 → e2e/screenshots/
 pnpm sim [games] [seed]        # bot-vs-bot simulation (default 10,000 games)
 pnpm --filter @qa/server cli   # terminal client for the game server (PORT 8080 by default)
 pnpm --filter @qa/server start # game server only; the client connects to VITE_SERVER_URL (default ws://<host>:8080)
