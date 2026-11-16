@@ -44,6 +44,12 @@ export type GameServerOptions = {
 /** rules.md §13 [OPEN] item 3 default. */
 export const BOT_DELAY_MS = 30_000;
 
+/**
+ * How long a bot waits before each move. Longer than the client's longest move animation
+ * (about 2.4 s: Measure, or a CNOT into the fog), so people see the last move land first.
+ */
+export const BOT_THINK_MS = 2_500;
+
 type Failure = { code: ErrorCode; message: string };
 const fail = (code: ErrorCode, message: string): Failure => ({ code, message });
 
@@ -68,7 +74,7 @@ export class GameServer {
     this.scheduler = options.scheduler ?? realScheduler();
     this.onSend = options.onSend;
     this.botDelayMs = options.botDelayMs ?? BOT_DELAY_MS;
-    this.botThinkMs = options.botThinkMs ?? 1_000;
+    this.botThinkMs = options.botThinkMs ?? BOT_THINK_MS;
     this.limits = options.limits ?? LIMITS;
     this.testHooks = options.testHooks;
   }

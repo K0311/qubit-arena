@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { botAction, mulberry32, productState, type Mode } from '@qa/engine';
-import { GameServer } from '../src/game-server';
+import { BOT_THINK_MS, GameServer } from '../src/game-server';
 import { ManualScheduler } from '../src/scheduler';
 import { MemClient, NO_LIMITS } from './mem-client';
 
@@ -85,6 +85,24 @@ describe('T-S-11 Bot Arena: bots added on purpose', () => {
     const guest = new MemClient(server);
     guest.say({ type: 'JOIN_ROOM', code, role: 'PLAYER', playerName: 'Bo' });
     expect(guest.latest('ROOM_STATE').you.seat).toBe('P3');
+  });
+
+  it('by default a bot waits 2.5 s before it plays, so the last move has finished animating', () => {
+    expect(BOT_THINK_MS).toBe(2_500);
+    const clock = new ManualScheduler();
+    const server = new GameServer({ scheduler: clock, limits: NO_LIMITS });
+    const me = new MemClient(server);
+    me.say({ type: 'BOT_GAME', mode: 'SOLO', playerName: 'Ann' });
+    const room = server.room(me.latest('ROOM_STATE').room.code)!;
+    // Hand the turn to the bot (P2) and arm it as any change would.
+    room.state = { ...room.state!, turn: 'P2' };
+    (server as unknown as { scheduleBot(room: unknown): void }).scheduleBot(room);
+    const cards = () => room.state!.log.filter((e) => e.type === 'CARD_PLAYED').length;
+    const before = cards();
+    clock.advance(BOT_THINK_MS - 1);
+    expect(cards()).toBe(before);
+    clock.advance(1);
+    expect(cards()).toBe(before + 1);
   });
 
   it('a bot plays its own turns and the game finishes', () => {
