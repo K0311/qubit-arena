@@ -134,9 +134,13 @@ Solo and Team carry a green **ONLINE** pill; Bot Arena a cyan **VS BOT** pill. T
 
 ## 5. Lobby (`/lobby`)
 
-* Title "LOBBY" top left, "← Back" top right, filter pills **All · Solo 1v1 · Team 2v2**.
-* Left (x 80, w 1100): room list. Columns: Room, Mode pill, Players `n / 2` or `n / 4`, Settings (`7 pts · 15 min`), Status pill (Waiting = green, Playing = grey), button **Join** or **Watch** (spectate public rooms, rules.md §10).
-* Right (x 1220, w 620): **Quick match** panel (cyan border, buttons Solo / Team), **Create room** (mode, public/private, name), **Join by code** (code input in Ket font, e.g. `QX7-42`).
+Fills the screen at 1920 × 1080 and fits on one screen at 1280 × 720 (there the Match column and the quick match hint are hidden).
+
+* Header: small caption "Find a game", title "LOBBY" top left, "← Back" top right.
+* Left (fills the height): **Open rooms** panel. Its head: title, a room count pill ("2 rooms"), a green "Live · updates every 3 s" dot (the list is asked for again every 3 s) and the filter pills **All · Solo 1v1 · Team 2v2**.
+  * Each room is a row card: name (up to two lines) with its code in Ket font, Mode pill, Players as one dome-shaped dot per seat (filled cyan for each player, dashed when free — the room list only has a count, so the dots do not show teams) plus `n/4`, Match (`7 pts · 15:00`), Status pill (Waiting = green, Playing = grey), button **Join** (primary) or **Watch** (spectate public rooms, rules.md §10). Rooms being played are drawn dimmer.
+  * No rooms: a small ring of the six state domes around a dashed ball spot, "No open rooms right now", one line on what to do, and **Create room** (focuses the room name field on the right) and **Practise in Bot Arena** (opens mode select, §4).
+* Right (w 600): **Quick match** panel (cyan border) with two tiles **Solo 1v1** (2 players) and **Team 2v2** (4 players · team chat), each with seat dots in team colours; **Create room** (mode, public/private, name, **Create room**); **Join by code** (code input in Ket font, e.g. `QX7-42`).
 
 ## 6. Room (`/room/:code`)
 
@@ -357,7 +361,7 @@ The board animations are in **visual-design §4** (hop along the edge, Bloch vec
 
 ## 14. Test ids (for Playwright)
 
-Use `data-testid` on: `menu-play`, `mode-solo`, `mode-team`, `mode-bot-solo`, `mode-bot-team`, `mode-bot-level-{EASY|NORMAL}`, `setting-bot-level-{EASY|NORMAL}`, `seat-{seat}` (with `data-ready` on a filled seat), `seat-{seat}-take`, `seat-{seat}-add-bot`, `seat-{seat}-remove-bot`, `player-chip-{seat}`, `room-code`, `room-copy-code`, `room-ready`, `room-ready-count`, `room-status`, `room-turn-order`, `room-leave`, `game-fullscreen`, `lobby-quick-solo`, `lobby-quick-team`, `room-start`, `turn-active`, `clock-game`, `clock-turn`, `score-blue`, `score-red`, `board-node-{ZERO|PLUS|MINUS_I|ONE|MINUS|PLUS_I}`, `ball` (with `data-position`; absent in the fog), `fog`, `preview-target`, `hand-card-{0..3}` (with `data-gate`), `play-card`, `opponent-count-{seat}`, `state-fog-indicator`, `action-log`, `team-chat`, `challenge-option-{0..5}`, `result-winner`, `result-reason`.
+Use `data-testid` on: `menu-play`, `mode-solo`, `mode-team`, `mode-bot-solo`, `mode-bot-team`, `mode-bot-level-{EASY|NORMAL}`, `setting-bot-level-{EASY|NORMAL}`, `seat-{seat}` (with `data-ready` on a filled seat), `seat-{seat}-take`, `seat-{seat}-add-bot`, `seat-{seat}-remove-bot`, `player-chip-{seat}`, `room-code`, `room-copy-code`, `room-ready`, `room-ready-count`, `room-status`, `room-turn-order`, `room-leave`, `game-fullscreen`, `lobby-quick-solo`, `lobby-quick-team`, `lobby-room-name`, `lobby-create`, `lobby-code`, `lobby-room-count`, `room-list`, `room-row-{code}`, `room-row-{code}-join`, `lobby-empty`, `lobby-empty-create`, `lobby-empty-bots`, `room-start`, `turn-active`, `clock-game`, `clock-turn`, `score-blue`, `score-red`, `board-node-{ZERO|PLUS|MINUS_I|ONE|MINUS|PLUS_I}`, `ball` (with `data-position`; absent in the fog), `fog`, `preview-target`, `hand-card-{0..3}` (with `data-gate`), `play-card`, `opponent-count-{seat}`, `state-fog-indicator`, `action-log`, `team-chat`, `challenge-option-{0..5}`, `result-winner`, `result-reason`.
 
 ## 15. Differences from the reference images
 
