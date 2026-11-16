@@ -2,22 +2,31 @@ import { useNavigate } from 'react-router';
 import { Button } from '../components/ui/button';
 import { Pill } from '../components/ui/pill';
 import { en } from '../i18n/en';
+import { send } from '../net/connection';
+import { usePlayerName } from '../state/player-name';
 
-function People({ n }: { n: number }) {
+function People({ n, bots = 0 }: { n: number; bots?: number }) {
   return (
     <span className="mode-card__icon" aria-hidden="true">
       {'👤'.repeat(n)}
+      {'🤖'.repeat(bots)}
     </span>
   );
 }
 
-/** ui-spec §4 Mode select: two cards, both ONLINE; no local or hot-seat mode. */
+/**
+ * ui-spec §4 Mode select: the two online modes, plus Bot Arena (play against server bots at
+ * once, in a private room). There is still no local or hot-seat mode.
+ */
 export function ModeSelect() {
   const navigate = useNavigate();
+  const [name] = usePlayerName();
   const cards = [
     { id: 'solo', icon: 2, title: en.mode.soloTitle, text: en.mode.soloText, frame: 'blue' },
     { id: 'team', icon: 4, title: en.mode.teamTitle, text: en.mode.teamText, frame: 'purple' },
   ] as const;
+  // The server answers with ROOM_STATE (PLAYING), and the app shell opens the game screen.
+  const botGame = (mode: 'SOLO' | 'TEAM') => send({ type: 'BOT_GAME', mode, playerName: name });
   return (
     <main className="screen">
       <header className="screen__header">
@@ -38,6 +47,20 @@ export function ModeSelect() {
             </Button>
           </article>
         ))}
+        <article className="mode-card panel panel--cyan" data-testid="mode-bot">
+          <Pill tone="cyan">{en.mode.botBadge}</Pill>
+          <People n={1} bots={1} />
+          <h2>{en.mode.botTitle}</h2>
+          <p>{en.mode.botText}</p>
+          <div className="row wrap">
+            <Button data-testid="mode-bot-solo" onClick={() => botGame('SOLO')}>
+              {en.mode.botSolo}
+            </Button>
+            <Button variant="secondary" data-testid="mode-bot-team" onClick={() => botGame('TEAM')}>
+              {en.mode.botTeam}
+            </Button>
+          </div>
+        </article>
       </div>
     </main>
   );

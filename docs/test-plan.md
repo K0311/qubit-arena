@@ -95,6 +95,7 @@ Coverage goal: **≥ 90 % lines in `packages/engine`**, ≥ 70 % in `apps/server
 * **T-S-08** — Spectator receives public state only.
 * **T-S-09** — Rate limit: 50 chat messages in 1 s are throttled.
 * **T-S-10** — Quantum Challenge: a bot answers for its side only when no human player of that side is connected (rules.md §8.1).
+* **T-S-11** — Bot Arena: only the host adds/removes bots, only before the game; bots are ready, never take a human's seat, play their own turns, stay after Play Again; the room closes when its last human leaves; `BOT_GAME` starts a private Solo/Team game at once.
 
 ### 3.5 End-to-end (Playwright)
 
@@ -104,6 +105,7 @@ Coverage goal: **≥ 90 % lines in `packages/engine`**, ≥ 70 % in `apps/server
 * **T-E-04** — CNOT: ball shows fog; Measure brings it back.
 * **T-E-05** — Reload during a game → the player returns to the same game.
 * **T-E-06** — Tutorial lesson 1 can be completed.
+* **T-E-07** — Bot Arena: one player picks "Solo vs Bot" and plays a whole game against the bot.
 
 Test hooks: the server accepts `TEST_SEED` and `TEST_DECK` **only** when `NODE_ENV=test`.
 `TEST_SEED` is a whole number used as every match's seed; `TEST_DECK` lists card counts such as `H3,X3,Z2,S2,SX2,MEASURE3,CNOT3` (missing kinds are 0) and replaces the deck of every game (`apps/server/src/test-hooks.ts`).

@@ -33,6 +33,11 @@ export type Seat = {
   left: boolean;
   /** A bot is playing for this seat (rules.md §10). */
   bot: boolean;
+  /**
+   * The host put a bot here on purpose (Bot Arena). Its session is a stand-in with no socket,
+   * it is always ready, and it stays through Play Again; a takeover bot does not.
+   */
+  addedBot: boolean;
 };
 
 export type Role = PlayerId | 'SPECTATOR';
@@ -133,12 +138,12 @@ export class Room {
 
   /**
    * Nobody is here any more. A running game survives everyone dropping at once (they can
-   * reconnect, and bots play meanwhile) unless every player has left on purpose.
+   * reconnect, and bots play meanwhile) unless every human player has left on purpose.
    */
   isEmpty(): boolean {
     if (this.members().length > 0) return false;
     if (this.status !== 'PLAYING') return true;
-    return [...this.seats.values()].every((s) => !s || s.left);
+    return [...this.seats.values()].every((s) => !s || s.left || s.addedBot);
   }
 
   /** Lobby row: counts only (ui-spec §5). */

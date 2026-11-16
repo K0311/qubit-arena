@@ -110,7 +110,7 @@ type Action =
 
 All messages are JSON with a `type` field and are validated with zod on both sides.
 
-**Client → server:** `CREATE_ROOM`, `JOIN_ROOM`, `QUICK_MATCH`, `TAKE_SEAT`, `READY`, `START_GAME`, `PLAY_CARD`, `CHAT`, `CHALLENGE_ANSWER`, `LEAVE`, `PING`, `LIST_ROOMS`, `UPDATE_SETTINGS`, `REMATCH`.
+**Client → server:** `CREATE_ROOM`, `JOIN_ROOM`, `QUICK_MATCH`, `TAKE_SEAT`, `READY`, `START_GAME`, `PLAY_CARD`, `CHAT`, `CHALLENGE_ANSWER`, `LEAVE`, `PING`, `LIST_ROOMS`, `UPDATE_SETTINGS`, `REMATCH`, `ADD_BOT`, `REMOVE_BOT`, `BOT_GAME`.
 
 **Server → client:** `WELCOME` (session token), `ROOM_STATE` (lobby), `GAME_VIEW` (filtered state), `EVENT` (card played, touchdown, kickoff, measure result, timeout, game over), `CHAT`, `ERROR`, `PONG`, `ROOM_LIST` (lobby rows).
 
@@ -123,7 +123,9 @@ Rules:
 * `READY` drives the ready pill in the room (ui-spec.md §6). `CREATE_ROOM`, `JOIN_ROOM` and `QUICK_MATCH` carry the player's display name.
 * Client messages over 4,096 characters are rejected before parsing.
 * `LIST_ROOMS` (optional mode filter) is answered with `ROOM_LIST`: public rooms only, with player and seat counts but no names or seats (ui-spec.md §5). The lobby asks again every few seconds.
-* `REMATCH` (Play Again, ui-spec.md §10) sends a finished room back to WAITING with the same seats. Seats that were left or played by a bot open up and nobody is ready, so everyone presses Ready again (the rematch vote) before the host starts.
+* `REMATCH` (Play Again, ui-spec.md §10) sends a finished room back to WAITING with the same seats. Seats that were left or played by a bot open up and nobody is ready, so everyone presses Ready again (the rematch vote) before the host starts. Bots the host added stay, still ready.
+* `ADD_BOT { seat? }` / `REMOVE_BOT { seat }` (host only, room WAITING): put the rules.md §10 bot in a free seat, or take it out again. The bot's seat holds a stand-in session with no socket and no token in the session table, so nobody can reconnect as it; it never counts as a connected human (rules.md §8.1 Challenge rule unchanged). A room whose humans have all left closes even if bots remain.
+* `BOT_GAME { mode, playerName }` (Bot Arena): a private room with the sender in P1, bots in the other seats, started at once.
 * Quantum Challenge events: `CHALLENGE_ANSWERED` names the side and the `player` who submitted; `CHALLENGE_RESULT` carries the correct choice and a one-line `explanation`, sent only after both sides answered. The view's `challenge.sideChoice` is the viewer's own side's submitted choice and is never sent to the other side or spectators.
 * The client bundle must not contain the quiz bank: `@qa/engine` is marked `sideEffects: false` so unused modules are dropped, and the client build fails if any question id or prompt is in the output (`apps/client/scripts/check-bundle.ts`).
 * `UPDATE_SETTINGS` lets the host change the match settings before the game (ui-spec.md §6). The mode cannot change; the server checks the deck can deal every seat and clears everyone's ready.
