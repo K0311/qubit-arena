@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { botAction, mulberry32, type Mode } from '@qa/engine';
+import { botAction, mulberry32, productState, type Mode } from '@qa/engine';
 import { GameServer } from '../src/game-server';
 import { ManualScheduler } from '../src/scheduler';
 import { MemClient, NO_LIMITS } from './mem-client';
@@ -122,6 +122,51 @@ describe('T-S-11 Bot Arena: bots added on purpose', () => {
     host.say({ type: 'START_GAME' });
     host.say({ type: 'LEAVE' });
     expect(server.room(code)).toBeUndefined();
+  });
+
+  it('P-6.4: rooms start at EASY; the host switches the bot level before the game', () => {
+    const { server, host, code, room } = setup();
+    expect(host.latest('ROOM_STATE').room.botLevel).toBe('EASY');
+    const guest = new MemClient(server);
+    guest.say({ type: 'JOIN_ROOM', code, role: 'SPECTATOR', playerName: 'Bo' });
+    guest.say({ type: 'UPDATE_SETTINGS', settings: { botLevel: 'NORMAL' } });
+    expect(guest.latest('ERROR').code).toBe('NOT_HOST');
+    host.say({ type: 'UPDATE_SETTINGS', settings: { botLevel: 'NORMAL' } });
+    expect(host.latest('ROOM_STATE').room.botLevel).toBe('NORMAL');
+    expect(room().botLevel).toBe('NORMAL');
+    // The game config itself is unchanged: the level is a room setting, not a rule.
+    expect(host.latest('ROOM_STATE').room.settings).not.toHaveProperty('botLevel');
+  });
+
+  it('P-6.4: a NORMAL bot takes the touchdown its hand offers', () => {
+    const { server, clock, host, room } = setup();
+    host.say({ type: 'UPDATE_SETTINGS', settings: { botLevel: 'NORMAL' } });
+    host.say({ type: 'ADD_BOT' });
+    host.say({ type: 'READY', ready: true });
+    host.say({ type: 'START_GAME' });
+    const r = room();
+    // Red's bot (P2) to move with the ball at |1⟩: of I, H, S only H reaches |−⟩ (Red's zone).
+    r.state = {
+      ...r.state!,
+      phase: 'PLAYING',
+      turn: 'P2',
+      qubits: productState('PLUS', 'ONE'),
+      hands: {
+        ...r.state!.hands,
+        P2: [
+          { id: 9001, kind: 'I' },
+          { id: 9002, kind: 'H' },
+          { id: 9003, kind: 'S' },
+          { id: 9004, kind: 'I' },
+        ],
+      },
+    };
+    // The state was swapped behind the server's back; arm the bot as any change would.
+    (server as unknown as { scheduleBot(room: unknown): void }).scheduleBot(r);
+    clock.advance(1_000);
+    const played = [...r.state!.log].reverse().find((e) => e.type === 'CARD_PLAYED');
+    expect(played).toMatchObject({ player: 'P2', card: { kind: 'H' } });
+    expect(r.state!.score.RED).toBe(1);
   });
 
   it.each(['SOLO', 'TEAM'] as const)(

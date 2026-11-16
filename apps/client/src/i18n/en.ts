@@ -25,6 +25,15 @@ export const en = {
     botTeam: 'Team with Bots',
   },
   common: { back: '← Back', loading: 'Loading…' },
+  botLevel: {
+    label: 'Bot level',
+    EASY: 'Easy',
+    NORMAL: 'Normal',
+    hint: {
+      EASY: 'Plays a random card from its hand.',
+      NORMAL: 'Looks for touchdowns and moves the ball towards its own end zone.',
+    },
+  },
   lobby: {
     title: 'LOBBY',
     all: 'All',

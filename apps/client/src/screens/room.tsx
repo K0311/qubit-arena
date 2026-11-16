@@ -169,6 +169,7 @@ export function RoomScreen() {
         <div className="room__side">
           <MatchSettings
             config={room.settings}
+            botLevel={room.botLevel}
             editable={!!you?.host}
             onChange={(settings) => send({ type: 'UPDATE_SETTINGS', settings })}
           />

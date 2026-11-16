@@ -120,9 +120,20 @@ export async function handKinds(page: Page): Promise<string[]> {
 }
 
 /** Where the server says the ball is: a position, or FOG (rules.md §4.4: no position). */
-export async function ballOf(page: Page): Promise<string> {
-  if ((await page.getByTestId('fog').count()) > 0) return 'FOG';
-  return (await page.getByTestId('ball').getAttribute('data-position')) ?? '';
+export async function ballOf(page: Page, timeoutMs = 10_000): Promise<string> {
+  // Ball and fog swap while a move lands, so never wait on one of them without a limit:
+  // a ball that turns into fog between the two checks would hang until the test times out.
+  const end = Date.now() + timeoutMs;
+  while (Date.now() < end) {
+    if ((await page.getByTestId('fog').count()) > 0) return 'FOG';
+    const pos = await page
+      .getByTestId('ball')
+      .getAttribute('data-position', { timeout: 500 })
+      .catch(() => null);
+    if (pos) return pos;
+    await page.waitForTimeout(100);
+  }
+  return '';
 }
 
 export const logRows = (page: Page) =>

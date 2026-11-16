@@ -148,6 +148,7 @@ describe('server → client messages (architecture.md §5)', () => {
       P4: { name: 'Cy', ready: false, connected: false, bot: false, host: false },
     },
     spectators: 2,
+    botLevel: 'EASY' as const,
   };
 
   it.each<[string, ServerMessage]>([

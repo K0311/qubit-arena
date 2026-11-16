@@ -14,6 +14,8 @@ export const phaseSchema = z.enum(['LOBBY', 'KICKOFF', 'PLAYING', 'CHALLENGE', '
 export const endReasonSchema = z.enum(['TARGET', 'TIME', 'NO_CARDS', 'CHALLENGE', 'DRAW']);
 export const winnerSchema = z.enum(['BLUE', 'RED', 'DRAW']);
 export const visibilitySchema = z.enum(['PUBLIC', 'PRIVATE']);
+/** EASY: random bot v1 (rules.md §10). NORMAL: greedy bot (P-6.4). */
+export const botLevelSchema = z.enum(['EASY', 'NORMAL']);
 
 export const count = z.number().int().nonnegative();
 /** Monotonic per room; clients drop messages older than what they already have. */

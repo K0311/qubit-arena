@@ -89,7 +89,7 @@
 - [ ] P-6.1 บัญชี + match history + ranking
 - [ ] P-6.3 เสียง (optional)
 - [x] Bot Arena: เล่นกับบอท (Solo/Team) + ปุ่ม Add bot ในห้อง (T-S-11, T-E-07)
-- [ ] P-6.4 Greedy bot + ระดับ Easy/Normal ในห้อง
+- [x] P-6.4 Greedy bot + ระดับ Easy/Normal ในห้อง
 
 ## เฟส 7 — Testing + user study (16 ก.พ. – 20 มี.ค.)
 
@@ -146,6 +146,7 @@
 | 12 พ.ย. 2026 | Challenge bot rule | rules.md §8.1: bot ตอบ Quantum Challenge แทนทีมเฉพาะเมื่อทีมไม่มีคนออนไลน์ (T-S-10) |
 | 15 พ.ย. 2026 | P-4.1 App shell | client: theme tokens, ฟอนต์, พื้นหลังอวกาศ, component กลาง, route ทุกหน้า, เมนู/เลือกโหมด/lobby/ห้อง, WebSocket + store; protocol เพิ่ม `LIST_ROOMS`/`ROOM_LIST`, `UPDATE_SETTINGS`; e2e quick match และสร้างห้อง→เริ่มเกม ผ่าน |
 | 15 พ.ย. 2026 | P-4.2 Game screen | กระดาน 2D (SVG, หมุนให้ end zone ตัวเองอยู่บน, หมอก), การ์ด gate (บรรทัด board effect สร้างจาก engine + snapshot), มือ + ตัวอย่างการเดิน, HUD, action log; protocol เพิ่ม `clocks` ใน `GAME_VIEW`; e2e เล่นการ์ด 1 ใบผ่าน |
+| 16 พ.ย. 2026 | P-6.4 Greedy bot | engine `botAction(..., 'NORMAL')`: คิดจากสถานะควอนตัมจริง (Measure ใช้ความน่าจะเป็นจาก amplitude ไม่แอบดู RNG) เลือก ทัชดาวน์ > ออกจากหมอกเมื่อดีกว่า > เข้าใกล้ end zone ตัวเอง > ห่าง end zone ฝ่ายตรงข้าม เสมอกันสุ่ม; ชนะบอทสุ่ม ~86 % ใน 1,000 เกม (เกณฑ์ > 60 %); ระดับ Easy/Normal ในห้อง (host ตั้ง) และบนการ์ด Bot Arena (ค่าเริ่ม Normal); ห้องทั่วไปเริ่มที่ Easy ตาม rules.md §10 |
 | 16 พ.ย. 2026 | Bot Arena | หน้าเลือกโหมดมีการ์ด Bot Arena (Solo vs Bot / Team with Bots) เริ่มเกมกับบอททันทีในห้อง private; host ใส่/เอาบอทออกจากที่นั่งว่างในห้องได้ (`ADD_BOT`/`REMOVE_BOT`/`BOT_GAME`); บอทอยู่ต่อหลัง Play Again; T-S-11, T-E-07 |
 | 16 พ.ย. 2026 | P-4.4 Playwright T-E-01..05 | server รับ `TEST_SEED` / `TEST_DECK` เฉพาะ `NODE_ENV=test`; e2e ใช้ port ของตัวเอง (8091/5174) + deck 18 ใบ; T-E-01 เล่นจนจบ (รวม Challenge), T-E-02 แชททีม 4 คน, T-E-03 preview ตรงตาราง gate (บน 3D), T-E-04 CNOT เข้าหมอก/Measure ออก (บน 3D), T-E-05 reload กลับที่นั่งเดิม; แก้ context ไม่ถูกปิด (e2e ช้า/สุ่มพัง); ภาพหน้าจอ 1920×1080 ครบ 18 จอ + `e2e/screenshots/REVIEW.md`; แก้ป้าย TARGET และมุมกล้อง goal view |
 | 16 พ.ย. 2026 | P-5.2 Bloch + animation | คิว animation จาก log (ไม่ตัดสินอะไรเอง, test id ใช้ค่าจาก server ทันที): บอลกระโดดเป็นโค้ง, Bloch vector หมุนรอบแกนของ gate (ตรวจกับ engine ทุก gate × ทุกตำแหน่ง), measure สั่นแล้วกระโดด, หมอกเข้า/ออก + เส้นเชื่อม sphere, ทัชดาวน์เด้งหมุน, kickoff จากกลาง, ลูกเต๋า opening roll, ตามองบอล + โดมยุบตัว; HUD: การ์ดบิน 400 ms, highlight ตาเลื่อน 300 ms; 2D board + state panel ใช้คิวเดียวกัน; คิวค้างเกิน 3 ข้ามไปล่าสุด; reduce motion สั้นและนิ่ง; หน้า /about + card library 9 ใบ |

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  botLevelSchema,
   cardKindSchema,
   chatTextSchema,
   modeSchema,
@@ -27,6 +28,8 @@ export const roomSettingsSchema = z.strictObject({
   turnTimerMs: z.number().int().min(seconds(10)).max(seconds(300)).optional(),
   suddenDeath: z.boolean().optional(),
   deckCounts: z.record(cardKindSchema, z.number().int().min(0).max(20)).optional(),
+  /** Strength of every bot in the room (Bot Arena seats and takeover bots); not a game rule. */
+  botLevel: botLevelSchema.optional(),
 });
 export type RoomSettings = z.infer<typeof roomSettingsSchema>;
 
@@ -102,7 +105,13 @@ export const clientMessageSchema = z.discriminatedUnion('type', [
   z.strictObject({ type: z.literal('ADD_BOT'), seat: seatSchema.optional() }),
   z.strictObject({ type: z.literal('REMOVE_BOT'), seat: seatSchema }),
   /** Bot Arena shortcut: a private room with you in P1, bots everywhere else, started at once. */
-  z.strictObject({ type: z.literal('BOT_GAME'), mode: modeSchema, playerName: playerNameSchema }),
+  z.strictObject({
+    type: z.literal('BOT_GAME'),
+    mode: modeSchema,
+    playerName: playerNameSchema,
+    /** Defaults to NORMAL: Bot Arena is for practice, the random bot is too easy for that. */
+    level: botLevelSchema.optional(),
+  }),
 ]);
 
 export type ClientMessage = z.infer<typeof clientMessageSchema>;
