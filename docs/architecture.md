@@ -170,6 +170,10 @@ Rules:
 
 Round 4 uses a simple **2D SVG board** so the game is playable early. Round 5 replaces it with the **3D board** (three.js) without changing game logic.
 
+* Both boards take the same props (ball, orientation, playable edges, preview, cosmetic settings) and never decide anything.
+* The 3D board (`apps/client/src/components/board3d/`) is lazy-loaded on the game screen, so menus do not download three.js. Its labels are HTML (drei `<Html>`), which keeps the ui-spec §14 test ids working, and no fonts are fetched at run time.
+* The 2D board is used when the player picks "Board: 2D" or the browser has no WebGL. On the 3D board a decorative 2D copy is the minimap; it carries no test ids.
+
 ## 8. Data (round 6)
 
 | Table | Fields (sketch) |

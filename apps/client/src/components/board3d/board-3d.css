@@ -1,0 +1,130 @@
+/* 3D board (visual-design §1–§3). The canvas fills the board area; labels are HTML. */
+.board3d {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+}
+.board3d canvas {
+  display: block;
+}
+.board3d__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+}
+
+.b3d-ket {
+  transform: translateY(26px);
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-family: var(--font-ket);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: rgb(4 5 10 / 0.55);
+  border: 1px solid color-mix(in srgb, var(--c) 60%, transparent);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+.b3d-ket.has-ball {
+  border-color: var(--accent-gold);
+}
+.b3d-ket.is-target {
+  color: var(--accent-gold);
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 10px rgb(255 209 77 / 0.6);
+}
+.b3d-zone {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  text-shadow: 0 0 8px currentColor;
+  pointer-events: none;
+}
+.b3d-gate {
+  padding: 0 4px;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: rgb(4 5 10 / 0.6);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.b3d-gate.is-playable {
+  color: var(--text-primary);
+}
+.b3d-gate.is-lit {
+  color: var(--accent-gold);
+}
+.b3d-sphere-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  pointer-events: none;
+}
+/* Test hooks (ui-spec §14): present and laid out, but not drawn over the scene. */
+.b3d-ball-marker,
+.b3d-target-marker {
+  display: block;
+  width: 4px;
+  height: 4px;
+  opacity: 0;
+  pointer-events: none;
+}
+.b3d-fog-label {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  color: var(--accent-purple);
+  text-shadow: 0 0 10px var(--accent-purple);
+  pointer-events: none;
+}
+
+/* Camera buttons and minimap, laid over the board area. */
+.board-cams {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  display: flex;
+  gap: 4px;
+  z-index: 2;
+}
+.board-cams button {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--stroke-subtle);
+  background: rgb(11 18 54 / 0.8);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.board-cams button.is-on {
+  color: var(--bg-deep);
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  font-weight: 700;
+}
+.board-minimap {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  width: 230px;
+  height: 150px;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgb(6 10 34 / 0.75);
+  border: 1px solid var(--stroke-subtle);
+  pointer-events: none;
+  z-index: 2;
+}

@@ -243,10 +243,12 @@ describe('settings (ui-spec §12)', () => {
       showLabels: false,
       ball: 'star',
     });
-    expect(screen.getByRole('radio', { name: '3D (coming in round 5)' })).toHaveProperty(
+    // jsdom has no WebGL: 3D and the camera views are offered but cannot be picked.
+    expect(screen.getByRole('radio', { name: '3D (WebGL not available)' })).toHaveProperty(
       'disabled',
       true,
     );
+    expect(screen.getByRole('radio', { name: 'Goal' })).toHaveProperty('disabled', true);
     expect(screen.queryByText(/Sound|Music|Volume/)).toBeNull();
   });
 });

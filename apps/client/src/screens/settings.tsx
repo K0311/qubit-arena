@@ -7,6 +7,7 @@ import { Toggle } from '../components/ui/toggle';
 import { en } from '../i18n/en';
 import { usePlayerName } from '../state/player-name';
 import { useSettings, type Settings } from '../state/settings';
+import { CAMERA_VIEWS, hasWebGL } from '../components/board3d/layout';
 
 function Choice<T extends string | number>({
   label,
@@ -51,6 +52,8 @@ export function SettingsScreen() {
   const [name, setName] = usePlayerName();
   const [draft, setDraft] = useState(name);
   const t = en.settings;
+  const [webgl] = useState(hasWebGL);
+  const board3d = s.board === '3D' && webgl;
 
   return (
     <main className="screen settings-screen">
@@ -65,18 +68,23 @@ export function SettingsScreen() {
         <Panel title={t.display}>
           <Choice
             label={t.board}
-            value={s.board}
+            value={webgl ? s.board : '2D'}
             options={[
               { value: '2D', label: t.board2d },
-              { value: '3D', label: t.board3d, disabled: true },
+              { value: '3D', label: webgl ? t.board3d : t.board3dNoGl, disabled: !webgl },
             ]}
             onChange={(board) => set({ board })}
           />
           <Choice
             label={t.camera}
-            value="goal"
-            options={[{ value: 'goal', label: t.cameraGoal, disabled: true }]}
-            onChange={() => undefined}
+            value={s.camera}
+            options={CAMERA_VIEWS.map((v) => ({
+              value: v,
+              label: t.cameras[v],
+              disabled: !board3d,
+            }))}
+            onChange={(camera) => set({ camera })}
+            testId="settings-camera"
           />
           <Choice
             label={t.reduceMotion}

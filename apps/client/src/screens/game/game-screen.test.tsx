@@ -188,6 +188,12 @@ describe('2D board (ui-spec §7.2, visual-design §2)', () => {
     expect(screen.getByTestId('fog')).toBeTruthy();
   });
 
+  it('a decorative copy (the 3D minimap) carries no test ids, so ids stay unique', () => {
+    const { container } = render(<Board2D ball="FOG" orientation="BLUE" decorative />);
+    expect(container.querySelectorAll('[data-testid]')).toHaveLength(0);
+    expect(container.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
+  });
+
   it('marks the preview target and edge', () => {
     render(
       <Board2D
