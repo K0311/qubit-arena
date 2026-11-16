@@ -25,7 +25,8 @@ import { useGame, type GameViewData } from '../../state/store';
 import { ActionLog } from './action-log';
 import { ChallengeOverlay, useChallengeReveal } from './challenge-overlay';
 import { ResultOverlay } from './result-overlay';
-import { StatePanel } from './state-panel';
+import { useAnimationPlayer } from '../../lib/anim/use-animation';
+import { AnimatedBoard2D, AnimatedStatePanel, CardFly, Dice } from './anim-hud';
 import { TeamChat } from './team-chat';
 import { Banner, Clocks, Scoreboard, TurnBar } from './hud';
 import { GateReference, TeamPanel } from './side-panels';
@@ -92,6 +93,8 @@ export function GameScreen() {
   const reduceMotion =
     settings.reduceMotion === 'on' ||
     (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  // visual-design §4: one queue turns new log entries into animations for every view of the board.
+  const player = useAnimationPlayer(view, { speed: settings.speed, reduce: reduceMotion });
 
   const viewer = view?.viewer ?? 'SPECTATOR';
   const you: PlayerId | null = viewer === 'SPECTATOR' ? null : viewer;
@@ -176,7 +179,7 @@ export function GameScreen() {
     ballShape: settings.ball,
     swirl: settings.swirl,
   };
-  const board2d = <Board2D {...boardProps} />;
+  const board2d = <AnimatedBoard2D {...boardProps} player={player} view={view} />;
 
   return (
     <main
@@ -226,6 +229,7 @@ export function GameScreen() {
                   camera={settings.camera}
                   active={sideOf(mode, view.turn)}
                   reduceMotion={reduceMotion}
+                  player={player}
                 />
               </Suspense>
               <div className="board-minimap" aria-label={en.settings.minimap}>
@@ -256,7 +260,9 @@ export function GameScreen() {
           ) : (
             board2d
           )}
+          <Dice player={player} view={view} />
         </div>
+        <CardFly view={view} you={you} speed={settings.speed} reduce={reduceMotion} sides={sides} />
 
         <div className="game-deck">
           <div className="game-deck__stack">
@@ -304,7 +310,7 @@ export function GameScreen() {
         )}
         {!you && <p className="game-spectating caption">{en.game.spectating}</p>}
 
-        <StatePanel qubits={view.qubits} ball={view.ball} partner={view.partner} />
+        <AnimatedStatePanel player={player} view={view} />
 
         <ActionLog rows={rows} room={room} />
 

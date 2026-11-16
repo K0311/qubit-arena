@@ -91,12 +91,28 @@
   gap: 10px;
 }
 .hud-turns {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
+}
+/* Gold frame that slides to the active pill (ui-spec §13 turn change, 300 ms). */
+.hud-turns__mark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border: 2px solid var(--accent-gold);
+  border-radius: 999px;
+  box-shadow: 0 0 20px rgb(255 209 77 / 0.55);
+  pointer-events: none;
+  transition:
+    transform calc(300ms / var(--anim-speed, 1)) ease,
+    width calc(300ms / var(--anim-speed, 1)) ease;
+  z-index: 1;
 }
 .hud-turns__item {
   display: flex;
@@ -126,8 +142,6 @@
 }
 .hud-turns__pill.is-active {
   opacity: 1;
-  border-color: var(--accent-gold);
-  box-shadow: 0 0 20px rgb(255 209 77 / 0.55);
 }
 .hud-banner {
   min-height: 44px;
@@ -511,4 +525,85 @@
   .hud-banner__text {
     animation: none;
   }
+}
+
+/* ---- dice and flying card (visual-design §4, ui-spec §13) ---- */
+.game-board .dice {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 28px;
+  z-index: 3;
+  pointer-events: none;
+}
+.die {
+  width: 84px;
+  height: 84px;
+  padding: 12px;
+  display: grid;
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  place-items: center;
+  border-radius: 18px;
+  box-shadow:
+    0 10px 30px rgb(0 0 0 / 0.5),
+    inset 0 -6px 0 rgb(0 0 0 / 0.25);
+}
+.die--blue {
+  background: var(--team-blue);
+}
+.die--red {
+  background: var(--team-red);
+}
+.die.is-rolling {
+  animation: die-tumble calc(260ms / var(--anim-speed, 1)) linear infinite;
+}
+.die__pip {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+}
+@keyframes die-tumble {
+  0% {
+    transform: rotate(0deg) translateY(0);
+  }
+  50% {
+    transform: rotate(180deg) translateY(-14px);
+  }
+  100% {
+    transform: rotate(360deg) translateY(0);
+  }
+}
+
+.card-fly {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 30;
+  pointer-events: none;
+  animation-name: card-fly;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: forwards;
+}
+@keyframes card-fly {
+  from {
+    transform: translate(var(--x0), var(--y0)) scale(1);
+    opacity: 1;
+  }
+  to {
+    /* The board centre on the 1920 × 1080 stage, card centred. */
+    transform: translate(885px, 375px) scale(0.45);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .die.is-rolling {
+    animation: none;
+  }
+}
+:root[data-motion='reduce'] .die.is-rolling {
+  animation: none;
 }

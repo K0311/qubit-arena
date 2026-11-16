@@ -12,6 +12,7 @@ import {
 import { en } from '../../i18n/en';
 import { CARD_LABEL, KET } from '../../lib/format';
 import type { MovePreview } from '../../lib/preview';
+import type { Frame, Spot } from '../../lib/anim/timeline';
 import { colors } from '../../theme/tokens';
 import { stateColors } from '../../theme/state-colors';
 import './board.css';
@@ -37,6 +38,8 @@ export type Board2DProps = {
   swirl?: number;
   /** A copy for show only (the 3D board's minimap): no test ids, hidden from screen readers. */
   decorative?: boolean;
+  /** Animation frame (visual-design §4). Without it the ball sits where the server put it. */
+  frame?: Frame;
 };
 
 const matches = (e: BoardEdge, m: EdgeRef) =>
@@ -58,6 +61,7 @@ export function Board2D({
   ballShape = 'football',
   swirl = 100,
   decorative = false,
+  frame,
 }: Board2DProps) {
   // ui-spec §14 test ids must exist once per page, on the board people play on.
   const tid = (id: string) => (decorative ? undefined : id);
@@ -73,6 +77,28 @@ export function Board2D({
   }, [flip]);
 
   const inFog = ball === 'FOG';
+  // SVG units per board unit (Blender path radius 4.6 ↔ R), for the hop height.
+  const UNIT = R / 4.6;
+  const spot = (sp: Spot) => (sp === 'CENTER' ? { x: 0, y: 0 } : pt[sp]);
+  const f = frame;
+  const drawn = f
+    ? (() => {
+        const a = spot(f.from);
+        const b = spot(f.to);
+        const base = (sp: Spot) => (sp === 'CENTER' ? 0 : DOME + 2);
+        const lift = base(f.from) + (base(f.to) - base(f.from)) * f.p + f.lift * UNIT;
+        return {
+          x: a.x + (b.x - a.x) * f.p + f.shake * 2.5 * Math.sin(performance.now() / 14),
+          y: a.y + (b.y - a.y) * f.p - lift,
+          visible: f.visible,
+          spin: (f.spin * 180) / Math.PI,
+        };
+      })()
+    : inFog
+      ? null
+      : { x: pt[ball].x, y: pt[ball].y - DOME - 2, visible: true, spin: 0 };
+  const fogAmount = f ? f.fog : inFog ? 1 : 0;
+  const animating = !!f && (f.p < 1 || f.lift > 0 || f.shake > 0);
 
   return (
     <svg
@@ -271,8 +297,11 @@ export function Board2D({
         </g>
       )}
 
-      {inFog ? (
-        <g data-testid={tid('fog')} className="board2d__fog">
+      {fogAmount > 0.01 && (
+        <g
+          className="board2d__fog"
+          style={{ opacity: fogAmount, transform: `scale(${0.3 + 0.7 * fogAmount})` }}
+        >
           <circle r={46} fill={colors.accentPurple} filter="url(#b-fog)" opacity={0.55} />
           <circle r={30} cx={10} cy={-6} fill="#ED298C" filter="url(#b-fog)" opacity={0.35} />
           <circle
@@ -284,12 +313,18 @@ export function Board2D({
             opacity={0.25}
           />
         </g>
+      )}
+      {/* Test hooks follow the server state, never the animation (ui-spec §14). */}
+      {inFog ? (
+        <g data-testid={tid('fog')} data-fog="true" />
       ) : (
+        <g data-testid={tid('ball')} data-position={ball} />
+      )}
+
+      {drawn && drawn.visible && (
         <g
-          data-testid={tid('ball')}
-          data-position={ball}
-          className="board2d__ball"
-          style={{ transform: `translate(${pt[ball].x}px, ${pt[ball].y - DOME - 2}px)` }}
+          className={`board2d__ball${animating ? ' is-animating' : ''}`}
+          style={{ transform: `translate(${drawn.x}px, ${drawn.y}px) rotate(${drawn.spin}deg)` }}
         >
           <ellipse className="board2d__ball-glow" cy={DOME + 2} rx={DOME + 3} ry={4} />
           <g className={`board2d__token board2d__token--${ballShape}`} data-shape={ballShape}>

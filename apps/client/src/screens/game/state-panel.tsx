@@ -4,26 +4,30 @@ import { KET } from '../../lib/format';
 import { describeState, formatAmplitude, formatVector } from '../../lib/quantum-format';
 
 /** Oblique projection (z up, y right, x toward the viewer), as on the gate cards. */
-const project = ([x, y, z]: BlochVector, r: number) => ({
-  px: (y - x * 0.45) * r,
-  py: (-z + x * 0.3) * r,
+const project = ([x, y, z]: BlochVector | readonly number[], r: number) => ({
+  px: (y! - x! * 0.45) * r,
+  py: (-z! + x! * 0.3) * r,
 });
 
-/** A small 2D Bloch sphere: glass circle, axes, the state vector with a gold tip. */
+/**
+ * A small 2D Bloch sphere: glass circle, axes, the state vector with a gold tip. The vector
+ * follows the board's animation (it turns with the gate, shrinks in the fog).
+ */
 function Bloch({
   v,
   label,
   ket,
   accent,
 }: {
-  v: BlochVector;
+  v: BlochVector | readonly number[];
   label: string;
   ket: string;
   accent: string;
 }) {
   const r = 46;
   const tip = project(v, r);
-  const fog = Math.hypot(...v) < 1e-6;
+  const len = Math.hypot(...v);
+  const fog = ket === KET.FOG;
   const axes: BlochVector[] = [
     [1, 0, 0],
     [0, 1, 0],
@@ -44,9 +48,8 @@ function Bloch({
         <text x={0} y={r + 12} className="bloch__pole">
           |1⟩
         </text>
-        {fog ? (
-          <circle r={6} className="bloch__fog" />
-        ) : (
+        {len < 0.5 && <circle r={6} className="bloch__fog" style={{ opacity: 1 - len * 2 }} />}
+        {len > 0.04 && (
           <>
             <line x1={0} y1={0} x2={tip.px} y2={tip.py} className="bloch__vector" />
             <circle cx={tip.px} cy={tip.py} r={4.5} className="bloch__tip" />
@@ -68,10 +71,13 @@ export function StatePanel({
   qubits,
   ball,
   partner,
+  vectors,
 }: {
   qubits: TwoQubitState;
   ball: BallPosition;
   partner: BallPosition;
+  /** Animated Bloch vectors; the numbers below always show the server state. */
+  vectors?: { bloch: readonly number[]; partner: readonly number[] };
 }) {
   const d = describeState(qubits);
   const fog = ball === 'FOG';
@@ -80,8 +86,18 @@ export function StatePanel({
     <section className="game-state panel" aria-label={en.game.quantumState}>
       <h2 className="panel__title">{en.game.quantumState}</h2>
       <div className="game-state__spheres">
-        <Bloch v={d.bloch} label={en.game.football} ket={KET[ball]!} accent="#598CFF" />
-        <Bloch v={d.partnerBloch} label={en.game.partner} ket={KET[partner]!} accent="#27E5F7" />
+        <Bloch
+          v={vectors?.bloch ?? d.bloch}
+          label={en.game.football}
+          ket={KET[ball]!}
+          accent="#598CFF"
+        />
+        <Bloch
+          v={vectors?.partner ?? d.partnerBloch}
+          label={en.game.partner}
+          ket={KET[partner]!}
+          accent="#27E5F7"
+        />
       </div>
 
       <div className="game-state__row">

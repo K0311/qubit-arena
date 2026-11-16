@@ -7,7 +7,6 @@ import {
   boardEdges,
   END_ZONE,
   POSITIONS,
-  reducedBloch,
   type BallPosition,
   type BlochVector,
   type Position,
@@ -30,6 +29,9 @@ import {
   type CameraView,
   type Vec3,
 } from './layout';
+import type { AnimationPlayer } from '../../lib/anim/player';
+import { restFrame } from '../../lib/anim/player';
+import type { Frame, Spot } from '../../lib/anim/timeline';
 import './board-3d.css';
 
 export type Board3DProps = {
@@ -45,6 +47,8 @@ export type Board3DProps = {
   /** Side whose turn it is, for the ball cam. */
   active?: Side;
   reduceMotion?: boolean;
+  /** Animation queue (visual-design §4); without it the board shows the server state. */
+  player?: AnimationPlayer;
 };
 
 const EDGES = boardEdges();
@@ -187,6 +191,8 @@ function Dome({
   target,
   confused,
   motion,
+  frames,
+  ballPos,
 }: {
   p: Position;
   index: number;
@@ -194,6 +200,8 @@ function Dome({
   target: boolean;
   confused: boolean;
   motion: boolean;
+  frames: Frames;
+  ballPos: React.MutableRefObject<THREE.Vector3>;
 }) {
   const body = useRef<THREE.Group>(null);
   const eyes = useRef<THREE.Group>(null);
@@ -203,12 +211,22 @@ function Dome({
   const color = stateColors[p];
   useFrame((state, dt) => {
     const t = state.clock.elapsedTime;
-    if (body.current) body.current.position.y = motion ? 0.08 * Math.sin(t * 1.4 + index * 1.1) : 0;
+    const f = frames();
+    const b = body.current;
+    if (b) {
+      b.position.y = motion ? 0.08 * Math.sin(t * 1.4 + index * 1.1) : 0;
+      // Bouncy squash when the ball lands on this head (visual-design §3).
+      const sq =
+        f.landing === p && motion ? Math.sin(f.squash * Math.PI) * Math.exp(-f.squash * 2) : 0;
+      b.scale.set(1 + 0.18 * sq, 1 - 0.28 * sq, 1 + 0.18 * sq);
+    }
     const e = eyes.current;
     if (!e) return;
-    // Eyes face the camera; in the fog they look around, confused.
-    const cam = state.camera.position;
-    e.lookAt(cam.x, e.getWorldPosition(new THREE.Vector3()).y, cam.z);
+    // Everyone watches the ball while it flies; otherwise the eyes face the camera, and in the
+    // fog they look around, confused.
+    const flying = f.lift > 0.05 && f.visible;
+    const look = flying ? ballPos.current : state.camera.position;
+    e.lookAt(look.x, e.getWorldPosition(new THREE.Vector3()).y, look.z);
     if (confused && motion) e.rotation.y += Math.sin(t * 2.5 + index) * 0.5;
     let sy = 1;
     if (motion && t > blinkAt.current) {
@@ -369,6 +387,13 @@ function Edge({
 
 // ---- ball, fog ------------------------------------------------------------------------------
 
+type Frames = () => Frame;
+
+/** World position of a spot: a dome top, or the board centre. */
+function spotPoint(spot: Spot): Vec3 {
+  return spot === 'CENTER' ? [0, 0, 0] : point3(spot);
+}
+
 function heartShape() {
   const s = new THREE.Shape();
   s.moveTo(0, -0.25);
@@ -416,7 +441,7 @@ function Token({ shape }: { shape: 'football' | 'heart' | 'star' }) {
     );
   }
   return (
-    <group rotation={[0, 0, 0]}>
+    <group>
       <mesh scale={[0.34, 0.21, 0.21]}>
         <sphereGeometry args={[1, 32, 16]} />
         <meshStandardMaterial color="#8B4A22" roughness={0.6} />
@@ -435,40 +460,74 @@ function Token({ shape }: { shape: 'football' | 'heart' | 'star' }) {
   );
 }
 
+/**
+ * The ball follows the animation frame: a hop along an arc, a shake before a measurement, a
+ * bounce and spin on a touchdown (visual-design §4). Its test id always shows the server's
+ * position, so tests never wait for an animation.
+ */
 function Ball({
   ball,
   shape,
   motion,
+  frames,
+  worldPos,
 }: {
-  ball: Position;
+  ball: BallPosition;
   shape: 'football' | 'heart' | 'star';
   motion: boolean;
+  frames: Frames;
+  worldPos: React.MutableRefObject<THREE.Vector3>;
 }) {
   const group = useRef<THREE.Group>(null);
   const spin = useRef<THREE.Group>(null);
-  const [x, , z] = point3(ball);
-  useFrame((state, dt) => {
+  const ring = useRef<THREE.Mesh>(null);
+  useFrame((state) => {
+    const f = frames();
     const g = group.current;
-    if (g) {
-      const k = 1 - Math.exp(-dt * 6);
-      g.position.x += (x - g.position.x) * k;
-      g.position.z += (z - g.position.z) * k;
+    if (!g) return;
+    const a = spotPoint(f.from);
+    const b = spotPoint(f.to);
+    // On a dome the ball rests on its head; at the centre it floats low above the board.
+    const baseA = f.from === 'CENTER' ? 0.35 : TOKEN_Y;
+    const baseB = f.to === 'CENTER' ? 0.35 : TOKEN_Y;
+    const shake = f.shake * 0.07 * Math.sin(state.clock.elapsedTime * 70);
+    g.position.set(
+      a[0] + (b[0] - a[0]) * f.p + shake,
+      baseA + (baseB - baseA) * f.p + f.lift,
+      a[2] + (b[2] - a[2]) * f.p,
+    );
+    g.visible = f.visible;
+    worldPos.current.copy(g.position);
+    if (ring.current) {
+      ring.current.visible = f.visible && f.lift < 0.05 && f.to !== 'CENTER';
+      ring.current.position.y = DOME_RADIUS + 0.02 - g.position.y;
     }
     const s = spin.current;
     if (!s) return;
     const t = state.clock.elapsedTime;
+    s.rotation.y = f.spin;
     if (!motion) return;
     if (shape === 'heart') s.scale.setScalar(1 + 0.12 * Math.max(0, Math.sin(t * 5)));
-    else if (shape === 'star') s.rotation.y = Math.sin(t * 1.5) * 0.4;
+    else if (shape === 'star') s.rotation.y = f.spin + Math.sin(t * 1.5) * 0.4;
     else s.rotation.z = Math.sin(t * 2.4) * 0.15;
   });
   return (
-    <group ref={group} position={[x, 0, z]}>
-      <group position={[0, TOKEN_Y, 0]}>
+    <>
+      <group ref={group}>
         <group ref={spin}>
           <Token shape={shape} />
         </group>
-        <Html center zIndexRange={LABEL_Z}>
+        <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.18, 0.34, 48]} />
+          <meshBasicMaterial color={GOLD} transparent opacity={0.65} />
+        </mesh>
+      </group>
+      {ball !== 'FOG' && (
+        <Html
+          position={[...point3(ball).slice(0, 1), TOKEN_Y, point3(ball)[2]] as Vec3}
+          center
+          zIndexRange={LABEL_Z}
+        >
           <span
             className="b3d-ball-marker"
             data-testid="ball"
@@ -476,16 +535,13 @@ function Ball({
             aria-label="ball"
           />
         </Html>
-      </group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, DOME_RADIUS + 0.02, 0]}>
-        <ringGeometry args={[0.18, 0.34, 48]} />
-        <meshBasicMaterial color={GOLD} transparent opacity={0.65} />
-      </mesh>
-    </group>
+      )}
+    </>
   );
 }
 
-function Fog({ motion }: { motion: boolean }) {
+/** Nebula cloud over the board centre; grows and shrinks with the frame's fog amount. */
+function Fog({ motion, frames, inFog }: { motion: boolean; frames: Frames; inFog: boolean }) {
   const ref = useRef<THREE.Points>(null);
   const geo = useMemo(() => {
     const n = 700;
@@ -510,10 +566,15 @@ function Fog({ motion }: { motion: boolean }) {
     return g;
   }, []);
   useFrame((state, dt) => {
-    if (!ref.current || !motion) return;
-    ref.current.rotation.y += dt * 0.08;
-    const m = ref.current.material as THREE.PointsMaterial;
-    m.opacity = 0.45 + 0.1 * Math.sin(state.clock.elapsedTime * 0.8);
+    const pts = ref.current;
+    if (!pts) return;
+    const f = frames();
+    pts.visible = f.fog > 0.01;
+    pts.scale.setScalar(0.15 + 0.85 * f.fog);
+    if (motion) pts.rotation.y += dt * 0.08;
+    const m = pts.material as THREE.PointsMaterial;
+    const pulse = motion ? 0.1 * Math.sin(state.clock.elapsedTime * 0.8) : 0;
+    m.opacity = (0.45 + pulse) * f.fog;
   });
   return (
     <group>
@@ -527,40 +588,75 @@ function Fog({ motion }: { motion: boolean }) {
           blending={THREE.AdditiveBlending}
         />
       </points>
-      <Html position={[0, 1.2, 0]} center zIndexRange={LABEL_Z}>
-        <span className="b3d-fog-label" data-testid="fog">
-          fog
-        </span>
-      </Html>
+      {inFog && (
+        <Html position={[0, 1.2, 0]} center zIndexRange={LABEL_Z}>
+          <span className="b3d-fog-label" data-testid="fog">
+            fog
+          </span>
+        </Html>
+      )}
     </group>
   );
 }
 
-// ---- Bloch spheres (static here; P-5.2 animates them) --------------------------------------
+// ---- Bloch spheres --------------------------------------------------------------------------
 
 /** Bloch (x, y, z) → board space: +x at the board's |+⟩ (−z), z up, y completes the frame. */
-const blochToWorld = ([bx, by, bz]: BlochVector): Vec3 => [-by, bz, -bx];
+const blochToWorld = ([bx, by, bz]: BlochVector | readonly number[]): Vec3 => [-by!, bz!, -bx!];
 
+const UP = new THREE.Vector3(0, 1, 0);
+
+/**
+ * A glass Bloch sphere whose state vector follows the animation (visual-design §3–§4): it turns
+ * about the gate's axis while the ball hops, and shrinks to the centre and pulses in the fog.
+ */
 function BlochSphere({
   position,
   radius,
-  v,
   accent,
   label,
+  pick,
+  motion,
 }: {
   position: Vec3;
   radius: number;
-  v: BlochVector;
   accent: string;
   label: string;
+  pick: () => readonly number[];
+  motion: boolean;
 }) {
-  const tip = blochToWorld(v).map((c) => c * radius) as Vec3;
-  const len = Math.hypot(...v);
+  const shaft = useRef<THREE.Mesh>(null);
+  const tip = useRef<THREE.Mesh>(null);
+  const core = useRef<THREE.Mesh>(null);
   const axes: Vec3[] = [
     [radius * 1.15, 0, 0],
     [0, radius * 1.15, 0],
     [0, 0, radius * 1.15],
   ];
+  useFrame((state) => {
+    const w = blochToWorld(pick());
+    const v = new THREE.Vector3(...w).multiplyScalar(radius);
+    const len = v.length();
+    const show = len > radius * 0.04;
+    if (shaft.current) {
+      shaft.current.visible = show;
+      if (show) {
+        shaft.current.quaternion.setFromUnitVectors(UP, v.clone().normalize());
+        shaft.current.scale.set(1, len, 1);
+        shaft.current.position.copy(v.clone().multiplyScalar(0.5));
+      }
+    }
+    if (tip.current) {
+      tip.current.visible = show;
+      tip.current.position.copy(v);
+    }
+    if (core.current) {
+      // Length 0 in the fog: a pulsing purple core instead of a vector.
+      core.current.visible = len < radius * 0.5;
+      const pulse = motion ? 1 + 0.25 * Math.sin(state.clock.elapsedTime * 4) : 1;
+      core.current.scale.setScalar(pulse * (1 - len / radius));
+    }
+  });
   return (
     <group position={position}>
       <mesh>
@@ -596,20 +692,18 @@ function BlochSphere({
           </mesh>
         );
       })}
-      {len > 1e-6 ? (
-        <>
-          <Line points={[[0, 0, 0], tip]} color="#ffffff" lineWidth={3} />
-          <mesh position={tip}>
-            <sphereGeometry args={[radius * 0.09, 16, 12]} />
-            <meshBasicMaterial color={GOLD} />
-          </mesh>
-        </>
-      ) : (
-        <mesh>
-          <sphereGeometry args={[radius * 0.1, 16, 12]} />
-          <meshBasicMaterial color={colors.accentPurple} />
-        </mesh>
-      )}
+      <mesh ref={shaft}>
+        <cylinderGeometry args={[radius * 0.025, radius * 0.025, 1, 10]} />
+        <meshBasicMaterial color="#ffffff" />
+      </mesh>
+      <mesh ref={tip}>
+        <sphereGeometry args={[radius * 0.09, 16, 12]} />
+        <meshBasicMaterial color={GOLD} />
+      </mesh>
+      <mesh ref={core}>
+        <sphereGeometry args={[radius * 0.12, 16, 12]} />
+        <meshBasicMaterial color={colors.accentPurple} />
+      </mesh>
       <Html position={[0, -radius - 0.25, 0]} center zIndexRange={LABEL_Z}>
         <div className="b3d-sphere-label">{label}</div>
       </Html>
@@ -617,31 +711,52 @@ function BlochSphere({
   );
 }
 
-function Spheres({ qubits }: { qubits: TwoQubitState }) {
-  const ball = reducedBloch(qubits, 'FOOTBALL');
-  const partner = reducedBloch(qubits, 'PARTNER');
-  const main: Vec3 = [0, 2.6, 0];
+const MAIN_SPHERE: Vec3 = [0, 2.6, 0];
+const PARTNER_SPHERE: Vec3 = [1.9, 2.2, 0.6];
+
+function Spheres({ frames, motion }: { frames: Frames; motion: boolean }) {
+  const link = useRef<THREE.Mesh>(null);
+  const a = new THREE.Vector3(...MAIN_SPHERE);
+  const b = new THREE.Vector3(...PARTNER_SPHERE);
+  const mid = a.clone().add(b).multiplyScalar(0.5);
+  const dir = b.clone().sub(a);
+  const quat = new THREE.Quaternion().setFromUnitVectors(UP, dir.clone().normalize());
+  useFrame((state) => {
+    const m = link.current;
+    if (!m) return;
+    // A glowing link joins the spheres while they are entangled (visual-design §3).
+    const k = frames().link;
+    m.visible = k > 0.01;
+    const pulse = motion ? 0.75 + 0.25 * Math.sin(state.clock.elapsedTime * 3) : 1;
+    (m.material as THREE.MeshBasicMaterial).opacity = 0.8 * k * pulse;
+  });
   return (
     <group>
       <BlochSphere
-        position={main}
+        position={MAIN_SPHERE}
         radius={0.85}
-        v={ball}
         accent="#598CFF"
         label={en.game.football}
+        pick={() => frames().bloch}
+        motion={motion}
       />
       <BlochSphere
-        position={[1.9, 2.2, 0.6]}
+        position={PARTNER_SPHERE}
         radius={0.42}
-        v={partner}
         accent={colors.accentCyan}
         label={en.game.partner}
+        pick={() => frames().partner}
+        motion={motion}
       />
+      <mesh ref={link} position={mid} quaternion={quat}>
+        <cylinderGeometry args={[0.035, 0.035, dir.length(), 10]} />
+        <meshBasicMaterial color={colors.accentPurple} transparent opacity={0.8} />
+      </mesh>
       {/* Beam and double-ring pad link the sphere to the board (visual-design §3). */}
       <Line
         points={[
           [0, 0.05, 0],
-          [0, main[1] - 0.85, 0],
+          [0, MAIN_SPHERE[1] - 0.85, 0],
         ]}
         color="#598CFF"
         lineWidth={1.2}
@@ -676,8 +791,12 @@ export default function Board3D({
   camera = 'GOAL',
   active,
   reduceMotion = false,
+  player,
 }: Board3DProps) {
   const motion = !reduceMotion;
+  const rest = useMemo(() => restFrame(ball, qubits ?? null), [ball, qubits]);
+  const frames: Frames = () => (player ? player.frame(performance.now()) : rest);
+  const ballPos = useRef(new THREE.Vector3());
   const inFog = ball === 'FOG';
   const targets = new Set(preview?.targets ?? []);
   const [ready, setReady] = useState(false);
@@ -735,6 +854,8 @@ export default function Board3D({
             target={targets.has(p)}
             confused={inFog}
             motion={motion}
+            frames={frames}
+            ballPos={ballPos}
           />
         ))}
         {preview && preview.targets.length > 0 && (
@@ -746,8 +867,9 @@ export default function Board3D({
             />
           </Html>
         )}
-        {inFog ? <Fog motion={motion} /> : <Ball ball={ball} shape={ballShape} motion={motion} />}
-        {qubits && <Spheres qubits={qubits} />}
+        <Fog motion={motion} frames={frames} inFog={inFog} />
+        <Ball ball={ball} shape={ballShape} motion={motion} frames={frames} worldPos={ballPos} />
+        {qubits && <Spheres frames={frames} motion={motion} />}
       </Canvas>
       {!ready && <div className="board3d__loading">{en.common.loading}</div>}
     </div>
