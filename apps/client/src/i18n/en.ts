@@ -69,7 +69,6 @@ export const en = {
     blueTeam: 'BLUE TEAM',
     redTeam: 'RED TEAM',
     blueZone: 'End zone',
-    waitingSeat: 'Waiting for player…',
     addBot: '+ Bot',
     addBotTitle: (seat: string) => `Put a bot in ${seat}`,
     removeBot: (seat: string) => `Remove the bot from ${seat}`,
@@ -78,8 +77,6 @@ export const en = {
     host: 'host',
     bot: 'bot',
     away: 'away',
-    turnOrderTeam: 'Turn order: P1 → P3 → P2 → P4 (opening roll decides which side starts)',
-    turnOrderSolo: 'Turn order: P1 ⇄ P2 (opening roll decides who starts)',
     settings: 'Match settings',
     hostOnly: 'Only the host can change these.',
     gameMode: 'Game mode',
@@ -92,6 +89,30 @@ export const en = {
     notReadyButton: 'Not ready',
     start: 'START GAME',
     spectating: 'You are watching this room.',
+    kicker: 'Room · waiting for players',
+    public: 'Public',
+    private: 'Private',
+    copy: 'COPY',
+    copied: 'COPIED',
+    copyTitle: 'Copy the room code to share it',
+    openSeat: 'Open seat',
+    openSeatHint: 'Share the code, or fill it with a bot',
+    openSeatHintGuest: 'Share the code with a friend',
+    notReady: 'NOT READY',
+    player: 'player',
+    vs: 'VS',
+    turnOrder: 'Turn order',
+    openingRoll: 'Opening roll picks who starts',
+    /** Who the room still waits for (ui-spec §6), e.g. "Waiting for P3 · 1 open seat". */
+    waitingFor: (notReady: readonly string[], open: number) =>
+      `Waiting for ${[
+        notReady.length > 0 ? notReady.join(', ') : null,
+        open > 0 ? `${open} open seat${open === 1 ? '' : 's'}` : null,
+      ]
+        .filter(Boolean)
+        .join(' · ')}`,
+    allReadyHost: 'Everyone is ready. Start when you like.',
+    allReadyGuest: 'Everyone is ready. Waiting for the host to start.',
     cards: (n: number) => `${n} cards`,
   },
   game: {

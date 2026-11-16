@@ -264,67 +264,7 @@
   letter-spacing: 0.12em;
 }
 
-/* ---- room (§6) ---- */
-.room__grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 520px);
-  gap: var(--space-5);
-  align-items: start;
-}
-.room__team-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-5);
-  margin-bottom: var(--space-4);
-}
-.team-col__title--blue {
-  color: var(--team-blue-soft);
-}
-.team-col__title--red {
-  color: var(--team-red-soft);
-}
-.team-col__seats {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  margin-top: var(--space-4);
-}
-.seat {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-.seat .chip {
-  flex: 1;
-}
-.seat-empty {
-  flex: 1;
-  min-height: 60px;
-  border-radius: 14px;
-  border: 1.5px dashed var(--stroke-subtle);
-  background: transparent;
-  color: var(--text-muted);
-  text-align: left;
-  padding: 0 16px;
-  cursor: pointer;
-}
-.seat-empty:hover {
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
-}
-.room__side {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-.room__actions {
-  display: flex;
-  gap: var(--space-3);
-  justify-content: flex-end;
-}
-.room__actions .btn {
-  flex: 1;
-}
+/* Room (§6) lives in room.css. */
 .settings-row {
   display: flex;
   align-items: center;
@@ -432,15 +372,13 @@
     width: 420px;
     height: 420px;
   }
-  .lobby__grid,
-  .room__grid {
+  .lobby__grid {
     grid-template-columns: minmax(0, 1fr) 380px;
   }
 }
 @media (max-width: 1000px) {
   .menu__body,
   .lobby__grid,
-  .room__grid,
   .mode-grid {
     grid-template-columns: 1fr;
   }
