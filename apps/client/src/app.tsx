@@ -12,6 +12,7 @@ import { RoomScreen } from './screens/room';
 import { GameScreen } from './screens/game/game-screen';
 import { Placeholder } from './screens/placeholder';
 import { SettingsScreen } from './screens/settings';
+import { AboutScreen } from './screens/about';
 import { applyDocumentSettings, useSettings } from './state/settings';
 import { en } from './i18n/en';
 
@@ -57,7 +58,7 @@ export function App() {
         <Route path="/tutorial" element={<Placeholder title={en.menu.tutorial} />} />
         <Route path="/tutorial/:lesson" element={<Placeholder title={en.menu.tutorial} />} />
         <Route path="/settings" element={<SettingsScreen />} />
-        <Route path="/about" element={<Placeholder title={en.menu.about} />} />
+        <Route path="/about" element={<AboutScreen />} />
         <Route path="/study/*" element={<Placeholder title="Study" />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

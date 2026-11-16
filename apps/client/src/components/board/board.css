@@ -116,6 +116,10 @@
 .board2d__ball {
   transition: transform calc(600ms / var(--anim-speed, 1)) cubic-bezier(0.4, 0, 0.2, 1);
 }
+/* While the animation queue drives the ball, it sets every frame itself. */
+.board2d__ball.is-animating {
+  transition: none;
+}
 .board2d__ball-glow {
   fill: var(--accent-gold);
   opacity: 0.4;
@@ -133,7 +137,6 @@
 }
 .board2d__fog {
   transform-origin: 0 0;
-  animation: b-pulse 5s ease-in-out infinite;
 }
 
 @keyframes b-spin {

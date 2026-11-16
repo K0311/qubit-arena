@@ -1,9 +1,5 @@
 import {
-  applyCnot,
-  applySingleGate,
   END_ZONE,
-  kickoffState,
-  measureFootball,
   otherSide,
   partnerPosition,
   sideOf,
@@ -12,11 +8,10 @@ import {
   type Mode,
   type PlayerId,
   type Side,
-  type SingleGate,
-  type TwoQubitState,
 } from '@qa/engine';
 import { en } from '../i18n/en';
 import { CARD_LABEL, KET, minutesSeconds } from './format';
+import { replayStates } from './replay';
 
 export type LogRow = {
   /** Index of the event in view.log that starts this row. */
@@ -40,9 +35,6 @@ const L = en.log;
 const B = en.banner;
 const sideName = (s: Side) => (s === 'BLUE' ? 'Blue' : 'Red');
 
-/** An Rng that always yields the outcome the server already reported (replay only). */
-const forced = (outcome: 'ZERO' | 'ONE') => ({ next: () => (outcome === 'ZERO' ? 0 : 1 - 1e-12) });
-
 /**
  * Action log rows and banners built only from engine events (ui-spec §7.5). The partner is not
  * in the events, so its position is replayed from the log with the engine: kickoff, every card
@@ -50,7 +42,7 @@ const forced = (outcome: 'ZERO' | 'ONE') => ({ next: () => (outcome === 'ZERO' ?
  */
 export function buildLog(log: readonly GameEvent[], mode: Mode, logGameMs: readonly number[] = []) {
   const rows: LogRow[] = [];
-  let qubits: TwoQubitState | null = null;
+  const states = replayStates(log);
   const time = (i: number) => (logGameMs[i] === undefined ? null : minutesSeconds(logGameMs[i]!));
   const row = (
     i: number,
@@ -78,12 +70,11 @@ export function buildLog(log: readonly GameEvent[], mode: Mode, logGameMs: reado
         });
         return;
       case 'KICKOFF':
-        qubits = kickoffState(e.ball);
         row(i, {
           kind: 'kickoff',
           side: e.side ?? null,
           text: L.kickoff,
-          result: L.kickoffResult(KET[e.ball]!, KET[partnerPosition(qubits)]!),
+          result: L.kickoffResult(KET[e.ball]!, KET[partnerPosition(states[i]!)]!),
           banners: [B.kickoff(e.side ?? null, KET[e.ball]!)],
         });
         return;
@@ -91,15 +82,8 @@ export function buildLog(log: readonly GameEvent[], mode: Mode, logGameMs: reado
         const side = sideOf(mode, e.player);
         const kind = e.card.kind;
         const label = CARD_LABEL[kind];
-        const before = qubits;
-        const next = log[i + 1];
-        const outcome = kind === 'MEASURE' && next?.type === 'MEASURED' ? next.outcome : null;
-        if (qubits) {
-          if (kind === 'MEASURE')
-            qubits = outcome ? measureFootball(qubits, forced(outcome)).state : qubits;
-          else if (kind === 'CNOT') qubits = applyCnot(qubits);
-          else qubits = applySingleGate(qubits, kind as SingleGate);
-        }
+        const before = i > 0 ? (states[i - 1] ?? null) : null;
+        const qubits = states[i] ?? null;
         const partnerMoved =
           before !== null && qubits !== null && partnerPosition(before) !== partnerPosition(qubits);
         const { from, to } = e;

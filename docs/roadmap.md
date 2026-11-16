@@ -78,7 +78,7 @@
 ## เฟส 5 — 3D + tutorial (1–15 ก.พ.) → Feature freeze
 
 - [x] P-5.1 3D board
-- [ ] P-5.2 Bloch spheres + animation
+- [x] P-5.2 Bloch spheres + animation
 - [ ] P-5.3 Tutorial 5 บท + T-E-06
 - [ ] P-7.0 Feature freeze checklist (ดู claude-code-prompts.md)
 
@@ -145,6 +145,7 @@
 | 12 พ.ย. 2026 | Challenge bot rule | rules.md §8.1: bot ตอบ Quantum Challenge แทนทีมเฉพาะเมื่อทีมไม่มีคนออนไลน์ (T-S-10) |
 | 15 พ.ย. 2026 | P-4.1 App shell | client: theme tokens, ฟอนต์, พื้นหลังอวกาศ, component กลาง, route ทุกหน้า, เมนู/เลือกโหมด/lobby/ห้อง, WebSocket + store; protocol เพิ่ม `LIST_ROOMS`/`ROOM_LIST`, `UPDATE_SETTINGS`; e2e quick match และสร้างห้อง→เริ่มเกม ผ่าน |
 | 15 พ.ย. 2026 | P-4.2 Game screen | กระดาน 2D (SVG, หมุนให้ end zone ตัวเองอยู่บน, หมอก), การ์ด gate (บรรทัด board effect สร้างจาก engine + snapshot), มือ + ตัวอย่างการเดิน, HUD, action log; protocol เพิ่ม `clocks` ใน `GAME_VIEW`; e2e เล่นการ์ด 1 ใบผ่าน |
+| 16 พ.ย. 2026 | P-5.2 Bloch + animation | คิว animation จาก log (ไม่ตัดสินอะไรเอง, test id ใช้ค่าจาก server ทันที): บอลกระโดดเป็นโค้ง, Bloch vector หมุนรอบแกนของ gate (ตรวจกับ engine ทุก gate × ทุกตำแหน่ง), measure สั่นแล้วกระโดด, หมอกเข้า/ออก + เส้นเชื่อม sphere, ทัชดาวน์เด้งหมุน, kickoff จากกลาง, ลูกเต๋า opening roll, ตามองบอล + โดมยุบตัว; HUD: การ์ดบิน 400 ms, highlight ตาเลื่อน 300 ms; 2D board + state panel ใช้คิวเดียวกัน; คิวค้างเกิน 3 ข้ามไปล่าสุด; reduce motion สั้นและนิ่ง; หน้า /about + card library 9 ใบ |
 | 16 พ.ย. 2026 | P-5.1 3D board | กระดาน three.js (@react-three/fiber 8 + drei 9): ฟ้าอวกาศ, โดม 6 ตัวมีตา, เส้น gate 13 เส้นจาก `boardEdges()`, วงโคจร 57 เส้นใน 3 ก้อน (fps < 45 ลดเหลือ 24), end zone, ลูกบอล (football/heart/star), หมอก, Bloch sphere ลูกบอล + partner แบบนิ่ง; กล้อง 5 มุม (goal view ค่าเริ่มต้น) + minimap; ไม่มี WebGL ใช้ 2D อัตโนมัติ; test id ผ่าน `<Html>`; โหลด three.js แยกเฉพาะหน้าเกม; e2e 5/5 รันบน 3D |
 | 15 พ.ย. 2026 | P-4.3 State panel, chat, Challenge, Result, Settings | state panel (Bloch 2 ลูก, amplitude, ความน่าจะเป็น, global phase, หมอก), team chat, overlay Quantum Challenge (เฉลย+คำอธิบาย 3 วิ), หน้าผล + สถิติจาก log + Play Again (`REMATCH`), หน้า Settings; engine ส่งผู้ตอบ/คำอธิบาย/`sideChoice`; แก้คลังคำถามหลุดไปใน bundle ของ client (`sideEffects: false` + build check); e2e team chat 4 คนผ่าน |
 | 11 พ.ย. 2026 | UI spec + ภาพ reference | `docs/ui-spec.md` (หน้าจอ, HUD, การ์ด) + `docs/visual-design.md` (กระดาน); เอาแค่ UI ไม่เปลี่ยนกฎ |

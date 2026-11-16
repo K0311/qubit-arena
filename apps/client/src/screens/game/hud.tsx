@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { TURN_ORDER, sideOf, type Mode, type PlayerId, type Side } from '@qa/engine';
 import { en } from '../../i18n/en';
 import type { LogRow } from '../../lib/game-log';
@@ -28,8 +28,22 @@ export function Scoreboard({ score, target }: { score: Record<Side, number>; tar
 
 /** ui-spec §7.1 Turn bar: pills in turn order, the active one in full team colour. */
 export function TurnBar({ mode, turn, you }: { mode: Mode; turn: PlayerId; you: PlayerId | null }) {
+  // ui-spec §13: the gold highlight slides along the bar to the active pill (300 ms).
+  const bar = useRef<HTMLOListElement>(null);
+  const [mark, setMark] = useState<{ left: number; width: number } | null>(null);
+  useLayoutEffect(() => {
+    const el = bar.current?.querySelector<HTMLElement>('.hud-turns__pill.is-active');
+    if (el) setMark({ left: el.offsetLeft, width: el.offsetWidth });
+  }, [turn, you, mode]);
   return (
-    <ol className="hud-turns" aria-label={en.game.turn}>
+    <ol className="hud-turns" aria-label={en.game.turn} ref={bar}>
+      {mark && (
+        <li
+          className="hud-turns__mark"
+          aria-hidden="true"
+          style={{ transform: `translateX(${mark.left}px)`, width: mark.width }}
+        />
+      )}
       {TURN_ORDER[mode].map((p, i) => {
         const active = p === turn;
         return (

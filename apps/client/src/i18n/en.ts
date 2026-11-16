@@ -292,6 +292,16 @@ export const en = {
     displayName: 'Display name',
     saved: 'Saved',
   },
+  about: {
+    title: 'ABOUT',
+    intro:
+      'Qubit Arena is an online, multiplayer quantum strategy game. Play quantum gate cards to move a football between six qubit states, entangle it with a partner qubit, and score in your own end zone.',
+    credit:
+      'Based on Qubit Touchdown by Thomas G. Wong. Senior project, Faculty of ICT, Mahidol University.',
+    library: 'CARD LIBRARY',
+    libraryNote:
+      'Each card turns the Bloch sphere about the highlighted axis. The board effect is computed from the gate matrices.',
+  },
   placeholder: { soon: 'Coming soon.' },
   net: {
     connecting: 'Connecting to the game server…',
