@@ -8,11 +8,23 @@ import { send } from '../net/connection';
 import { usePlayerName } from '../state/player-name';
 import { BotLevelPicker } from './bot-level';
 
-function People({ n, bots = 0 }: { n: number; bots?: number }) {
+type Seat = 'blue' | 'red' | 'bot';
+
+/**
+ * The match-up as team-coloured seat domes, as on the board and in the lobby. The person and
+ * robot emoji looked out of place next to the rest of the space theme.
+ */
+function Seats({ blue, red }: { blue: Seat[]; red: Seat[] }) {
+  const dome = (s: Seat, i: number) => (
+    <i key={i} className={`mode-seat mode-seat--${s}`}>
+      {s === 'bot' && <span>BOT</span>}
+    </i>
+  );
   return (
-    <span className="mode-card__icon" aria-hidden="true">
-      {'👤'.repeat(n)}
-      {'🤖'.repeat(bots)}
+    <span className="mode-seats" aria-hidden="true">
+      {blue.map(dome)}
+      <b className="mode-seats__vs">VS</b>
+      {red.map(dome)}
     </span>
   );
 }
@@ -26,14 +38,29 @@ export function ModeSelect() {
   const [name] = usePlayerName();
   const [level, setLevel] = useState<BotLevel>('NORMAL');
   const cards = [
-    { id: 'solo', icon: 2, title: en.mode.soloTitle, text: en.mode.soloText, frame: 'blue' },
-    { id: 'team', icon: 4, title: en.mode.teamTitle, text: en.mode.teamText, frame: 'purple' },
+    {
+      id: 'solo',
+      seats: [['blue'], ['red']],
+      title: en.mode.soloTitle,
+      text: en.mode.soloText,
+      frame: 'blue',
+    },
+    {
+      id: 'team',
+      seats: [
+        ['blue', 'blue'],
+        ['red', 'red'],
+      ],
+      title: en.mode.teamTitle,
+      text: en.mode.teamText,
+      frame: 'purple',
+    },
   ] as const;
   // The server answers with ROOM_STATE (PLAYING), and the app shell opens the game screen.
   const botGame = (mode: 'SOLO' | 'TEAM') =>
     send({ type: 'BOT_GAME', mode, playerName: name, level });
   return (
-    <main className="screen">
+    <main className="screen mode-screen">
       <header className="screen__header">
         <h1>{en.mode.title}</h1>
         <Button variant="secondary" size="small" onClick={() => navigate('/')}>
@@ -44,7 +71,7 @@ export function ModeSelect() {
         {cards.map((c) => (
           <article key={c.id} className={`mode-card panel panel--${c.frame}`}>
             <Pill tone="green">{en.mode.online}</Pill>
-            <People n={c.icon} />
+            <Seats blue={[...c.seats[0]]} red={[...c.seats[1]]} />
             <h2>{c.title}</h2>
             <p>{c.text}</p>
             <Button data-testid={`mode-${c.id}`} onClick={() => navigate(`/lobby?mode=${c.id}`)}>
@@ -54,11 +81,11 @@ export function ModeSelect() {
         ))}
         <article className="mode-card panel panel--cyan" data-testid="mode-bot">
           <Pill tone="cyan">{en.mode.botBadge}</Pill>
-          <People n={1} bots={1} />
+          <Seats blue={['blue']} red={['bot']} />
           <h2>{en.mode.botTitle}</h2>
           <p>{en.mode.botText}</p>
           <BotLevelPicker value={level} onChange={setLevel} testId="mode-bot-level" />
-          <div className="row wrap">
+          <div className="mode-card__buttons">
             <Button data-testid="mode-bot-solo" onClick={() => botGame('SOLO')}>
               {en.mode.botSolo}
             </Button>

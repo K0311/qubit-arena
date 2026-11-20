@@ -20,7 +20,7 @@ export function AboutScreen() {
           {en.common.back}
         </Button>
       </header>
-      <Panel>
+      <Panel className="about__intro">
         <p>{t.intro}</p>
         <p className="muted">{t.credit}</p>
       </Panel>
