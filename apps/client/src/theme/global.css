@@ -95,6 +95,14 @@ h3 {
   color: var(--text-muted);
 }
 
+/* Scores and counts. Orbitron's zero has a slash and JetBrains Mono's a dot, so 0 read as Ø;
+   Exo 2 has a plain zero, and tabular figures keep digits from shifting as they change. */
+.num {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
 /* ui-spec §1: every ket uses JetBrains Mono (many UI fonts lack ⟩). */
 .ket {
   font-family: var(--font-ket);

@@ -16,7 +16,7 @@ Which document wins:
 
 | Topic | Rule |
 |---|---|
-| Design size | 1920 × 1080. All positions below are on this grid. The layout must still work at **1280 × 720** (scale down; side columns shrink to 300 px). Mobile is out of scope. |
+| Design size | 1920 × 1080. All positions below are on this grid. The layout must still work at **1280 × 720** (scale down; side columns shrink to 300 px). Mobile is out of scope; the menus and lobby still fit a phone, and the game screen asks a phone held upright to turn sideways. |
 | Background | Dark space: navy gradient, star layers and a Milky Way / nebula band (visual-design §3 "Sky"). Built with CSS/canvas or three.js — **never ship the reference PNGs as assets**. |
 | Frames | Panels are rounded rectangles (radius 16–24) with a 1.5 px `stroke/subtle` border and `surface/panel` at ~85 % opacity. Important panels get a coloured border plus a soft outer glow in the same colour (see `ref-03`, `ref-04`). |
 | Kets | Every state label (\|0⟩, \|+⟩, \|−i⟩ …) uses **JetBrains Mono**. Many UI fonts do not have the ⟩ glyph. Use the real minus sign "−" (U+2212). |
@@ -120,7 +120,7 @@ A player who leaves the room or game screen without pressing Leave (the browser'
 * Left half: logo **"QUBIT ARENA"** (Display, glow) with a football swooshing around it, tagline **"Play. Learn. Master Quantum."**, one line explaining the game.
 * Menu buttons stacked on the left, 360 px wide: **Play** (Primary) · **Tutorial** · **Settings** · **About**. No "Quit" — it is a web page.
 * Right half: decorative scene. Round 4: a static CSS scene. Round 5: the 3D board in the "low cinematic" camera (visual-design §5) slowly orbiting.
-* Top right: player badge (name; level/rank only after P-6.1).
+* Top right: player badge (name and a pencil icon; click to rename. Level/rank only after P-6.1).
 * Footer: version and "Senior project · Faculty of ICT, Mahidol University".
 
 **Mode select** (`ref-03`): three cards side by side (one column on narrow screens).
@@ -199,11 +199,11 @@ Layout (1920 × 1080, fits on one screen at 1280 × 720 too): **Blue team · VS 
 | Clocks | x 1530, y 20, 360 × 96 | GAME `mm:ss` (match timer counting down), TURN `0:47` in gold with a shrinking bar; under 10 s the turn clock turns red and pulses. Draw-pile count. |
 | Blue team panel | x 30, y 140, 360 × 214 | Chips P1, P2 (seat, name, "4 cards"). Active player chip highlighted. Your **teammate's hand** is shown as small gate tags (rules.md §9). |
 | Red team panel | x 30, y 366, 360 × 184 | Chips P3, P4 with **card count only**. |
-| Gate reference | x 30, y 562, 360 × 498 | One row per card: coloured tag + its moves on the board (§8.2 "Board effect" column). |
+| Gate reference | x 30, y 562, 360 × 498 | One line per card: coloured tag, name, short label. Clicking a row opens its moves on the board (§8.2 "Board effect" column); selecting a hand card opens that card's row. The Help drawer lists every row open. |
 | Board | centre, about 1100 × 700 between the side columns | visual-design §2–§3. In 3D views a **minimap** sits in the top-left corner of the board area. |
 | Deck | x 430, y 850, 150 × 200 | Stacked card backs, "DECK 31 cards left". |
 | Hand | x 640, y 850, 4 × 150 × 210, gap 18 | §7.3. |
-| Play Card | x 1330, y 900 | Primary button "PLAY CARD", enabled only on your turn with a card selected. Caption "No passing — 1 card per turn". |
+| Play Card | x 1330, y 900 | Primary button "PLAY CARD", enabled only on your turn with a card selected. While disabled it is a dashed outline that says what it waits for: "PICK A CARD" on your turn, "NOT YOUR TURN" otherwise. Caption "No passing — 1 card per turn". |
 | Quantum state panel | x 1530, y 140, 360 × 600 | §7.4. |
 | Action log | x 1530, y 756, 360 × 150 | §7.5. |
 | Team chat | x 1530, y 920, 360 × 140 | Team mode only; header "TEAM CHAT · BLUE". Spectators and opponents never see it. |
@@ -317,7 +317,7 @@ Adapted from `ref-04-quantum-challenge.png`.
 Adapted from the right half of `ref-06`.
 
 * Small "VICTORY" / "DEFEAT" / "DRAW" (from your side's view), then **"BLUE TEAM WINS"** (or RED / "DRAW") in Display with the team colour, the final score `7 : 5`, trophy or football illustration.
-* **Reason** pill: "Reached the target score (7)", "Time's up", "All cards played", or "Quantum Challenge 3 : 2" (rules.md §8: the result screen must show the reason).
+* **Reason** pill: "Reached the target score (7)", "Time's up", "All cards played", or "Quantum Challenge 3 : 2" (rules.md §8: the result screen must show the reason). A muted line under the pill says why that decides the winner, e.g. "Tied on points, so the Quantum Challenge decided it.", so a 0 : 0 win does not look like a bug. Scores use Exo 2 tabular figures (Orbitron's zero is slashed).
 * Player stats table: seat chip, touchdowns, cards played, Measure, CNOT. Match summary: turns, entanglements, failed punts, longest time in fog.
 * Buttons: **Play Again** (same room, rematch vote), **Main Menu**, and — only while the user study is running — **Take the learning check →**.
 * Background: the 3D board in the low cinematic camera (round 5).

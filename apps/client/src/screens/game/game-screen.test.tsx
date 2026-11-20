@@ -75,11 +75,13 @@ describe('game screen (ui-spec §7)', () => {
     renderGame();
     const first = screen.getByTestId('hand-card-0');
     expect(screen.getByTestId('play-card')).toHaveProperty('disabled', true);
+    expect(screen.getByTestId('play-card').textContent).toBe('PICK A CARD');
 
     fireEvent.keyDown(window, { key: '1' });
     expect(first.getAttribute('aria-pressed')).toBe('true');
     expect(screen.getByTestId('preview-line').textContent).not.toBe('');
     expect(screen.getByTestId('play-card')).toHaveProperty('disabled', false);
+    expect(screen.getByTestId('play-card').textContent).toBe('PLAY CARD');
 
     fireEvent.keyDown(window, { key: 'Escape' });
     expect(first.getAttribute('aria-pressed')).toBe('false');
@@ -97,6 +99,7 @@ describe('game screen (ui-spec §7)', () => {
     renderGame();
     fireEvent.click(screen.getByTestId('hand-card-0'));
     expect(screen.getByTestId('play-card')).toHaveProperty('disabled', true);
+    expect(screen.getByTestId('play-card').textContent).toBe('NOT YOUR TURN');
     fireEvent.keyDown(window, { key: 'Enter' });
     expect(send).not.toHaveBeenCalled();
     expect(screen.getByTestId(`opponent-count-${solo.turn}`).getAttribute('data-count')).toBe('4');

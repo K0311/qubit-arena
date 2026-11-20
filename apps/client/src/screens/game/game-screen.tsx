@@ -187,6 +187,11 @@ export function GameScreen() {
       className={`game game--${team ? 'team' : 'solo'}${you ? '' : ' game--spectator'}`}
       data-testid="game-screen"
     >
+      {/* ui-spec §1: the stage is 16:9 and mobile is out of scope; upright, it is too small to play. */}
+      <div className="rotate-hint" role="note">
+        <span aria-hidden="true">⟳</span>
+        {en.game.rotateHint}
+      </div>
       <Stage>
         <Scoreboard score={view.score} target={view.config.targetScore} />
         <div className="game-top">
@@ -218,7 +223,7 @@ export function GameScreen() {
           {sides.map((s) => (
             <TeamPanel key={s} side={s} mode={mode} room={room} view={view} you={you} />
           ))}
-          <GateReference />
+          <GateReference focus={selected?.kind ?? null} />
         </div>
 
         <div className="game-board" data-board={use3D ? '3D' : '2D'}>
@@ -298,8 +303,14 @@ export function GameScreen() {
 
         {you && (
           <div className="game-play">
-            <Button data-testid="play-card" disabled={!canPlay} onClick={play}>
-              {en.game.playCard}
+            {/* A dim PLAY CARD looked broken; the disabled button says what it is waiting for. */}
+            <Button
+              data-testid="play-card"
+              className={canPlay ? undefined : 'game-play__idle'}
+              disabled={!canPlay}
+              onClick={play}
+            >
+              {canPlay ? en.game.playCard : myTurn ? en.game.pickCard : en.game.notYourTurn}
             </Button>
             <span className="caption">{caption}</span>
             {preview && (
@@ -325,7 +336,7 @@ export function GameScreen() {
       {view.phase === 'FINISHED' && !reveal && <ResultOverlay view={view} room={room} />}
 
       <Modal open={help} title={en.game.gateReference}>
-        <GateReference />
+        <GateReference full />
         <p className="caption">{en.game.keysHint}</p>
         <Button variant="secondary" size="small" onClick={() => setHelp(false)}>
           {en.common.back}
