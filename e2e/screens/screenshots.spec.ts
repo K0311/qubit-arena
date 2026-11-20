@@ -28,6 +28,9 @@ test('menus, lobby, room and the pages around the game', async ({ newPlayer }) =
   await expect(p.getByTestId('menu-play')).toBeVisible();
   await shot(p, '01-main-menu');
   await p.getByTestId('menu-play').click();
+  // Wait for the screen itself: shooting straight after the click caught the main menu.
+  await expect(p.getByTestId('mode-bot')).toBeVisible();
+  await p.waitForTimeout(400);
   await shot(p, '02-mode-select');
   await toLobby(p, 'solo');
   await p.waitForTimeout(800);

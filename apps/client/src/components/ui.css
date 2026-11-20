@@ -339,36 +339,118 @@
   gap: 8px;
   z-index: 60;
 }
+/* Toasts and the net banner share the glass panel look of the rest of the UI. */
 .toast {
-  padding: 12px 20px;
-  border-radius: 12px;
-  background: var(--surface-raised);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 320px;
+  max-width: 560px;
+  padding: 10px 10px 10px 14px;
+  border-radius: 14px;
+  background: rgb(11 18 54 / 0.92);
   border: 1.5px solid var(--stroke-subtle);
-  animation: fade-in 0.2s ease;
+  border-left: 4px solid var(--accent-cyan);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(6px);
+  animation: toast-in 0.25s ease;
 }
 .toast--error {
-  border-color: var(--team-red);
-  color: var(--team-red-soft);
+  border-left-color: var(--team-red);
+}
+.toast__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--bg-deep);
+  background: var(--accent-cyan);
+}
+.toast--error .toast__icon {
+  background: var(--team-red);
+  color: #fff;
+}
+.toast__text {
+  flex: 1;
+  font-size: 15px;
+  line-height: 1.4;
+}
+.toast__close {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.toast__close:hover {
+  background: rgb(255 255 255 / 0.08);
+  color: var(--text-primary);
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 }
 .net-banner {
   position: fixed;
-  top: 0;
+  top: 12px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 70;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 18px;
-  border-radius: 0 0 12px 12px;
-  background: var(--surface-raised);
-  border: 1.5px solid var(--accent-gold);
-  border-top: none;
+  gap: 14px;
+  padding: 10px 20px 10px 16px;
+  border-radius: 14px;
+  background: rgb(11 18 54 / 0.92);
+  border: 1.5px solid var(--accent-cyan);
+  box-shadow:
+    0 12px 32px rgb(0 0 0 / 0.45),
+    0 0 24px rgb(39 229 247 / 0.2);
+  backdrop-filter: blur(6px);
+  color: var(--accent-cyan);
+  animation: toast-in 0.25s ease;
+}
+.net-banner--lost {
+  border-color: var(--accent-gold);
+  box-shadow:
+    0 12px 32px rgb(0 0 0 / 0.45),
+    0 0 24px rgb(255 209 77 / 0.2);
   color: var(--accent-gold);
 }
+.net-banner__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.net-banner__text strong {
+  font-size: 15px;
+}
+.net-banner__text span {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .net-banner {
+    animation: none;
+  }
+}
 .spinner {
-  width: 14px;
-  height: 14px;
+  flex: none;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   border: 2px solid currentColor;
   border-right-color: transparent;

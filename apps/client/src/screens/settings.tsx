@@ -112,51 +112,60 @@ export function SettingsScreen() {
           />
           <Toggle label={t.tips} checked={s.tips} onChange={(tips) => set({ tips })} />
         </Panel>
-        <Panel title={t.gameplay}>
-          <Choice
-            label={t.speed}
-            value={s.speed}
-            options={[
-              { value: 0.5, label: '0.5×' },
-              { value: 1, label: '1×' },
-              { value: 2, label: '2×' },
-            ]}
-            onChange={(speed) => set({ speed })}
-          />
-          <Choice
-            label={t.ball}
-            value={s.ball}
-            options={[
-              { value: 'football', label: t.football },
-              { value: 'heart', label: t.heart },
-              { value: 'star', label: t.star },
-            ]}
-            onChange={(ball) => set({ ball })}
-            testId="settings-ball"
-          />
-        </Panel>
-        <Panel title={t.account}>
-          <form
-            className="settings-row"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setName(draft);
-            }}
-          >
-            <label className="stepper__label" htmlFor="settings-name">
-              {t.displayName}
-            </label>
-            <input
-              id="settings-name"
-              value={draft}
-              maxLength={24}
-              onChange={(e) => setDraft(e.target.value)}
+        {/* Right column: who you are first, then how the game plays. */}
+        <div className="settings-col">
+          <Panel title={t.account} className="settings-account">
+            {/* Same badge as the main menu, so the two places to set the name read as one thing. */}
+            <div className="badge settings-account__badge" aria-hidden="true">
+              <span className="caption">{en.badge.label}</span>
+              <span className="badge__name">{name}</span>
+            </div>
+            <form
+              className="settings-row"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setName(draft);
+              }}
+            >
+              <label className="stepper__label" htmlFor="settings-name">
+                {t.displayName}
+              </label>
+              <input
+                id="settings-name"
+                value={draft}
+                maxLength={24}
+                onChange={(e) => setDraft(e.target.value)}
+              />
+              <Button size="small" type="submit" disabled={draft.trim() === name}>
+                {en.badge.save}
+              </Button>
+            </form>
+            <p className="caption settings-account__note">{t.nameNote}</p>
+          </Panel>
+          <Panel title={t.gameplay}>
+            <Choice
+              label={t.speed}
+              value={s.speed}
+              options={[
+                { value: 0.5, label: '0.5×' },
+                { value: 1, label: '1×' },
+                { value: 2, label: '2×' },
+              ]}
+              onChange={(speed) => set({ speed })}
             />
-            <Button size="small" type="submit" disabled={draft.trim() === name}>
-              {en.badge.save}
-            </Button>
-          </form>
-        </Panel>
+            <Choice
+              label={t.ball}
+              value={s.ball}
+              options={[
+                { value: 'football', label: t.football },
+                { value: 'heart', label: t.heart },
+                { value: 'star', label: t.star },
+              ]}
+              onChange={(ball) => set({ ball })}
+              testId="settings-ball"
+            />
+          </Panel>
+        </div>
       </div>
     </main>
   );

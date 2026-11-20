@@ -349,6 +349,8 @@ export const en = {
     heart: 'Heart',
     star: 'Star',
     displayName: 'Display name',
+    nameNote:
+      'Shown on your badge and to other players. You can also change it from the main menu.',
     saved: 'Saved',
   },
   about: {
@@ -365,7 +367,9 @@ export const en = {
   net: {
     connecting: 'Connecting to the game server…',
     reconnecting: 'Connection lost. Reconnecting…',
+    retryNote: 'This happens automatically; no need to reload.',
   },
+  toast: { close: 'Dismiss' },
   inRoom: {
     label: (code: string) => `You are still in room ${code}`,
     leave: 'Leave',

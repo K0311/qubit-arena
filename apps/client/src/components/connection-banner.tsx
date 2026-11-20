@@ -6,9 +6,16 @@ export function ConnectionBanner() {
   const status = useGame((s) => s.status);
   if (status === 'open' || status === 'idle') return null;
   return (
-    <div className="net-banner" role="status" data-testid="net-status">
+    <div
+      className={`net-banner net-banner--${status === 'reconnecting' ? 'lost' : 'connecting'}`}
+      role="status"
+      data-testid="net-status"
+    >
       <span className="spinner" aria-hidden="true" />
-      {status === 'reconnecting' ? en.net.reconnecting : en.net.connecting}
+      <span className="net-banner__text">
+        <strong>{status === 'reconnecting' ? en.net.reconnecting : en.net.connecting}</strong>
+        <span>{en.net.retryNote}</span>
+      </span>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { en } from '../../i18n/en';
 import { useGame } from '../../state/store';
 
 const TOAST_MS = 4000;
@@ -18,7 +19,18 @@ export function Toasts() {
     <div className="toasts" role="status" aria-live="polite">
       {toasts.map((t) => (
         <div key={t.id} className={`toast toast--${t.tone}`}>
-          {t.text}
+          <span className="toast__icon" aria-hidden="true">
+            {t.tone === 'error' ? '!' : 'i'}
+          </span>
+          <span className="toast__text">{t.text}</span>
+          <button
+            type="button"
+            className="toast__close"
+            aria-label={en.toast.close}
+            onClick={() => dismiss(t.id)}
+          >
+            ×
+          </button>
         </div>
       ))}
     </div>

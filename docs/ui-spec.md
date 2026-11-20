@@ -108,7 +108,7 @@ All three fonts are on Google Fonts; self-host them with `@fontsource/*` so the 
 | 12 | Study pages | `/study/*` | built in P-7.3 from [user-study.md](user-study.md) |
 
 Phase names are the engine's: `LOBBY`, `KICKOFF`, `PLAYING`, `CHALLENGE`, `FINISHED`.
-Reconnecting, errors and "waiting for server" are shown as a toast or a full-screen dim with a spinner; they are not separate routes.
+Reconnecting, errors and "waiting for server" are shown as a toast or a banner; they are not separate routes. The net banner sits top centre (cyan while connecting, gold when the connection is lost) with a spinner and the line "This happens automatically; no need to reload." Toasts sit bottom centre as glass cards with a coloured left bar and icon (cyan `i` info, red `!` error) and a × to dismiss; they also fade after 4 s.
 A player who leaves the room or game screen without pressing Leave (the browser's Back button, a menu link) is still in the room on the server. Every other screen then shows a small bar at the bottom: "You are still in room `QX7-42`" with **Back to room** (or **Back to game** once it has started) and **Leave**.
 
 ---
@@ -123,13 +123,13 @@ A player who leaves the room or game screen without pressing Leave (the browser'
 * Top right: player badge (name and a pencil icon; click to rename. Level/rank only after P-6.1).
 * Footer: version and "Senior project · Faculty of ICT, Mahidol University".
 
-**Mode select** (`ref-03`): three cards side by side (one column on narrow screens).
+**Mode select** (`ref-03`): three cards side by side, centred in the screen height (one column on narrow screens). The icon is the match-up as team-coloured seat domes with a gold "VS", as on the board; buttons span the card width.
 
 | Card | Icon | Title | Text | Button |
 |---|---|---|---|---|
-| Blue frame | 2 people | **Solo 1v1** | "Compete against another player online." | Select |
-| Purple frame | 4 people | **Team 2v2** | "Blue P1, P2 vs Red P3, P4. Plan with your partner in team chat." | Select |
-| Cyan frame | person + robot | **Bot Arena** | "Practise against bots right away, no other players needed." | Bot level **Easy · Hard** (Hard selected), then **Solo vs Bot** · **Team with Bots** |
+| Blue frame | 1 blue VS 1 red dome | **Solo 1v1** | "Compete against another player online." | Select |
+| Purple frame | 2 blue VS 2 red domes | **Team 2v2** | "Blue P1, P2 vs Red P3, P4. Plan with your partner in team chat." | Select |
+| Cyan frame | blue VS striped red dome labelled BOT | **Bot Arena** | "Practise against bots right away, no other players needed." | Bot level **Easy · Hard** (Hard selected), then **Solo vs Bot** · **Team with Bots** |
 
 Solo and Team carry a green **ONLINE** pill; Bot Arena a cyan **VS BOT** pill. There is no local or hot-seat mode (out of scope). "Select" opens the lobby filtered to that mode. Bot Arena buttons send `BOT_GAME`: the server opens a private room "Bot Arena" with the player in P1 and bots (rules.md §10) in every other seat, and starts at once, so the game screen opens directly. In Team the player's partner P2 is a bot too.
 
@@ -332,7 +332,7 @@ Adapted from the right half of `ref-06`.
 
 ## 12. Settings (`/settings`)
 
-Personal settings only (room settings live in the room, §6). Saved in `localStorage`. None of them change the game state.
+Personal settings only (room settings live in the room, §6). Saved in `localStorage`. None of them change the game state. Two columns: Display on the left; Account (with the same player badge as the main menu) and Gameplay stacked on the right.
 
 | Group | Setting | Default |
 |---|---|---|

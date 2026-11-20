@@ -217,30 +217,97 @@ button.badge:hover {
 
 /* ---- mode select ---- */
 .mode-grid {
+  /* Fill the screen height and centre the cards; they used to sit in the top half. */
+  flex: 1;
   display: grid;
-  grid-template-columns: repeat(3, minmax(260px, 440px));
+  grid-template-columns: repeat(3, minmax(260px, 460px));
   justify-content: center;
+  align-content: center;
   gap: var(--space-6);
-  margin-top: var(--space-6);
 }
 .mode-card {
+  min-height: 480px;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
   align-items: flex-start;
   padding: var(--space-6);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.mode-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 0.35);
 }
 .mode-card .pill {
   align-self: flex-end;
 }
-.mode-card__icon {
-  font-size: 40px;
-  letter-spacing: 4px;
+.mode-card h2 {
+  margin: 0;
+  font-size: 30px;
 }
 .mode-card p {
+  margin: 0;
+  font-size: 16px;
   color: var(--text-muted);
-  line-height: 1.5;
+  line-height: 1.55;
   flex: 1;
+}
+.mode-card > .btn {
+  width: 100%;
+}
+.mode-screen {
+  min-height: 100vh;
+}
+.mode-card__buttons {
+  width: 100%;
+  display: grid;
+  gap: var(--space-3);
+}
+.mode-card__buttons .btn {
+  width: 100%;
+}
+.mode-seats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: var(--space-3) 0;
+}
+.mode-seat {
+  position: relative;
+  width: 44px;
+  height: 40px;
+  border-radius: 50% 50% 42% 42%;
+}
+.mode-seat--blue {
+  background: #3f7cf0;
+  box-shadow: 0 0 16px #3f7cf088;
+}
+.mode-seat--red {
+  background: #e0505c;
+  box-shadow: 0 0 16px #e0505c88;
+}
+.mode-seat--bot {
+  background: repeating-linear-gradient(135deg, #e0505c 0 6px, #b93a46 6px 12px);
+  box-shadow: 0 0 16px #e0505c88;
+}
+.mode-seat span {
+  position: absolute;
+  left: 50%;
+  bottom: -18px;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+.mode-seats__vs {
+  margin: 0 6px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--accent-gold);
 }
 
 /* Lobby (§5) lives in lobby.css; the form helpers below are shared. */
@@ -279,9 +346,30 @@ button.badge:hover {
 }
 .settings-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  /* Two balanced columns: Display on the left, Account and Gameplay stacked on the right. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-4);
   align-items: start;
+}
+.settings-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.settings-account__badge {
+  width: fit-content;
+  cursor: default;
+  margin-bottom: var(--space-3);
+}
+.settings-account__note {
+  margin: var(--space-2) 0 0;
+  text-transform: none;
+  letter-spacing: 0;
+}
+@media (max-width: 800px) {
+  .settings-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .settings-grid .toggle {
   display: flex;
@@ -350,11 +438,22 @@ button.badge:hover {
 .about__heading {
   margin-top: var(--space-5);
 }
+.about__intro p {
+  margin: 0;
+  max-width: 900px;
+  font-size: 18px;
+  line-height: 1.6;
+}
+.about__intro p + p {
+  margin-top: var(--space-3);
+  font-size: 14px;
+}
 .about__cards {
+  /* Fixed card columns, centred: auto-fill 1fr left wide gaps between the 300px cards. */
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  justify-items: center;
-  gap: var(--space-5);
+  grid-template-columns: repeat(auto-fill, 300px);
+  justify-content: center;
+  gap: 36px 40px;
   margin-top: var(--space-4);
 }
 .about__footer {
