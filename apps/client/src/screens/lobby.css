@@ -64,10 +64,12 @@
 }
 .lobby-room {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 120px 150px 130px 110px 110px;
+  /* The name keeps at least 140px: with the side panels at full width, wider fixed columns
+     squeezed it to a few letters per line. Players fits four seat dots plus "3/4". */
+  grid-template-columns: minmax(140px, 1fr) 92px 140px 100px 84px 132px;
   align-items: center;
-  gap: var(--space-4);
-  padding: 16px 24px;
+  gap: 8px;
+  padding: 16px 18px;
   border-radius: 16px;
   background: var(--surface-raised);
   border: 1.5px solid var(--stroke-subtle);
@@ -76,7 +78,7 @@
   background: #16225c88;
 }
 .lobby-room--head {
-  padding: 0 24px;
+  padding: 0 18px;
   background: none;
   border: 0;
 }
@@ -90,13 +92,12 @@
   font-size: 19px;
   line-height: 1.25;
   overflow: hidden;
-  overflow-wrap: anywhere;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .lobby-room .btn {
   width: 100%;
+  white-space: nowrap;
 }
 .seat-dots {
   display: inline-flex;
@@ -196,6 +197,10 @@
   gap: var(--space-4);
   margin-top: var(--space-4);
 }
+/* A lobby opened for one mode shows one tile; let it use the whole row. */
+.quick-tiles > :only-child {
+  grid-column: 1 / -1;
+}
 .quick-tile {
   display: flex;
   flex-direction: column;
@@ -244,7 +249,7 @@
     grid-template-columns: minmax(0, 1fr) 380px;
   }
   .lobby-room {
-    grid-template-columns: minmax(0, 1fr) 110px 130px 110px 100px;
+    grid-template-columns: minmax(140px, 1fr) 92px 140px 84px 132px;
     gap: var(--space-3);
     padding: 12px 16px;
   }

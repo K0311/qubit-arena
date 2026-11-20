@@ -109,6 +109,7 @@ All three fonts are on Google Fonts; self-host them with `@fontsource/*` so the 
 
 Phase names are the engine's: `LOBBY`, `KICKOFF`, `PLAYING`, `CHALLENGE`, `FINISHED`.
 Reconnecting, errors and "waiting for server" are shown as a toast or a full-screen dim with a spinner; they are not separate routes.
+A player who leaves the room or game screen without pressing Leave (the browser's Back button, a menu link) is still in the room on the server. Every other screen then shows a small bar at the bottom: "You are still in room `QX7-42`" with **Back to room** (or **Back to game** once it has started) and **Leave**.
 
 ---
 
@@ -136,11 +137,11 @@ Solo and Team carry a green **ONLINE** pill; Bot Arena a cyan **VS BOT** pill. T
 
 Fills the screen at 1920 × 1080 and fits on one screen at 1280 × 720 (there the Match column and the quick match hint are hidden).
 
-* Header: small caption "Find a game", title "LOBBY" top left, "← Back" top right.
+* Header: small caption "Find a game", title "LOBBY" top left with a pill for the mode chosen on mode select (Solo 1v1 or Team 2v2), "← Back" top right. The player picked the mode on the screen before, so the lobby does not ask again: with `?mode=` set, the filter pills, the second quick match tile and the mode switch in Create room are hidden. `/lobby` without a mode (old links) shows all of them.
 * Left (fills the height): **Open rooms** panel. Its head: title, a room count pill ("2 rooms"), a green "Live · updates every 3 s" dot (the list is asked for again every 3 s) and the filter pills **All · Solo 1v1 · Team 2v2**.
-  * Each room is a row card: name (up to two lines) with its code in Ket font, Mode pill, Players as one dome-shaped dot per seat (filled cyan for each player, dashed when free — the room list only has a count, so the dots do not show teams) plus `n/4`, Match (`7 pts · 15:00`), Status pill (Waiting = green, Playing = grey), button **Join** (primary) or **Watch** (spectate public rooms, rules.md §10). Rooms being played are drawn dimmer.
-  * No rooms: a small ring of the six state domes around a dashed ball spot, "No open rooms right now", one line on what to do, and **Create room** (focuses the room name field on the right) and **Practise in Bot Arena** (opens mode select, §4).
-* Right (w 600): **Quick match** panel (cyan border) with two tiles **Solo 1v1** (2 players) and **Team 2v2** (4 players · team chat), each with seat dots in team colours; **Create room** (mode, public/private, name, **Create room**); **Join by code** (code input in Ket font, e.g. `QX7-42`).
+  * Each room is a row card: name (one line, cut with "…", full name on hover) with its code in Ket font, Mode pill, Players as one dome-shaped dot per seat (filled cyan for each player, dashed when free — the room list only has a count, so the dots do not show teams) plus `n/4`, Match (`7 pts · 15:00`), Status pill (Waiting = green, Playing = grey), button **Join** (primary) or **Watch** (spectate public rooms, rules.md §10); on the player's own room it reads **Back to room** / **Back to game** and opens it. Rooms being played are drawn dimmer.
+  * No rooms: a small ring of the six state domes around a dashed ball spot, "No open rooms right now" and one line on what to do. No buttons here: Create room and quick match are already on the right, and Bot Arena is on mode select (§4).
+* Right (w 600): **Quick match** panel (cyan border) with a tile for the chosen mode, **Solo 1v1** (2 players) or **Team 2v2** (4 players · team chat), or both when no mode is set, each with seat dots in team colours; **Create room** (mode, public/private, name, **Create room**); **Join by code** (code input in Ket font, e.g. `QX7-42`).
 
 ## 6. Room (`/room/:code`)
 

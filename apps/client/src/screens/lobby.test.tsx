@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import { defaultConfig } from '@qa/engine';
-import type { RoomSummary, ServerMessage } from '@qa/protocol';
+import type { Room, RoomSummary, ServerMessage } from '@qa/protocol';
 
 const send = vi.fn();
 vi.mock('../net/connection', () => ({ connection: vi.fn(), send: (m: unknown) => send(m) }));
@@ -26,10 +26,10 @@ function Where() {
   return <span data-testid="where">{useLocation().pathname}</span>;
 }
 
-function showLobby(rooms: RoomSummary[]) {
+function showLobby(rooms: RoomSummary[], path = '/lobby') {
   useGame.getState().receive({ type: 'ROOM_LIST', rooms } as ServerMessage);
   render(
-    <MemoryRouter initialEntries={['/lobby']}>
+    <MemoryRouter initialEntries={[path]}>
       <Routes>
         <Route path="/lobby" element={<Lobby />} />
         <Route path="*" element={<Where />} />
@@ -38,7 +38,10 @@ function showLobby(rooms: RoomSummary[]) {
   );
 }
 
-beforeEach(() => send.mockClear());
+beforeEach(() => {
+  send.mockClear();
+  useGame.setState({ room: null });
+});
 
 describe('Lobby (ui-spec §5)', () => {
   it('lists each room as a row with its seats filled, and Join or Watch', () => {
@@ -61,18 +64,45 @@ describe('Lobby (ui-spec §5)', () => {
     expect(screen.getByTestId('room-row-ZZ1-08-join').textContent).toBe('Watch');
   });
 
-  it('with no rooms, invites the player to create one', async () => {
+  it('with no rooms, points to the panels on the right without repeating their buttons', () => {
     showLobby([]);
     expect(screen.getByTestId('lobby-empty').textContent).toMatch(/no open rooms/i);
     expect(screen.getByTestId('lobby-room-count').textContent).toMatch(/0 rooms/);
-    await act(async () => fireEvent.click(screen.getByTestId('lobby-empty-create')));
-    expect(document.activeElement).toBe(screen.getByTestId('lobby-room-name'));
+    expect(screen.getByTestId('lobby-empty').querySelector('button')).toBeNull();
+    expect(screen.getAllByRole('button', { name: 'Create room' })).toHaveLength(1);
   });
 
-  it('with no rooms, offers Bot Arena practice on the mode select screen', () => {
-    showLobby([]);
-    fireEvent.click(screen.getByTestId('lobby-empty-bots'));
-    expect(screen.getByTestId('where').textContent).toBe('/play');
+  it('a lobby opened for one mode offers only that mode', () => {
+    showLobby([], '/lobby?mode=solo');
+    expect(screen.queryByRole('tablist')).toBeNull();
+    expect(screen.queryByRole('radiogroup', { name: 'Mode' })).toBeNull();
+    expect(screen.getByTestId('lobby-mode').textContent).toBe('Solo 1v1');
+    expect(screen.getByTestId('lobby-quick-solo')).toBeTruthy();
+    expect(screen.queryByTestId('lobby-quick-team')).toBeNull();
+    fireEvent.click(screen.getByTestId('lobby-create'));
+    expect(send).toHaveBeenLastCalledWith(
+      expect.objectContaining({ type: 'CREATE_ROOM', mode: 'SOLO' }),
+    );
+  });
+
+  it('a Team lobby creates Team rooms and asks only for Team rooms', () => {
+    useGame.setState({ status: 'open' });
+    showLobby([], '/lobby?mode=team');
+    expect(send).toHaveBeenCalledWith({ type: 'LIST_ROOMS', mode: 'TEAM' });
+    fireEvent.click(screen.getByTestId('lobby-create'));
+    expect(send).toHaveBeenLastCalledWith(
+      expect.objectContaining({ type: 'CREATE_ROOM', mode: 'TEAM' }),
+    );
+  });
+
+  it('Join on the room the player is already in goes back to that room', () => {
+    useGame.setState({ room: { code: 'QX7-42', status: 'WAITING' } as Room });
+    showLobby([summary({})]);
+    expect(screen.getByTestId('room-row-QX7-42-join').textContent).toBe('Back to room');
+    send.mockClear();
+    fireEvent.click(screen.getByTestId('room-row-QX7-42-join'));
+    expect(send).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'JOIN_ROOM' }));
+    expect(screen.getByTestId('where').textContent).toBe('/room/QX7-42');
   });
 
   it('quick match tiles still send QUICK_MATCH', () => {

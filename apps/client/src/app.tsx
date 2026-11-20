@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router';
 import { SpaceBackground } from './components/space-background';
 import { ConnectionBanner } from './components/connection-banner';
+import { InRoomBar } from './components/in-room-bar';
 import { Toasts } from './components/ui/toast';
 import { connection } from './net/connection';
 import { useGame } from './state/store';
@@ -48,6 +49,7 @@ export function App() {
     <div className="app">
       <SpaceBackground />
       <ConnectionBanner />
+      <InRoomBar />
       <RouteSync />
       <Routes>
         <Route path="/" element={<MainMenu />} />
