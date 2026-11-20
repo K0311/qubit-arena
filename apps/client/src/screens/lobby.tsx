@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import type { Mode } from '@qa/engine';
 import type { RoomSummary } from '@qa/protocol';
+import { roomPath } from '../components/in-room-bar';
 import { Button } from '../components/ui/button';
 import { Panel } from '../components/ui/panel';
 import { Pill } from '../components/ui/pill';
@@ -37,14 +38,19 @@ function SeatDots({ filled, seats }: { filled: number; seats: number }) {
 
 function RoomRow({ r }: { r: RoomSummary }) {
   const [name] = usePlayerName();
+  const mine = useGame((s) => s.room);
+  const navigate = useNavigate();
   const open = r.status === 'WAITING' && r.players < r.seats;
+  // Our own room shows up in the list after the browser's Back button; joining it again only
+  // earns an error, so the button takes the player back to it instead.
+  const isMine = mine?.code === r.code;
   return (
     <li
       className={`lobby-room ${open ? '' : 'lobby-room--live'}`}
       data-testid={`room-row-${r.code}`}
     >
       <div className="lobby-room__name">
-        <strong>{r.name}</strong>
+        <strong title={r.name}>{r.name}</strong>
         <span className="ket muted small">{r.code}</span>
       </div>
       <span>
@@ -60,21 +66,31 @@ function RoomRow({ r }: { r: RoomSummary }) {
           {r.status === 'WAITING' ? en.lobby.waiting : en.lobby.playing}
         </Pill>
       </span>
-      <Button
-        size="small"
-        variant={open ? 'primary' : 'secondary'}
-        data-testid={`room-row-${r.code}-join`}
-        onClick={() =>
-          send({
-            type: 'JOIN_ROOM',
-            code: r.code,
-            role: open ? 'PLAYER' : 'SPECTATOR',
-            playerName: name,
-          })
-        }
-      >
-        {open ? en.lobby.join : en.lobby.watch}
-      </Button>
+      {isMine ? (
+        <Button
+          size="small"
+          data-testid={`room-row-${r.code}-join`}
+          onClick={() => navigate(roomPath(mine.code, mine.status))}
+        >
+          {mine.status === 'WAITING' ? en.lobby.backToRoom : en.lobby.backToGame}
+        </Button>
+      ) : (
+        <Button
+          size="small"
+          variant={open ? 'primary' : 'secondary'}
+          data-testid={`room-row-${r.code}-join`}
+          onClick={() =>
+            send({
+              type: 'JOIN_ROOM',
+              code: r.code,
+              role: open ? 'PLAYER' : 'SPECTATOR',
+              playerName: name,
+            })
+          }
+        >
+          {open ? en.lobby.join : en.lobby.watch}
+        </Button>
+      )}
     </li>
   );
 }
@@ -104,17 +120,8 @@ function EmptyRing() {
   );
 }
 
-function RoomList({
-  filter,
-  rooms,
-  onCreate,
-}: {
-  filter: Filter;
-  rooms: RoomSummary[] | null;
-  onCreate: () => void;
-}) {
+function RoomList({ filter, rooms }: { filter: Filter; rooms: RoomSummary[] | null }) {
   const status = useGame((s) => s.status);
-  const navigate = useNavigate();
 
   // The server has no lobby push yet, so ask again every few seconds while the list is open.
   useEffect(() => {
@@ -133,18 +140,6 @@ function RoomList({
         <EmptyRing />
         <h2>{en.lobby.emptyTitle}</h2>
         <p className="muted">{en.lobby.emptyBody}</p>
-        <div className="row">
-          <Button data-testid="lobby-empty-create" onClick={onCreate}>
-            {en.lobby.emptyCreate}
-          </Button>
-          <Button
-            variant="secondary"
-            data-testid="lobby-empty-bots"
-            onClick={() => navigate('/play')}
-          >
-            {en.lobby.emptyBots}
-          </Button>
-        </div>
       </div>
     );
   }
@@ -190,27 +185,27 @@ function QuickTile({ mode }: { mode: Mode }) {
   );
 }
 
-function SidePanels({
-  defaultMode,
-  nameRef,
-}: {
-  defaultMode: Mode;
-  nameRef: RefObject<HTMLInputElement>;
-}) {
+/**
+ * `locked` is the mode picked on the mode select screen. The player already chose it there, so
+ * the lobby does not ask again: only that quick match tile, and no mode switch when creating.
+ */
+function SidePanels({ locked }: { locked: Mode | undefined }) {
   const [name] = usePlayerName();
-  const [mode, setMode] = useState<Mode>(defaultMode);
+  const [picked, setPicked] = useState<Mode>('SOLO');
+  const mode = locked ?? picked;
   const [visibility, setVisibility] = useState<'PUBLIC' | 'PRIVATE'>('PUBLIC');
   const [roomName, setRoomName] = useState(en.lobby.defaultRoomName(name).slice(0, 40));
   const [code, setCode] = useState('');
-  useEffect(() => setMode(defaultMode), [defaultMode]);
+  const quickModes: Mode[] = locked ? [locked] : ['SOLO', 'TEAM'];
 
   return (
     <div className="lobby__side">
       <Panel title={en.lobby.quick} accent="cyan">
         <p className="muted">{en.lobby.quickHint}</p>
         <div className="quick-tiles">
-          <QuickTile mode="SOLO" />
-          <QuickTile mode="TEAM" />
+          {quickModes.map((m) => (
+            <QuickTile key={m} mode={m} />
+          ))}
         </div>
       </Panel>
 
@@ -229,20 +224,22 @@ function SidePanels({
           }}
         >
           <div className="row wrap">
-            <div className="segmented" role="radiogroup" aria-label={en.lobby.modeCol}>
-              {(['SOLO', 'TEAM'] as const).map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  role="radio"
-                  aria-checked={mode === m}
-                  className={mode === m ? 'is-on' : ''}
-                  onClick={() => setMode(m)}
-                >
-                  {en.modes[m]}
-                </button>
-              ))}
-            </div>
+            {!locked && (
+              <div className="segmented" role="radiogroup" aria-label={en.lobby.modeCol}>
+                {(['SOLO', 'TEAM'] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    role="radio"
+                    aria-checked={mode === m}
+                    className={mode === m ? 'is-on' : ''}
+                    onClick={() => setPicked(m)}
+                  >
+                    {en.modes[m]}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="segmented" role="radiogroup" aria-label="Visibility">
               {(['PUBLIC', 'PRIVATE'] as const).map((v) => (
                 <button
@@ -261,7 +258,6 @@ function SidePanels({
           <label className="field">
             <span className="caption">{en.lobby.roomName}</span>
             <input
-              ref={nameRef}
               value={roomName}
               maxLength={40}
               onChange={(e) => setRoomName(e.target.value)}
@@ -306,9 +302,9 @@ export function Lobby() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const rooms = useGame((s) => s.roomList);
-  const nameRef = useRef<HTMLInputElement>(null);
   const raw = params.get('mode');
   const filter: Filter = raw === 'solo' || raw === 'team' ? raw : 'all';
+  const locked = toMode(filter);
   const filters: { id: Filter; label: string }[] = [
     { id: 'all', label: en.lobby.all },
     { id: 'solo', label: en.lobby.solo },
@@ -319,7 +315,14 @@ export function Lobby() {
       <header className="screen__header lobby__header">
         <div>
           <div className="caption lobby__kicker">{en.lobby.kicker}</div>
-          <h1>{en.lobby.title}</h1>
+          <div className="row">
+            <h1>{en.lobby.title}</h1>
+            {locked && (
+              <span data-testid="lobby-mode">
+                <Pill tone={locked === 'SOLO' ? 'blue' : 'purple'}>{en.modes[locked]}</Pill>
+              </span>
+            )}
+          </div>
         </div>
         <Button variant="secondary" size="small" onClick={() => navigate('/play')}>
           {en.common.back}
@@ -341,25 +344,27 @@ export function Lobby() {
                 <i aria-hidden="true" />
                 {en.lobby.live}
               </span>
-              <div className="segmented" role="tablist">
-                {filters.map((f) => (
-                  <button
-                    key={f.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={filter === f.id}
-                    className={filter === f.id ? 'is-on' : ''}
-                    onClick={() => setParams(f.id === 'all' ? {} : { mode: f.id })}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
+              {!locked && (
+                <div className="segmented" role="tablist">
+                  {filters.map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={filter === f.id}
+                      className={filter === f.id ? 'is-on' : ''}
+                      onClick={() => setParams(f.id === 'all' ? {} : { mode: f.id })}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-          <RoomList filter={filter} rooms={rooms} onCreate={() => nameRef.current?.focus()} />
+          <RoomList filter={filter} rooms={rooms} />
         </Panel>
-        <SidePanels defaultMode={toMode(filter) ?? 'SOLO'} nameRef={nameRef} />
+        <SidePanels locked={locked} />
       </div>
     </main>
   );

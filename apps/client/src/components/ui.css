@@ -379,3 +379,22 @@
     transform: rotate(360deg);
   }
 }
+
+/* "You are still in room …" (in-room-bar.tsx). Top centre, where the screen headers leave room;
+   the net banner sits above it at top 0 when the connection drops. */
+.in-room-bar {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 65;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px 10px 20px;
+  border-radius: 14px;
+  background: var(--surface-raised);
+  border: 1.5px solid var(--accent-cyan);
+  box-shadow: 0 8px 28px #00000080;
+  white-space: nowrap;
+}

@@ -54,9 +54,9 @@ export const en = {
     playing: 'Playing',
     emptyTitle: 'No open rooms right now',
     emptyBody:
-      'Open a room and share its code, or use quick match and the next player who looks will find you.',
-    emptyCreate: 'Create room',
-    emptyBots: 'Practise in Bot Arena',
+      'Create a room on the right and share its code, or use quick match and the next player who looks will find you.',
+    backToRoom: 'Back to room',
+    backToGame: 'Back to game',
     quick: 'Quick match',
     quickHint: 'Join the first open public room, or open a new one.',
     soloPlayers: '2 players',
@@ -356,6 +356,10 @@ export const en = {
   net: {
     connecting: 'Connecting to the game server…',
     reconnecting: 'Connection lost. Reconnecting…',
+  },
+  inRoom: {
+    label: (code: string) => `You are still in room ${code}`,
+    leave: 'Leave',
   },
   modes: { SOLO: 'Solo 1v1', TEAM: 'Team 2v2' },
 } as const;
