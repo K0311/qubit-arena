@@ -279,7 +279,7 @@ Adapted from `ref-02-gate-cards.png`. Same frame style for every card; only the 
 6. "Effect" box — **board moves** generated from the engine (not matrix algebra).
 7. Footer keyword in caps.
 
-At hand size, show 1, 2, 3 and 7 plus the preview line (`H → |+⟩`); the full card appears on hover and in the card library.
+At hand size, show 1, 2, 3 and 7 plus the preview line (`H → |+⟩`). Hovering a hand card for 600 ms shows a compact tip (240 px: tag, name, small Bloch sphere, rotation text, board effect) above it; it is hidden while the card is selected, so the board's preview path stays in view. The full detail card is in the card library.
 
 ### 8.2 Card text (checked against rules.md §3.2 and §4)
 
@@ -320,7 +320,7 @@ Adapted from the right half of `ref-06`.
 * **Reason** pill: "Reached the target score (7)", "Time's up", "All cards played", or "Quantum Challenge 3 : 2" (rules.md §8: the result screen must show the reason). A muted line under the pill says why that decides the winner, e.g. "Tied on points, so the Quantum Challenge decided it.", so a 0 : 0 win does not look like a bug. Scores use Exo 2 tabular figures (Orbitron's zero is slashed).
 * Player stats table: seat chip, touchdowns, cards played, Measure, CNOT. Match summary: turns, entanglements, failed punts, longest time in fog.
 * Buttons: **Play Again** (same room, rematch vote), **Main Menu**, and — only while the user study is running — **Take the learning check →**.
-* Background: the 3D board in the low cinematic camera (round 5).
+* Background: the 3D board, grown to the whole screen, in the low cinematic camera; the HUD fades out (2D board: the dimmed game screen).
 
 ## 11. Tutorial (`/tutorial/:lesson`)
 
@@ -359,6 +359,9 @@ The board animations are in **visual-design §4** (hop along the edge, Bloch vec
 | Score change | Score number ticks up with a short glow | 600 ms |
 | Turn change | Active pill slides along the turn bar | 300 ms |
 | Overlay open | Challenge / Result fade and scale in | 300 ms |
+| Your turn starts | "YOUR TURN · Pick a card from your hand" toast over the top of the board, shown once the board has finished animating (opening roll, the opponent's move); hand cards pulse a cyan glow until one is selected | 1.6 s toast; glow loops |
+| Screen change | Each route fades in (opacity only) | 220 ms |
+| Result | The 3D board grows to the whole stage, the HUD fades, the camera moves to Low | 600 ms |
 
 ## 14. Test ids (for Playwright)
 

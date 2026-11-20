@@ -151,7 +151,7 @@
   line-height: 1.45;
 }
 
-/* Full card on hover (ui-spec §8.1), above the hand. */
+/* Hover tip above a hand card (ui-spec §8.1). */
 .gate-card-slot {
   position: relative;
 }
@@ -170,7 +170,55 @@
 .gate-card-slot:hover .gate-card__hover {
   opacity: 1;
   transform: translateX(-50%) scale(1);
-  transition-delay: 350ms;
+  /* Long enough that sweeping the mouse along the hand does not flash tips. */
+  transition-delay: 600ms;
+}
+.gate-tip {
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid color-mix(in srgb, var(--gate) 70%, transparent);
+  background: rgb(11 18 54 / 0.96);
+  box-shadow:
+    0 10px 30px rgb(0 0 0 / 0.5),
+    0 0 18px color-mix(in srgb, var(--gate) 30%, transparent);
+}
+.gate-tip__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gate-tip__name {
+  font-size: 14px;
+  font-weight: 700;
+}
+.gate-tip__body {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+.gate-tip .gate-card__bloch {
+  width: 56px;
+  height: 56px;
+}
+.gate-tip__text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+.gate-tip__effect {
+  margin: 0;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgb(6 10 34 / 0.7);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.45;
 }
 
 .card-back {

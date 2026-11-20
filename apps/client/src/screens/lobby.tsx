@@ -4,6 +4,7 @@ import type { Mode } from '@qa/engine';
 import type { RoomSummary } from '@qa/protocol';
 import { roomPath } from '../components/in-room-bar';
 import { Button } from '../components/ui/button';
+import { SkeletonRows } from '../components/ui/loader';
 import { Panel } from '../components/ui/panel';
 import { Pill } from '../components/ui/pill';
 import { en } from '../i18n/en';
@@ -133,7 +134,7 @@ function RoomList({ filter, rooms }: { filter: Filter; rooms: RoomSummary[] | nu
     return () => clearInterval(t);
   }, [filter, status]);
 
-  if (!rooms) return <p className="muted">{en.common.loading}</p>;
+  if (!rooms) return <SkeletonRows />;
   if (rooms.length === 0) {
     return (
       <div className="lobby-empty" data-testid="lobby-empty">

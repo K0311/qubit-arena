@@ -192,6 +192,11 @@
   overflow: auto;
   animation: overlay-in calc(300ms / var(--anim-speed, 1)) ease;
 }
+.overlay--result {
+  /* Lighter and unblurred: the cinematic board behind it is part of the screen. */
+  background: radial-gradient(ellipse at center, rgb(4 6 20 / 0.35), rgb(4 6 20 / 0.7));
+  backdrop-filter: none;
+}
 @keyframes overlay-in {
   from {
     opacity: 0;

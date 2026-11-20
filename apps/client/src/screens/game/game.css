@@ -355,6 +355,31 @@
   width: 1100px;
   height: 700px;
 }
+/* Result (ui-spec §10): the board grows to the whole stage and the HUD fades, so the low
+   cinematic camera is the background of the result card. */
+.game-board {
+  transition:
+    left 600ms ease,
+    top 600ms ease,
+    width 600ms ease,
+    height 600ms ease;
+}
+.game--result .game-board {
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  border-radius: 0;
+}
+.game--result .stage > :not(.game-board) {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 400ms ease;
+}
+.game--result .board-minimap,
+.game--result .board-cams {
+  display: none;
+}
 .game-over {
   position: absolute;
   left: 50%;
@@ -458,8 +483,9 @@
   left: 1530px;
   top: 140px;
   width: 360px;
-  /* Sized to its content; the room it used to leave empty goes to the action log. */
-  height: 530px;
+  /* Fits its tallest content (global phase rows, or the entangled pair note) without clipping
+     the hint; 530 cut it off. */
+  height: 590px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -504,15 +530,15 @@
 
 .game-log {
   left: 1530px;
-  top: 686px;
+  top: 746px;
   width: 360px;
-  height: 220px;
+  height: 160px;
   display: flex;
   flex-direction: column;
 }
 .game--solo .game-log,
 .game--spectator .game-log {
-  height: 374px;
+  height: 314px;
 }
 .log {
   flex: 1;
@@ -595,6 +621,81 @@
   .hud-banner__text {
     animation: none;
   }
+}
+
+/* ---- your turn: toast over the board, glow on the hand ---- */
+.turn-toast {
+  left: 960px;
+  top: 190px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 36px;
+  border-radius: 16px;
+  border: 1.5px solid var(--accent-cyan);
+  background: rgb(6 10 34 / 0.85);
+  box-shadow: 0 0 40px rgb(39 229 247 / 0.35);
+  pointer-events: none;
+  transform: translateX(-50%);
+  animation: turn-toast 1600ms ease forwards;
+}
+.turn-toast strong {
+  font-family: var(--font-display);
+  font-size: 30px;
+  letter-spacing: 0.12em;
+  color: var(--accent-cyan);
+  text-shadow: 0 0 18px rgb(39 229 247 / 0.6);
+}
+.turn-toast span {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+@keyframes turn-toast {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px) scale(0.94);
+  }
+  15%,
+  80% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+.game-hand.is-my-turn .gate-card--hand:not(.is-selected) {
+  animation: hand-glow 2.2s ease-in-out infinite;
+}
+@keyframes hand-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgb(39 229 247 / 0);
+  }
+  50% {
+    box-shadow:
+      0 0 22px rgb(39 229 247 / 0.45),
+      0 0 0 1.5px rgb(39 229 247 / 0.6);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .turn-toast {
+    animation: none;
+  }
+  .game-hand.is-my-turn .gate-card--hand:not(.is-selected) {
+    animation: none;
+    box-shadow: 0 0 14px rgb(39 229 247 / 0.4);
+  }
+}
+:root[data-motion='reduce'] .turn-toast {
+  animation: none;
+}
+:root[data-motion='reduce'] .game-hand.is-my-turn .gate-card--hand:not(.is-selected) {
+  animation: none;
+  box-shadow: 0 0 14px rgb(39 229 247 / 0.4);
 }
 
 /* ---- dice and flying card (visual-design §4, ui-spec §13) ---- */

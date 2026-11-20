@@ -105,6 +105,47 @@ export function Banner({ rows, logLength }: { rows: readonly LogRow[]; logLength
   );
 }
 
+const TURN_TOAST_MS = 1600;
+
+/**
+ * A short "YOUR TURN" toast when the turn comes to this player. The turn bar alone was easy to
+ * miss while watching the board. It waits until the board has finished animating (the opening
+ * roll, the opponent's move), so it does not cover them; `isBusy` comes from the animation player.
+ */
+export function TurnToast({ active, isBusy }: { active: boolean; isBusy?: () => boolean }) {
+  // Armed on mount when it is already our turn (the first turn after the opening roll) and on
+  // every turn that comes to us later.
+  const [armed, setArmed] = useState(active);
+  const [show, setShow] = useState(false);
+  const [prev, setPrev] = useState(active);
+  if (active !== prev) {
+    setPrev(active);
+    setArmed(active);
+    if (!active) setShow(false);
+  }
+  useEffect(() => {
+    if (!armed) return;
+    const id = setInterval(() => {
+      if (isBusy?.()) return;
+      setArmed(false);
+      setShow(true);
+    }, 150);
+    return () => clearInterval(id);
+  }, [armed, isBusy]);
+  useEffect(() => {
+    if (!show) return;
+    const id = setTimeout(() => setShow(false), TURN_TOAST_MS);
+    return () => clearTimeout(id);
+  }, [show]);
+  if (!show) return null;
+  return (
+    <div className="turn-toast" role="status" data-testid="turn-toast">
+      <strong>{en.game.yourTurn}</strong>
+      <span>{en.game.yourTurnHint}</span>
+    </div>
+  );
+}
+
 /** ui-spec §7.1 Clocks: match clock, turn clock with a shrinking bar, red under 10 s. */
 export function Clocks({
   gameMs,

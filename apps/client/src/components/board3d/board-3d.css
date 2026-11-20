@@ -62,6 +62,9 @@
 .b3d-gate.is-playable {
   color: var(--text-primary);
 }
+.b3d-gate.is-dim {
+  opacity: 0.35;
+}
 .b3d-gate.is-lit {
   color: var(--accent-gold);
 }

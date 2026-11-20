@@ -398,3 +398,117 @@
   box-shadow: 0 8px 28px #00000080;
   white-space: nowrap;
 }
+
+/* ---- loading ---- */
+.loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  color: var(--text-muted);
+}
+.loader--large {
+  min-height: 60vh;
+  justify-content: center;
+}
+.loader__ring {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  animation: loader-spin 2.4s linear infinite;
+}
+.loader--small .loader__ring {
+  width: 44px;
+  height: 44px;
+}
+.loader__ring i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px currentColor;
+  /* Six dots, 60° apart, each pulsing a little after the last. */
+  transform: rotate(calc(var(--i) * 60deg)) translateY(-28px);
+  animation: loader-pulse 1.2s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.2s);
+}
+.loader--small .loader__ring i {
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  transform: rotate(calc(var(--i) * 60deg)) translateY(-17px);
+}
+.loader__label {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+@keyframes loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes loader-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.skeleton-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.skeleton-row {
+  height: 72px;
+  border-radius: 16px;
+  border: 1.5px solid var(--stroke-subtle);
+  background: linear-gradient(
+    90deg,
+    var(--surface-raised) 0%,
+    rgb(39 229 247 / 0.08) 50%,
+    var(--surface-raised) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton 1.4s ease-in-out infinite;
+}
+@keyframes skeleton {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+/* ---- route change: a short fade. Opacity only, so fixed-position screens (the game) are not
+   pulled into a transformed containing block. ---- */
+.route-fade {
+  animation: route-fade 220ms ease-out;
+}
+@keyframes route-fade {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-fade,
+  .loader__ring,
+  .loader__ring i,
+  .skeleton-row {
+    animation: none;
+  }
+}
+:root[data-motion='reduce'] .route-fade,
+:root[data-motion='reduce'] .loader__ring,
+:root[data-motion='reduce'] .loader__ring i,
+:root[data-motion='reduce'] .skeleton-row {
+  animation: none;
+}

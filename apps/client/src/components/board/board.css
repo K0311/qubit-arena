@@ -39,6 +39,12 @@
   stroke-width: 2.6;
   filter: drop-shadow(0 0 3px var(--accent-gold));
 }
+.board2d.has-playable .board2d__edge:not(.is-playable):not(.is-preview) line {
+  opacity: 0.12;
+}
+.board2d.has-playable .board2d__edge:not(.is-playable):not(.is-preview) .board2d__edge-label {
+  opacity: 0.35;
+}
 .board2d__edge-label {
   font-size: 6.5px;
   fill: var(--text-muted);
