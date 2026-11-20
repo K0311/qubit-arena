@@ -102,7 +102,8 @@ export function Board2D({
 
   return (
     <svg
-      className="board2d"
+      // With moves to show, the other lines fade so the playable paths stand out.
+      className={`board2d${playable.length > 0 ? ' has-playable' : ''}`}
       viewBox="-160 -100 320 200"
       role={decorative ? undefined : 'img'}
       aria-label={decorative ? undefined : 'Board'}

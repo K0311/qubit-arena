@@ -57,7 +57,7 @@ export function ResultOverlay({ view, room }: { view: GameViewData; room: Room }
   const seats = (Object.keys(view.handCounts) as PlayerId[]).sort();
 
   return (
-    <div className="overlay" role="dialog" aria-modal="true" aria-label={t.title}>
+    <div className="overlay overlay--result" role="dialog" aria-modal="true" aria-label={t.title}>
       <div className={`result panel panel--${tone === 'gold' ? 'gold' : tone}`}>
         <span className={`result__ball result__ball--${tone}`} aria-hidden="true">
           🏈

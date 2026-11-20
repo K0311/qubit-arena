@@ -33,6 +33,16 @@ function RouteSync() {
   return null;
 }
 
+/** Remounts on every path change so each screen fades in (ui-spec §13). */
+function RouteFade({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation();
+  return (
+    <div key={pathname} className="route-fade">
+      {children}
+    </div>
+  );
+}
+
 /** Routes from ui-spec §3. */
 export function App() {
   useEffect(() => {
@@ -51,19 +61,21 @@ export function App() {
       <ConnectionBanner />
       <InRoomBar />
       <RouteSync />
-      <Routes>
-        <Route path="/" element={<MainMenu />} />
-        <Route path="/play" element={<ModeSelect />} />
-        <Route path="/lobby" element={<Lobby />} />
-        <Route path="/room/:code" element={<RoomScreen />} />
-        <Route path="/game/:id" element={<GameScreen />} />
-        <Route path="/tutorial" element={<Placeholder title={en.menu.tutorial} />} />
-        <Route path="/tutorial/:lesson" element={<Placeholder title={en.menu.tutorial} />} />
-        <Route path="/settings" element={<SettingsScreen />} />
-        <Route path="/about" element={<AboutScreen />} />
-        <Route path="/study/*" element={<Placeholder title="Study" />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <RouteFade>
+        <Routes>
+          <Route path="/" element={<MainMenu />} />
+          <Route path="/play" element={<ModeSelect />} />
+          <Route path="/lobby" element={<Lobby />} />
+          <Route path="/room/:code" element={<RoomScreen />} />
+          <Route path="/game/:id" element={<GameScreen />} />
+          <Route path="/tutorial" element={<Placeholder title={en.menu.tutorial} />} />
+          <Route path="/tutorial/:lesson" element={<Placeholder title={en.menu.tutorial} />} />
+          <Route path="/settings" element={<SettingsScreen />} />
+          <Route path="/about" element={<AboutScreen />} />
+          <Route path="/study/*" element={<Placeholder title="Study" />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </RouteFade>
       <Toasts />
     </div>
   );

@@ -150,9 +150,35 @@ export function GateCard({
           <span className="gate-card__footer">{text.footer}</span>
         )}
       </button>
-      <div className="gate-card__hover" aria-hidden="true">
-        <GateCard kind={kind} size="detail" />
+      {/* Hover tip, not the full card: the 300 × 420 card covered the board's left side. Once the
+          card is selected the board shows the move itself, so the tip goes away. */}
+      {!selected && (
+        <div className="gate-card__hover" aria-hidden="true">
+          <GateTip kind={kind} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Compact hover tip for a hand card (ui-spec §8.1): name, rotation and board effect. */
+function GateTip({ kind }: { kind: CardKind }) {
+  const text = en.cards[kind];
+  return (
+    <div
+      className="gate-tip"
+      style={{ '--gate': gateColors[kind] } as React.CSSProperties}
+      data-testid="gate-tip"
+    >
+      <div className="gate-tip__head">
+        <GateTag kind={kind} />
+        <span className="gate-tip__name">{text.name}</span>
       </div>
+      <div className="gate-tip__body">
+        <MiniBloch kind={kind} />
+        <p className="gate-tip__text">{text.text}</p>
+      </div>
+      <p className="gate-tip__effect ket">{effectText(kind)}</p>
     </div>
   );
 }

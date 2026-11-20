@@ -1,6 +1,7 @@
 import {
   lazy,
   Suspense,
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -13,6 +14,7 @@ import { Board2D, type EdgeRef } from '../../components/board/board-2d';
 import { CAMERA_VIEWS, hasWebGL } from '../../components/board3d/layout';
 import '../../components/board3d/board-3d.css';
 import { CardBack, GateCard } from '../../components/cards/gate-card';
+import { Loader } from '../../components/ui/loader';
 import { Button } from '../../components/ui/button';
 import { Modal } from '../../components/ui/modal';
 import { en } from '../../i18n/en';
@@ -28,7 +30,7 @@ import { ResultOverlay } from './result-overlay';
 import { useAnimationPlayer } from '../../lib/anim/use-animation';
 import { AnimatedBoard2D, AnimatedStatePanel, CardFly, Dice } from './anim-hud';
 import { TeamChat } from './team-chat';
-import { Banner, Clocks, Scoreboard, TurnBar } from './hud';
+import { Banner, Clocks, Scoreboard, TurnBar, TurnToast } from './hud';
 import { GateReference, TeamPanel } from './side-panels';
 import { FullscreenButton } from './fullscreen';
 import './game.css';
@@ -96,6 +98,7 @@ export function GameScreen() {
     (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
   // visual-design §4: one queue turns new log entries into animations for every view of the board.
   const player = useAnimationPlayer(view, { speed: settings.speed, reduce: reduceMotion });
+  const isBusy = useCallback(() => player.busy(performance.now()), [player]);
 
   const viewer = view?.viewer ?? 'SPECTATOR';
   const you: PlayerId | null = viewer === 'SPECTATOR' ? null : viewer;
@@ -114,13 +117,14 @@ export function GameScreen() {
     () => (view && selected && mySide ? previewMove(view.qubits, selected.kind, mySide) : null),
     [view, selected, mySide],
   );
+  // Only on this player's turn: then the board fades every line their hand cannot use.
   const playable = useMemo<EdgeRef[]>(() => {
-    if (!view || !mySide) return [];
+    if (!view || !mySide || !myTurn) return [];
     return hand.flatMap((c) => {
       const e = previewMove(view.qubits, c.kind, mySide).edge;
       return e ? [e] : [];
     });
-  }, [view, hand, mySide]);
+  }, [view, hand, mySide, myTurn]);
 
   const play = () => {
     if (!canPlay || !selected) return;
@@ -157,12 +161,14 @@ export function GameScreen() {
   if (!view || !room) {
     return (
       <main className="screen" data-testid="game-screen">
-        <p className="muted">{en.common.loading}</p>
+        <Loader label={en.common.loading} />
       </main>
     );
   }
 
   const team = mode === 'TEAM';
+  // ui-spec §10: behind the result, the 3D board fills the screen in the low cinematic camera.
+  const cinematic = use3D && view.phase === 'FINISHED' && !reveal;
   const orientation: Side = mySide ?? 'BLUE';
   const sides: Side[] = orientation === 'BLUE' ? ['BLUE', 'RED'] : ['RED', 'BLUE'];
   const caption = myTurn
@@ -184,7 +190,7 @@ export function GameScreen() {
 
   return (
     <main
-      className={`game game--${team ? 'team' : 'solo'}${you ? '' : ' game--spectator'}`}
+      className={`game game--${team ? 'team' : 'solo'}${you ? '' : ' game--spectator'}${cinematic ? ' game--result' : ''}`}
       data-testid="game-screen"
     >
       {/* ui-spec §1: the stage is 16:9 and mobile is out of scope; upright, it is too small to play. */}
@@ -198,6 +204,7 @@ export function GameScreen() {
           <TurnBar mode={mode} turn={view.turn} you={you} />
           <Banner rows={rows} logLength={view.log.length} />
         </div>
+        <TurnToast active={myTurn} isBusy={isBusy} />
         <div className="game-actions">
           <Button variant="danger" size="small" onClick={() => setConfirmLeave(true)}>
             {en.game.leave}
@@ -233,7 +240,7 @@ export function GameScreen() {
                 <Board3D
                   {...boardProps}
                   qubits={view.qubits}
-                  camera={settings.camera}
+                  camera={cinematic ? 'LOW' : settings.camera}
                   active={sideOf(mode, view.turn)}
                   reduceMotion={reduceMotion}
                   player={player}
@@ -282,7 +289,7 @@ export function GameScreen() {
         </div>
 
         {you && (
-          <div className="game-hand" role="group" aria-label="Hand">
+          <div className={`game-hand${myTurn ? ' is-my-turn' : ''}`} role="group" aria-label="Hand">
             {hand.map((c, i) => {
               const isSel = c.id === selected?.id;
               return (

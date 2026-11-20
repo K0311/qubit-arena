@@ -32,6 +32,7 @@ import {
 import type { AnimationPlayer } from '../../lib/anim/player';
 import { restFrame } from '../../lib/anim/player';
 import type { Frame, Spot } from '../../lib/anim/timeline';
+import { Loader } from '../ui/loader';
 import './board-3d.css';
 
 export type Board3DProps = {
@@ -341,6 +342,7 @@ function Edge({
   gates,
   lit,
   playable,
+  dim,
   showLabel,
 }: {
   a: Position;
@@ -349,6 +351,8 @@ function Edge({
   gates: readonly string[];
   lit: boolean;
   playable: boolean;
+  /** Another line is playable or previewed, so this one steps back. */
+  dim: boolean;
   showLabel: boolean;
 }) {
   const { from, to } = edgeSegment(a, b);
@@ -370,19 +374,25 @@ function Edge({
           [ca.r, ca.g, ca.b],
           [cb.r, cb.g, cb.b],
         ]}
-        lineWidth={lit ? 4.5 : playable ? 3 : 1.8}
+        lineWidth={lit ? 4.5 : playable ? 3 : dim ? 1.4 : 1.8}
         transparent
-        opacity={lit ? 1 : playable ? 0.95 : 0.5}
+        opacity={lit ? 1 : playable ? 0.95 : dim ? 0.14 : 0.5}
       />
       {directed && (
         <mesh position={[p1[0] - dir.x * 0.12, y, p1[2] - dir.z * 0.12]} quaternion={quat}>
           <coneGeometry args={[0.11, 0.3, 16]} />
-          <meshBasicMaterial color={lit ? GOLD : stateColors[b]} />
+          <meshBasicMaterial
+            color={lit ? GOLD : stateColors[b]}
+            transparent
+            opacity={dim ? 0.25 : 1}
+          />
         </mesh>
       )}
       {showLabel && (
         <Html position={label} center zIndexRange={LABEL_Z}>
-          <div className={`b3d-gate${lit ? ' is-lit' : playable ? ' is-playable' : ''}`}>
+          <div
+            className={`b3d-gate${lit ? ' is-lit' : playable ? ' is-playable' : dim ? ' is-dim' : ''}`}
+          >
             {gates.map((g) => CARD_LABEL[g as keyof typeof CARD_LABEL]).join(', ')}
           </div>
         </Html>
@@ -840,18 +850,23 @@ export default function Board3D({
         />
         <MilkyWay />
         <Swirl brightness={swirl} motion={motion} />
-        {EDGES.map((e, i) => (
-          <Edge
-            key={i}
-            a={e.a}
-            b={e.b}
-            directed={e.directed}
-            gates={e.gates}
-            lit={preview?.edge ? matches(e.a, e.b, e.directed, preview.edge) : false}
-            playable={playable.some((m) => matches(e.a, e.b, e.directed, m))}
-            showLabel={showLabels}
-          />
-        ))}
+        {EDGES.map((e, i) => {
+          const lit = preview?.edge ? matches(e.a, e.b, e.directed, preview.edge) : false;
+          const canPlay = playable.some((m) => matches(e.a, e.b, e.directed, m));
+          return (
+            <Edge
+              key={i}
+              a={e.a}
+              b={e.b}
+              directed={e.directed}
+              gates={e.gates}
+              lit={lit}
+              playable={canPlay}
+              dim={(playable.length > 0 || !!preview?.edge) && !lit && !canPlay}
+              showLabel={showLabels}
+            />
+          );
+        })}
         {POSITIONS.map((p, i) => (
           <Dome
             key={p}
@@ -878,7 +893,11 @@ export default function Board3D({
         <Ball ball={ball} shape={ballShape} motion={motion} frames={frames} worldPos={ballPos} />
         {qubits && <Spheres frames={frames} motion={motion} />}
       </Canvas>
-      {!ready && <div className="board3d__loading">{en.common.loading}</div>}
+      {!ready && (
+        <div className="board3d__loading">
+          <Loader label={en.common.loading} size="small" />
+        </div>
+      )}
     </div>
   );
 }

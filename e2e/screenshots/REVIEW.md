@@ -36,6 +36,5 @@ Differences that ui-spec §15 already decides (the reference images break the ru
 
 | Item | Where | Note |
 |---|---|---|
-| Result background in the low cinematic camera | §10 | Cosmetic; good fit for P-8.3 (screenshots and video). The football and a line explaining a 0 : 0 Challenge win were added on 20 Nov |
 | Room page shows the room's deck, not the test deck | Room, e2e only | Real games use the room's deck; only the e2e server overrides it |
 | `/study/*` | §3 | Placeholder until P-7.3 |

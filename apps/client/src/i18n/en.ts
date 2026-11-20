@@ -133,6 +133,7 @@ export const en = {
     targetLabel: 'TARGET',
     endzone: (side: 'BLUE' | 'RED') => (side === 'BLUE' ? '+ endzone' : '− endzone'),
     yourTurn: 'YOUR TURN',
+    yourTurnHint: 'Pick a card from your hand',
     clockGame: 'GAME',
     clockTurn: 'TURN',
     deck: 'DECK',
