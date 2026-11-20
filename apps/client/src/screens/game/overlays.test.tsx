@@ -162,6 +162,8 @@ describe('Result overlay (ui-spec §10)', () => {
     expect(screen.getByTestId('result-winner').textContent).toBe('BLUE TEAM WINS');
     expect(screen.getByText('VICTORY')).toBeTruthy();
     expect(screen.getByTestId('result-reason').textContent).toBe('Quantum Challenge 5 : 0');
+    // A 0 : 0 win must say why the Challenge decided it.
+    expect(screen.getByText('Tied on points, so the Quantum Challenge decided it.')).toBeTruthy();
     fireEvent.click(screen.getByTestId('result-play-again'));
     expect(send).toHaveBeenCalledWith({ type: 'REMATCH' });
     expect(screen.queryByText('Take the learning check →')).toBeNull();

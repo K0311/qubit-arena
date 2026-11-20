@@ -46,6 +46,9 @@ function PlayerBadge() {
     >
       <span className="caption">{en.badge.label}</span>
       <span className="badge__name">{name}</span>
+      <span className="badge__edit" aria-hidden="true">
+        ✎
+      </span>
     </button>
   );
 }

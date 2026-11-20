@@ -312,6 +312,29 @@
 }
 @media (max-width: 1000px) {
   .lobby__grid {
+    /* minmax(0, …): a plain 1fr grew to the widest row and pushed the page past a phone screen. */
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* Phones: a room is its name, seats and the button; mode and status are in the filter and the
+   button text already. */
+@media (max-width: 600px) {
+  .lobby__header .btn {
+    white-space: nowrap;
+  }
+  .lobby-room {
+    grid-template-columns: minmax(0, 1fr) auto 96px;
+    padding: 12px 14px;
+  }
+  .lobby-room > :nth-child(2),
+  .lobby-room > :nth-child(5),
+  .lobby-room--head {
+    display: none;
+  }
+  .quick-tiles {
     grid-template-columns: 1fr;
+  }
+  .lobby-empty h2 {
+    font-size: 22px;
   }
 }

@@ -26,21 +26,26 @@ export function ResultOverlay({ view, room }: { view: GameViewData; room: Room }
     winner === 'DRAW' ? t.draw : !mySide ? null : winner === mySide ? t.victory : t.defeat;
   const tone = winner === 'BLUE' ? 'blue' : winner === 'RED' ? 'red' : 'gold';
 
-  const reason = (() => {
+  // The pill says how the game ended; the line under it says why that decides the winner, so a
+  // 0 : 0 win after a Quantum Challenge does not read as a mistake.
+  const [reason, why] = ((): [string, string] => {
     switch (view.endReason) {
       case 'TARGET':
-        return t.reasonTarget(view.config.targetScore);
+        return [t.reasonTarget(view.config.targetScore), t.whyTarget];
       case 'TIME':
-        return t.reasonTime;
+        return [t.reasonTime, t.whyMore];
       case 'NO_CARDS':
-        return t.reasonCards;
+        return [t.reasonCards, t.whyMore];
       case 'CHALLENGE':
       case 'DRAW':
         return stats.challenge
-          ? t.reasonChallenge(stats.challenge.BLUE, stats.challenge.RED)
-          : t.reasonDraw;
+          ? [
+              t.reasonChallenge(stats.challenge.BLUE, stats.challenge.RED),
+              winner === 'DRAW' ? t.whyDraw : t.whyChallenge,
+            ]
+          : [t.reasonDraw, t.whyDraw];
       default:
-        return '';
+        return ['', ''];
     }
   })();
 
@@ -54,17 +59,22 @@ export function ResultOverlay({ view, room }: { view: GameViewData; room: Room }
   return (
     <div className="overlay" role="dialog" aria-modal="true" aria-label={t.title}>
       <div className={`result panel panel--${tone === 'gold' ? 'gold' : tone}`}>
+        <span className={`result__ball result__ball--${tone}`} aria-hidden="true">
+          🏈
+        </span>
         {verdict && <span className={`result__verdict result__verdict--${tone}`}>{verdict}</span>}
         <h2 className={`result__winner result__winner--${tone}`} data-testid="result-winner">
           {winner === 'DRAW' ? t.drawTitle : t.wins(winner)}
         </h2>
-        <p className="result__score ket">
-          <span className="result__blue">{view.score.BLUE}</span> :{' '}
+        <p className="result__score num" aria-label={`${view.score.BLUE} : ${view.score.RED}`}>
+          <span className="result__blue">{view.score.BLUE}</span>
+          <span className="result__colon">:</span>
           <span className="result__red">{view.score.RED}</span>
         </p>
         <span className="pill pill--gold result__reason" data-testid="result-reason">
           {reason}
         </span>
+        {why && <p className="result__why muted">{why}</p>}
 
         <table className="result__table">
           <thead>
@@ -97,19 +107,21 @@ export function ResultOverlay({ view, room }: { view: GameViewData; room: Room }
         <dl className="result__summary">
           <div>
             <dt>{t.turns}</dt>
-            <dd>{stats.turns}</dd>
+            <dd className="num">{stats.turns}</dd>
           </div>
           <div>
             <dt>{t.entanglements}</dt>
-            <dd>{stats.entanglements}</dd>
+            <dd className="num">{stats.entanglements}</dd>
           </div>
           <div>
             <dt>{t.failedPunts}</dt>
-            <dd>{stats.failedPunts}</dd>
+            <dd className="num">{stats.failedPunts}</dd>
           </div>
           <div>
             <dt>{t.longestFog}</dt>
-            <dd>{stats.longestFogMs === null ? '—' : minutesSeconds(stats.longestFogMs)}</dd>
+            <dd className="num">
+              {stats.longestFogMs === null ? '—' : minutesSeconds(stats.longestFogMs)}
+            </dd>
           </div>
         </dl>
 

@@ -441,6 +441,13 @@
 }
 @media (max-width: 1000px) {
   .room__stage {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* Phones: the ready badge sat on top of the seat dome; put it in the card's flow instead. */
+@media (max-width: 600px) {
+  .seat-card__status {
+    position: static;
+    order: 1;
   }
 }

@@ -14,7 +14,7 @@ export function Scoreboard({ score, target }: { score: Record<Side, number>; tar
           <span className="hud-score__zone ket">({en.game.endzone(side)})</span>
           <span
             key={score[side]}
-            className="hud-score__value"
+            className="hud-score__value num"
             data-testid={side === 'BLUE' ? 'score-blue' : 'score-red'}
           >
             {score[side]}
@@ -23,7 +23,7 @@ export function Scoreboard({ score, target }: { score: Record<Side, number>; tar
       ))}
       <span className="hud-score__target" aria-label={en.game.target(target)}>
         {en.game.targetLabel}
-        <b className="hud-score__target-value ket">{target}</b>
+        <b className="hud-score__target-value num">{target}</b>
       </span>
     </div>
   );

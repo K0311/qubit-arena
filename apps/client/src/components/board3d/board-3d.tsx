@@ -128,6 +128,12 @@ function MilkyWay() {
   );
 }
 
+/**
+ * Swirl opacity at 100 % brightness. At 0.55 the 57 loops drowned the gate lines in the middle of
+ * the ring; at 0.28 they read as a backdrop and the gate paths stay clear. Settings still scales it.
+ */
+const SWIRL_OPACITY = 0.28;
+
 function Swirl({ brightness, motion }: { brightness: number; motion: boolean }) {
   // Measure the frame rate once; a slow machine gets fewer loops (P-5.1 plan).
   const [loops, setLoops] = useState(57);
@@ -153,7 +159,7 @@ function Swirl({ brightness, motion }: { brightness: number; motion: boolean }) 
     groups.current.forEach((g) => {
       const m = (g?.children[0] as THREE.LineSegments | undefined)?.material as
         THREE.LineBasicMaterial | undefined;
-      if (m) m.opacity = 0.55 * (brightness / 100) * pulse;
+      if (m) m.opacity = SWIRL_OPACITY * (brightness / 100) * pulse;
     });
   });
   if (brightness <= 0) return null;
@@ -169,7 +175,7 @@ function Swirl({ brightness, motion }: { brightness: number; motion: boolean }) 
             <lineBasicMaterial
               vertexColors
               transparent
-              opacity={0.55 * (brightness / 100)}
+              opacity={SWIRL_OPACITY * (brightness / 100)}
               depthWrite={false}
             />
           </lineSegments>

@@ -36,7 +36,6 @@ Differences that ui-spec §15 already decides (the reference images break the ru
 
 | Item | Where | Note |
 |---|---|---|
-| Result background in the low cinematic camera, trophy/football art | §10 | Cosmetic; good fit for P-8.3 (screenshots and video) |
+| Result background in the low cinematic camera | §10 | Cosmetic; good fit for P-8.3 (screenshots and video). The football and a line explaining a 0 : 0 Challenge win were added on 20 Nov |
 | Room page shows the room's deck, not the test deck | Room, e2e only | Real games use the room's deck; only the e2e server overrides it |
-| Orbitron's zero has a slash (Ø-like) in the scoreboard | §2.3 type | Font choice from the spec; readable, but could switch the score to the ket font if the team prefers |
 | `/study/*` | §3 | Placeholder until P-7.3 |
